@@ -1,40 +1,40 @@
 {
  "n": 8,
  "cosine_threshold": 0.9,
- "n_corpus": 5000,
+ "n_corpus": 8000,
  "n_ref_questions": 408,
  "total_overlap_8grams": 0,
- "max_cosine": 0.8182,
+ "max_cosine": 0.8269,
  "top_cosine_hits": [
   {
-   "cosine": 0.8182,
-   "synthetic_id": "SYN-TR-1594",
+   "cosine": 0.8269,
+   "synthetic_id": "SYN-TR-4228",
    "ref_file": "test-bank/brutal-bank-v1-frozen.json",
    "ref_id": "B-058"
   },
   {
-   "cosine": 0.7936,
-   "synthetic_id": "SYN-TR-1842",
-   "ref_file": "test-bank/brutal-bank-v1-frozen.json",
-   "ref_id": "B-133"
-  },
-  {
    "cosine": 0.7805,
-   "synthetic_id": "SYN-TR-4387",
+   "synthetic_id": "SYN-TR-0117",
    "ref_file": "ground-truth/ground-truth-v2-hma27-A.json",
    "ref_id": "H14"
   },
   {
-   "cosine": 0.7559,
-   "synthetic_id": "SYN-TR-2720",
-   "ref_file": "tests/fixtures/laya_maintenance_final_check.json",
-   "ref_id": "034"
+   "cosine": 0.7762,
+   "synthetic_id": "SYN-TR-2366",
+   "ref_file": "test-bank/brutal-bank-v1-frozen.json",
+   "ref_id": "B-142"
   },
   {
-   "cosine": 0.7469,
-   "synthetic_id": "SYN-VA-0247",
-   "ref_file": "ground-truth/ground-truth-v2-hma27-A.json",
-   "ref_id": "H5"
+   "cosine": 0.7758,
+   "synthetic_id": "SYN-TR-0267",
+   "ref_file": "test-bank/brutal-bank-v1-frozen.json",
+   "ref_id": "B-133"
+  },
+  {
+   "cosine": 0.7702,
+   "synthetic_id": "SYN-TR-2913",
+   "ref_file": "test-bank/brutal-bank-v1-frozen.json",
+   "ref_id": "B-192"
   }
  ],
  "per_ref_file": {
@@ -49,42 +49,38 @@
    "ref_questions": 230,
    "overlap_8grams": 0,
    "synthetic_ids_with_overlap": [],
-   "max_cosine": 0.8182,
+   "max_cosine": 0.8269,
    "overlap_8gram_hashes": []
   },
   "tests/fixtures/laya_maintenance_development.json": {
    "ref_questions": 48,
    "overlap_8grams": 0,
    "synthetic_ids_with_overlap": [],
-   "max_cosine": 0.6669,
+   "max_cosine": 0.6776,
    "overlap_8gram_hashes": []
   },
   "tests/fixtures/laya_maintenance_verification.json": {
    "ref_questions": 46,
    "overlap_8grams": 0,
    "synthetic_ids_with_overlap": [],
-   "max_cosine": 0.649,
+   "max_cosine": 0.6249,
    "overlap_8gram_hashes": []
   },
   "tests/fixtures/laya_maintenance_challenge.json": {
    "ref_questions": 34,
    "overlap_8grams": 0,
    "synthetic_ids_with_overlap": [],
-   "max_cosine": 0.6836,
+   "max_cosine": 0.6922,
    "overlap_8gram_hashes": []
   },
   "tests/fixtures/laya_maintenance_final_check.json": {
    "ref_questions": 34,
    "overlap_8grams": 0,
    "synthetic_ids_with_overlap": [],
-   "max_cosine": 0.7559,
+   "max_cosine": 0.7217,
    "overlap_8gram_hashes": []
   }
  },
- "sealed": {
-  "status": "QUEUED",
-  "reason": "hash index file does not exist; sealed files were NOT opened",
-  "trusted_command": "python3 scripts/check_ngram_leakage.py --build-hash-index test-bank/sealed/sealed-fresh-20.json test-bank/sealed/sealed-kannada-8.json --hash-index-out data/synthetic_v7_1/sealed-hash-index.json && python3 scripts/check_ngram_leakage.py --sealed-index data/synthetic_v7_1/sealed-hash-index.json"
- },
- "verdict": "PASS-READABLE-ONLY (sealed QUEUED)"
+ "sealed": null,
+ "verdict": "PASS"
 }
