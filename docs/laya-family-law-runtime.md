@@ -67,10 +67,12 @@ extractor from the repository root:
 python -B -m tests.laya_maintenance_backtest --split development --extractor structured --strict
 ```
 
-Use `--split verification` for the second bank. Both report raw exact
-provision sets, extra provisions, required clarifications, structural source
-audits, runtime errors and outcome hashes. The banks contain authored
-maintenance scenarios and include one unsupported-script case apiece.
+Use `--split verification` for the diagnosed regression bank, `--split
+challenge` for further adversarial cases, and `--split final_check` for the
+later frozen engineering check. The reports include exact provision sets,
+extra provisions, required clarifications, structural source audits, runtime
+errors and outcome hashes. The authored banks include unsupported-script
+cases to exercise the language boundary.
 
 ## Historical guided smoke evidence
 

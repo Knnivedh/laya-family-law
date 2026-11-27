@@ -25,14 +25,14 @@ CASE = re.compile(r"\b(?:case|proceedings?|petition|application|suit|hearing)\b"
 ORDER = re.compile(r"\b(?:order|ordered|fixed|awarded|granted)\b", re.I)
 DECREE = re.compile(r"\b(?:decree|(?:grant(?:ed|ing)\s+(?:me\s+)?(?:a\s+)?(?:divorce|judicial separation|nullity)))\b", re.I)
 PENDING = re.compile(
-    r"\b(?:pending|ongoing|going on|still hearing|still (?:in|before) (?:the |a )?(?:court|judge)|"
+    r"\b(?:pending|ongoing|going on|still hearing|(?:still|currently) being heard|still (?:in|before) (?:the |a )?(?:court|judge)|"
     r"before (?:the |a )?(?:court|judge)|next hearing|has not concluded|hasn't concluded|underway|in progress)\b",
     re.I,
 )
 DECREE_EFFECTIVE = re.compile(
     r"\b(?:(?:court|judge)\s+(?:has |had |already |is ){0,3}"
     r"(?:granted|entered|passed|issued|pronounced|passing|granting)|"
-    r"(?:was|has been|had been|is being|got)\s+(?:already\s+)?(?:granted|entered|passed|issued|pronounced)|"
+    r"(?:was|has\s+(?:already\s+)?been|had\s+(?:already\s+)?been|is being|got)\s+(?:already\s+)?(?:granted|entered|passed|issued|pronounced)|"
     r"decree\s+(?:ended|dissolved)|(?:ended|dissolved)\s+by\s+(?:a|the)\s+decree)\b",
     re.I,
 )
@@ -216,7 +216,7 @@ def separate_support_evidence(question: str) -> dict | None:
     return None
 
 REQUEST = re.compile(
-    r"\b(?:i\b.{0,96}\band\s+(?:need|want|seek|wish|intend to (?:request|apply|seek|ask))|"
+    r"\b(?:i\b.{0,96}\band\s+(?:(?:now|also|still)\s+){0,2}(?:need|want|seek|wish|intend to (?:request|apply|seek|ask))|"
     r"i\s+(?:really\s+|now\s+|only\s+|also\s+|just\s+|specifically\s+){0,2}"
     r"(?:want|need|seek|wish|would like|am asking|am trying|intend to (?:request|apply|seek|ask))|"
     r"i(?:'d|’d)\s+like|how\s+(?:to|do|can|could|may|should|would)|"
@@ -247,7 +247,12 @@ PERMANENT_REQUEST = re.compile(
     r"lump sum|financial aid|financial relief)\b",
     re.I,
 )
-RECOVERY_REQUEST = re.compile(r"\b(?:recover(?:y|ed|ing)?|collect(?:ed|ing|ion)?|enforc(?:e|ed|ing|ement)|claim)\b", re.I)
+RECOVERY_REQUEST = re.compile(
+    r"\b(?:recover(?:y|ed|ing)?|collect(?:ed|ing|ion)?|enforc(?:e|ed|ing|ement)|claim|"
+    r"(?:seek|want|need)\s+(?:the\s+)?(?:unpaid|missed|overdue|outstanding)\s+"
+    r"(?:ordered\s+)?(?:instal+ments?|payments?|amounts?|dues|sums?))\b",
+    re.I,
+)
 PAYMENTS_DUE = re.compile(
     r"\b(?:unpaid|missing|missed|arrears|owing|owed|owes|outstanding|balance|skipped|shortfall|overdue|remainder|"
     r"remaining\s+(?:sums?|amounts?|instal+ments?|payments?)|"
@@ -353,7 +358,7 @@ CHILD_ONLY = re.compile(
     re.I,
 )
 SELF_ONLY = re.compile(
-    r"\b(?:only for myself|just for myself|not for (?:my |our |the |any )?(?:children|child|son|daughter)|"
+    r"\b(?:(?:only|solely|exclusively|just)\s+for myself|not for (?:my |our |the |any )?(?:children|child|son|daughter)|"
     r"do not assess (?:\w+\s+){0,3}?(?:for|towards)\s+(?:my |our |the )?(?:children|child|son|daughter)|"
     r"(?:don't|do not|am not|['’]m not)\s+(?:asking|ask|seeking|seek|want)\s+(?:for\s+)?(?:any\s+)?(?:payments?|support|money|assistance|help)?"
     r"\s*(?:for|towards)\s+(?:my |our |the )?(?:children|child|son|daughter))\b",

@@ -282,6 +282,23 @@ class FamilyLawTests(unittest.TestCase):
                 answer = assess(question, lambda _: {"maintenance": "unknown"})
                 self.assertEqual(self.ids(answer), {section})
 
+    def test_common_word_order_preserves_explicit_procedural_evidence(self):
+        cases = (
+            ("I am the husband. My HMA marriage petition is still being heard. I need help with court fees.", "hma-24"),
+            ("The decree in my case under the Hindu Marriage Act has already been pronounced. I am the former wife and now wish to ask for permanent maintenance.", "hma-25"),
+            ("I need the unpaid ordered instalments under my BNSS 144 maintenance order. What can I do?", "bnss-144-3"),
+        )
+        for question, provision in cases:
+            with self.subTest(provision=provision):
+                self.assertEqual(self.ids(assess(question, lambda _: {"maintenance": "unknown"})), {provision})
+
+    def test_child_age_does_not_override_an_explicitly_personal_claim(self):
+        result = assess(
+            "My 12-year-old is provided for. I am the husband asking for money solely for myself from my spouse.",
+            lambda _: {"new_support": "yes", "minor_child": "yes"},
+        )
+        self.assertEqual(self.ids(result), set())
+
     def test_follow_up_can_correct_a_fact_stated_in_the_question(self):
         result = assess(
             "My HMA divorce petition is still pending. Can I get interim support?",
