@@ -5,13 +5,18 @@
 > into the exact article / section set that applies — in a fraction of a second
 > of model time per decision, with a full legal recheck before anything is returned.**
 
-**Status — read this first (2026-11-27):** the system scores **9.0/10 live on the
-16-question regression set** (16/16 exact; 9.8 raw, capped at 9.0 because prose,
-fresh held-out, Kannada and confirmation re-run are not measured yet). The
-**230-question brutal backtest is RUNNING LIVE in Colab right now** — its results
-are NOT in this repo yet and will be added under `results/` when the run finishes.
-Nothing in this README claims a result that has not been measured live. Where a
-piece is missing, it says so.
+**Status — read this first (2026-11-27, post-v6 brutal run):** on the **16-question
+dev regression set** (`v2` D1-A GT), the live v6 pipeline holds **`16/16` exact
+(`13/16` court, `16/16` esc-bool, `11/16` esc-kinds, `9.9` raw → capped `9.0/10`)**.
+On the **230-question out-of-sample brutal bank** (run live locally on RTX 5050 GPU),
+`v6-brutal` scored **`79/230` (`34.3%`) exact**, **micro-F1 `0.629`**, **`75` silent**,
+**`5` pre-recheck forbidden (`Fb`)**, **`1.9/10` (`FAIL`)**, plus **`5/20` sealed fresh**
+and **`1/8` sealed Kannada** (`0.43s/Q` mean GPU latency). All `v6-brutal` JSON/MD outputs
+are now filed in `results/`, **Graph v4** (`34/66/99`, 0 dangling edges) and **Prose
+Renderer v2** (`src/laya_prose_v2.py`, `246/246` `Fp=0`) are built & unit-tested, and
+the full updated problems/tasks ledger lives in §9 and
+`docs/pending-tasks-and-problems-ledger.md`. Nothing in this README claims an unmeasured
+result; where a piece is missing or verified only on a probe/subset, it says so.
 
 **This repo is public so another AI agent can pick the system up cold.** If you are
 that agent: start at [§1 Start here](#1-start-here-for-another-agent), then
@@ -127,14 +132,12 @@ User question (layman English / Kannada)
 | Version | File | Sections | Nodes | Edges | Status |
 |---|---|---|---|---|---|
 | v1 | `graph/laya-crpc-bns-section-decision-tree-v1.json` | — | — | — | Superseded |
-| v2 | `graph/laya-crpc-bns-section-decision-tree-v2.json` | 32 | 46 | 77 | Previous live version |
-| **v3** | `graph/laya-crpc-bns-section-decision-tree-v3.json` | **34** | **48** | **79** | **Current — used by the v6 notebook** |
+| v2 | `graph/laya-crpc-bns-section-decision-tree-v2.json` | 32 | 46 | 77 | Previous live version (frozen) |
+| v3 | `graph/laya-crpc-bns-section-decision-tree-v3.json` | 34 | 48 | 79 | Frozen baseline used by the v6 notebook |
+| **v4** | **`graph/laya-crpc-bns-section-decision-tree-v4.json`** | **34** | **66** | **99** | **Built & verified (`tests/test_graph_v4.py`); fixes all v3 dangling edges/typos & specifies Stage 2 v4 routing (`docs/v4-decision-graph-architecture.md`) — pending v7 runtime integration** |
 
-v3 = v2 + the D2 gate patch applied + two new sections: `hma-9` (HMA s.9,
-restitution of conjugal rights — for bank question B-018) and `pwdva-22`
-(PWDVA s.22, compensation orders — for B-019). Full change log:
-`graph/graph-v3-change-log.md`. Each section entry carries all 14 schema fields
-plus a choice-type `laya_question`.
+v3 = v2 + the D2 gate patch applied + `hma-9` and `pwdva-22` leaf stubs (`graph/graph-v3-change-log.md`).
+v4 = v3 built deterministically by `src/build_graph_v4.py` (`graph/graph-v4-change-log.md`): repairs all 3 pre-existing dangling edges, fixes `'hmga-6' -> 'hmga-1956-s6'`, canonicalizes all `related_sections` and `laya_question` fields, and adds `+18` nodes / `+20` edges for `hma-9`, `pwdva-22`, `hma-13b`, `hma-25` settlements, `hma-27` joint property, `claimant-applicability-gate` (`C8` male/parent), `pwdva-17/19` vs `18` independence, and empty-GT leaves.
 
 Graph-walk test (graph logic simulation, NOT live Laya): v1 15/34 → v2 33/34;
 Kannada 0/5 → 5/5.
@@ -267,50 +270,38 @@ errors, no category below 75%.
 
 ---
 
-## 7. Live results so far (measured in Colab, CPU, laya 0.5.5)
+## 7. Live results so far (Colab CPU v1–v5 & Local RTX 5050 GPU v6-brutal)
 
-| Run | Date (IST) | Notebook | Exact | Micro-F1 | Court | Escalates | Rating (frozen formula) |
-|---|---|---|---|---|---|---|---|
-| v1 | 2026-11-26 | v1 | 5/16 | 0.510 | 10/16 | 11/16 | **3.3/10** |
-| v3 | 2026-11-26 | v3-empty5 | 5/16 | 0.767 | 11/16 | 14/16 | **5.0/10** |
-| v4r | 2026-11-27 | v4r-residence-only | 10/16 | 0.905 | 13/16 | 14/16 | **7.3/10** |
-| **v5** | **2026-11-27** | **v5-precision** | **16/16** | **1.000** | **16/16** | **12/16** | **9.8 raw → capped 9.0/10** |
-| v6 brutal | in progress | v6-brutal | — | — | — | — | — |
+| Run | Date (IST) | Notebook / Set | Exact | Micro-F1 | Court | Escalates | Latency Mean | Rating (frozen formula) |
+|---|---|---|---|---|---|---|---|---|
+| v1 | 2026-11-26 | v1 (`16-Q`, Colab CPU) | 5/16 | 0.510 | 10/16 | 11/16 | — | **3.3/10** |
+| v3 | 2026-11-26 | v3-empty5 (`16-Q`, Colab CPU) | 5/16 | 0.767 | 11/16 | 14/16 | — | **5.0/10** |
+| v4r | 2026-11-27 | v4r (`16-Q`, Colab CPU) | 10/16 | 0.905 | 13/16 | 14/16 | 57.6s | **7.3/10** |
+| v5 | 2026-11-27 | v5-precision (`16-Q`, Colab CPU, old 57-sec GT) | 16/16 | 1.000 | 16/16 | 12/16 | 61.93s | **9.8 raw → capped 9.0/10** |
+| v6-reg | 2026-11-27 | v6-brutal (`16-Q` `v2` D1-A GT, RTX 5050 GPU) | **16/16** | **1.000** | 13/16 | 16/16 bool (`11/16` kinds) | **0.52s** | **9.9 raw → capped 9.0/10** |
+| **v6-brutal** | **2026-11-27** | **v6-brutal (`Brutal-230` frozen, RTX 5050 GPU)** | **79/230 (34.3%)** | **0.629** (`TP 225/FP 75/FN 190`) | **152/230** | **144/230 bool** (`48/230` kinds) | **0.43s** (`1.00s` max) | **1.9/10 (`FAIL`)** |
+| v6-fresh | 2026-11-27 | v6-brutal (`Sealed Fresh-20`, RTX 5050 GPU) | 5/20 | 0.635 | 8/20 | 17/20 bool (`6/20` kinds) | 0.45s | **3.6/10** *(measured only)* |
+| v6-kn | 2026-11-27 | v6-brutal (`Sealed Kannada-8`, RTX 5050 GPU) | 1/8 | 0.083 | 1/8 | 1/8 bool (`1/8` kinds) | 0.57s | **1.4/10** *(measured only)* |
 
-Result files: `results/live-laya-colab-results-v{1,3,4r,5}.json/.md`.
+Result files: `results/live-laya-colab-results-v{1,3,4r,5}.json/.md`, `results/live-laya-colab-results-v6-brutal-final.json`, `results/live-laya-colab-results-v6-brutal.md`, `results/live-laya-colab-results-v6-brutal-B{1..10}.json`, `results/live-laya-colab-results-v6-brutal-regression.json/.md`, and `results/live-laya-colab-results-v6-sealed-{fresh-20,kannada-8}.json`. Local RTX 5050 (`bf16`) vs Colab CPU (`v5`) matched within `mean_abs_diff = 0.002306` across all 160 raw `16-Q` prompts with `0` fired-issue diffs.
 Live notebook copies: v1 https://colab.research.google.com/drive/1pY2WJAyN0vyEvk462prTeTswROQSLnTa ·
 v3 https://colab.research.google.com/drive/1vXB7ckTFKhscsHH1zbVdKV13ovGpnntr ·
 v4r https://colab.research.google.com/drive/1GcSvGZbluEn4UsqkgYm-MoQYtnLE4bgK ·
 v5 https://colab.research.google.com/drive/1WkA_j2NvB_-fiUdGbcoViFrjpA6oZDN- ·
 v6 https://colab.research.google.com/drive/1kA784vVpU87S34og9CpuQcRvUPTj8yKa
 
-### Honest limits — do not soften these
+### Honest limits — measured in the live brutal run
 
-- **v5's 16/16 is an oracle ceiling, not generalisation proof.** The evidence
-  gates run on hand-annotated facts, and the 16 questions are now a frozen
-  regression set. The brutal 230 is the first real test.
-- **The v5 fixes mostly do not generalise as shipped** (custody regex overfit,
-  guard margin 0.0105, H1 knife-edge 0.0052, divorce-gate sub-choice wrong 8/9).
-  See `docs/v6-deep-dive-report.md`.
-- **Escalates fell 14/16 → 12/16 in v5** (H2, H4, H7, H15) because the false
-  maintenance fires that carried the quantum boilerplate are now gated out.
-- **Latency gate FAILS on CPU:** v5 mean 61.93 s/question (max 138.2 s) vs the
-  ≤ 15 s budget. Only a recorded T4 GPU run can pass it; sub-second
-  classification is not achievable with this model/setup.
-- **v6 brutal ceiling is 228/230, not 230/230:** B-018 (`hma-9`) and B-019
-  (`pwdva-22`) are guaranteed misses — graph v3 adds only Stage-2 leaf nodes;
-  no Stage 1 route emits them yet.
-- **Known scoring gaps in v6:** `fact` kind (44 uses; 7 fact-only questions are
-  guaranteed misses), `procedure` non-birth branches (30), `court` forum-ask (6),
-  `demand` (B-010/B-135), safety (B-108). Recorded, never silently mapped to True.
-- **Pre-existing graph defects (v2, untouched):** 3 edges point at non-nodes
-  (`escalate_clarify`, `bns-316`, `escalate_demand_first`) and a wrong id
-  (`hmga-6` in bnss-144's related_sections; real id `hmga-1956-s6`).
-- **Sealed maintenance-only court scores will show systematic misses** (sealed GT
-  expects Family Court; the pipeline follows the 16-set Magistrate convention).
-- **ChatGPT's Sukhdev Singh v. Sukhbir Kaur (Feb 2025) citation for HMA 25 is
-  unverified — verify before citing.** Both model consultations (Gemini + ChatGPT)
-  agree the gates are an oracle upper bound; their summaries are in `docs/`.
+- **v5/v6's `16/16` did NOT generalise to unseen paraphrases (`79/230 = 34.3%`, `5/20` fresh, `1/8` Kannada):**
+  Out of `60` English silent (`kept=[]`) brutal questions (`75` total incl. `15` Kannada), **`35/60` already had full-text Laya `stage1_raw >= threshold`** before the v5 English regex gates zeroed them (`_CUSTODY_PATTERNS` caused `37/41` `gwa-1890` misses and `0/20` on `C5`; `money_fact` caused `17/16` `bnss-144`/`pwdva-20` misses and `0/8` on `C12`; `gold_fact` blocked all `8` `hma-27` joint flat/property items; `residence_claim` blocked `13` `pwdva-17/19` items).
+- **Kannada (`C13` `1/16`, `Sealed Kannada-8` `1/8`):** English regex gates + English-only `PIXMELT/laya` missed `28/28` C13 GT sections (passing only empty `B-218`). Probe testing (`docs/v7-multilingual-prose-latency-design.md`) shows `convaiinnovations/laya` `multilingual` fails (`0/16–6/16`), whereas sentence-split `NLLB-200-distilled-600M` + generic tail-drop + `PIXMELT/laya` reaches **`14/16` (`0.949` F1, `0` silent)** on `C13`.
+- **Stage 1 zero-shot plateau vs v7 Stage 0/1 training (`docs/v7-stage1-semantic-probes.md`):** Removing regex vetoes in GPU probes (`102-Q`) lifted recall to `89.3%` (`Silent=1/94`), `birth_certificate` to `1.000`, `joint_property` to `1.000`, and `custody` to `0.893`, **but** zero-shot precision capped at `0.702` (`0.786` F1) — confirming trained Stage 0/1 heads (`P1.2`) are required for `>=0.95` F1.
+- **Stage 2 & Graph v3 gaps exposed (`Fb=5`, `C7/C8/C12`):** Old `stage2()` lacks `hma-13b` (`FN=5`), `hma-9` (`B-018`), `pwdva-22` (`B-019`), `hma-25` lump-sum settlements (`FN=4`), `hma-27` joint property (`FN=8`), male/parent claimant exclusions (`C8`), `pwdva-17/18/19` decoupling, and Layer A `hma-24` filtering (`Fb=5`). All structural fixes are now encoded in `graph/laya-crpc-bns-section-decision-tree-v4.json` and `docs/v4-decision-graph-architecture.md`.
+- **Latency (`G14`):** **Passes cleanly on RTX 5050 GPU** (`0.43s/Q` mean, `1.00s` max on `v6-brutal`; `0.303s/Q` mean warmed `fp16` `predict_batch`), **FAILS on CPU** (`61.93s/Q` Colab CPU `v5`; `17.8s/Q` local 4Q CPU sample). Colab T4 `fp16` timing remains unverified.
+- **Post-D1-A 16-Q & Brutal GT splits (`D-V4-1..4`):** `16-Q` `H3/H10/H15` kept `['Family Court', 'Magistrate']` despite D1-A leaving `bns-316` (`13/16` court), and `16-Q` omitted `safety` (`11/16` kinds). `brutal-bank-v1-frozen` omits `hmga-1956-s6` & `welfare-principle` (`5` pure vocab misses; `84/230` without them).
+- **Pre-existing v2/v3 graph defects kept intact inside frozen `v2`/`v3` files** and **fixed in `graph/laya-crpc-bns-section-decision-tree-v4.json`**.
+- **Prose renderer & doc bug fix:** Cell 9 prose wasn't wired into `v6` (`9.0` cap remains); a deterministic `Fp=0` renderer + verifier (`src/laya_prose_v2.py`) is now built & unit-tested (`246/246`, fixing a pre-D1-A `HMA s.27` leak found in `docs/v6-lane4-prose-latency.md` §2.3.3).
+- **ChatGPT's Sukhdev Singh v. Sukhbir Kaur (Feb 2025) citation for HMA 25 remains unverified.**
 
 ---
 
@@ -322,9 +313,10 @@ laya-family-law/
 ├── .gitignore                    # model weights + caches are never committed
 ├── graph/                        # the decision graph (the heart of the system)
 │   ├── laya-crpc-bns-section-decision-tree-v1.json
-│   ├── laya-crpc-bns-section-decision-tree-v2.json   # 32 sections / 46 nodes / 77 edges
-│   ├── laya-crpc-bns-section-decision-tree-v3.json   # 34 / 48 / 79 — CURRENT
-│   ├── graph-v3-change-log.md
+│   ├── laya-crpc-bns-section-decision-tree-v2.json   # 32 sections / 46 nodes / 77 edges (frozen)
+│   ├── laya-crpc-bns-section-decision-tree-v3.json   # 34 / 48 / 79 (frozen baseline)
+│   ├── laya-crpc-bns-section-decision-tree-v4.json   # 34 / 66 / 99 — 0 dangling edges (next live build)
+│   ├── graph-v3-change-log.md / graph-v4-change-log.md
 │   ├── lanes/                    # per-issue lane outputs (custody, maintenance, procedure, residence, stridhan)
 │   └── v2-lanes/                 # v2 build lanes: phrasebook, Stage-1 mapping, Stage-2 recheck, adversarial tests
 ├── ground-truth/                 # frozen ground truth + the HMA 27 settlement
@@ -338,9 +330,10 @@ laya-family-law/
 │   ├── brutal-bank-freeze-note.md / brutal-bank-second-rater-report.md / brutal-bank-adjudication.md
 │   └── sealed/                   # sealed held-out sets: fresh-20 + Kannada-8 + freeze note
 ├── notebooks/                    # live Colab notebooks v1–v6 (the pipeline lives here)
-├── src/                          # deterministic notebook builders + graph merge/replay helpers
-├── docs/                         # gate definition, 10/10 plan, v5/v6 reports, consultations, designs
-└── results/                      # live Colab result JSONs + summaries (v1, v3, v4r, v5; v6 to come)
+├── src/                          # notebook builders, Graph v4 builder, Lane 4 Prose v2, local brutal runner/analyzer
+├── tests/                        # offline integrity & verification tests (test_graph_v4.py, test_prose_renderer_v2.py)
+├── docs/                         # gate definition, 10/10 plans, v4/v7 blueprints, Stage 1 probes, pending ledger
+└── results/                      # live result JSONs + summaries (v1, v3, v4r, v5 Colab + v6-brutal RTX 5050)
 ```
 
 **Frozen-file hashes (verify before any run):**
@@ -363,50 +356,53 @@ laya-family-law/
 
 ## 9. Pending tasks, end to end
 
-Every item states its honest status. **Missing ≠ done. In progress ≠ done.**
+Every item states its verified live state (full cross-cutting audit in
+[`docs/pending-tasks-and-problems-ledger.md`](docs/pending-tasks-and-problems-ledger.md)).
+**Missing ≠ done. Built-in-unit-test ≠ verified end-to-end live.**
 
-### P0 — The brutal backtest (the accuracy number for integration)
-
-| # | Task | Status |
-|---|---|---|
-| P0.1 | **Brutal 230 live Colab run** — v6 notebook, 10 batches (B1–B9 of 25, B10 of 5), no tuning between batches; per-batch JSONs filed in `results/` as they land | **IN PROGRESS (live since 2026-11-27 ~10:56 IST, ~4 h CPU)** |
-| P0.2 | 16-question regression under corrected GT (Cell 8 of the v6 notebook) — expected 16/16 per the offline re-base | IN PROGRESS (same run, Cell 8) |
-| P0.3 | Sealed fresh-20 live score (Cell 20) — measured number only until the G2 amendment (16 → 20) is signed | IN PROGRESS (same run, Cell 20) |
-| P0.4 | Sealed Kannada-8 live score (Cell 21) | IN PROGRESS (same run, Cell 21) |
-| P0.5 | Per-question latency for every question + G14 verdict (mean ≤ 15 s, max ≤ 30 s) | IN PROGRESS — **expected FAIL on CPU** (v5 mean 61.93 s) |
-| P0.6 | Final cumulative scoring + pass/fail vs the brutal pass bar (§6) + Wilson interval + brutal rating (capped 9.0, Fp NOT MEASURED) | WAITING on P0.1 |
-| P0.7 | **Confirmation re-run** — the full gate a second time, zero code changes, frozen hashes | PLANNED, NOT RUN (only after P0.6) |
-| P0.8 | Gate-row pass/fail table for every row G1–G16 (see `docs/brutal-v6-build-report.md` §7) | IN PROGRESS (produced by the v6 notebook's final cell) |
-
-### P1 — Missing pieces that cap the score
+### P0 — The brutal backtest (completed locally on RTX 5050 GPU; confirmation re-run pending v7)
 
 | # | Task | Status |
 |---|---|---|
-| P1.1 | **Prose renderer** — turns the classified payload into user-facing prose without inventing law (designs exist: `docs/prose-renderer-design.md`, `docs/v6-lane4-prose-latency.md`, ChatGPT "Approved Legal Payload", Gemini "Plan-Realize-Verify"). Until it exists and is measured, Fp is NOT MEASURED and the rating is capped at 9.0 | **MISSING — NOT BUILT** |
-| P1.2 | **Automatic Stage-0 fact extraction** — replaces the hand-annotated oracle facts with a real extractor (10 atomic facts, three-state supported/contradicted/unknown, evidence spans; cheapest path per ChatGPT: frozen-encoder heads on the 421M ModernBERT; per Gemini: ABSENT/BACKGROUND/OPERATIVE frame + soft gating). Needs 200–400 labelled questions in scenario families | **MISSING — NOT BUILT** (agreed next build after the brutal run) |
-| P1.3 | **Typed escalations (D5/D9)** — replace the boolean escalate with typed kinds (custody, residence, recovery, procedure, fact, …) to lift escalates from 12/16 toward 16/16. Designed in `docs/v6-deep-dive-report.md` + both model consultations; the v6 notebook already scores BOTH boolean and kinds | DESIGNED, NOT BUILT |
-| P1.4 | **T4 GPU run for the latency gate (G14)** — needs owner approval; T4 timings are unverified, no T4 numbers claimed | NOT RUN — needs approval |
-| P1.5 | **Stage 1 routes for `hma-9` and `pwdva-22`** — new issue prompt + Stage-2 route so B-018/B-019 can be answered at all (raises the brutal ceiling from 228/230 to 230/230) | MISSING — needs a pipeline change |
+| P0.1 | **Brutal 230 live run** — v6 notebook (`B1–B10`, no tuning between batches), filed in `results/` | **DONE (RTX 5050 GPU)** — `79/230` exact (`34.3%`), micro-F1 `0.629`, `75` silent, `Fb=5`, **`1.9/10` (`FAIL`)** |
+| P0.2 | 16-question regression under corrected `v2` D1-A GT (Cell 8) | **DONE** — `16/16` exact (`13/16` court, `16/16` esc-bool, `11/16` esc-kinds, `9.0/10` capped) |
+| P0.3 | Sealed fresh-20 live score (Cell 20) — measured number only until G2 amendment signed | **DONE** — `5/20` exact, micro-F1 `0.635`, `8/20` court, `17/20` esc-bool, `3` silent, `Fb=1` |
+| P0.4 | Sealed Kannada-8 live score (Cell 21) | **DONE** — `1/8` exact (`KN5` `hma-13`), micro-F1 `0.083`, `6` silent |
+| P0.5 | Per-question latency & `G14` verdict (mean ≤ 15 s, max ≤ 30 s) | **DONE (RTX 5050 passes `0.43s/Q` mean / `1.00s` max)**; CPU fails (`17.8s/Q` local, `61.93s/Q` Colab); Colab T4 still unverified |
+| P0.6 | Final cumulative scoring + pass/fail vs §6 bar + Wilson interval + filing | **DONE** (`results/live-laya-colab-results-v6-brutal-final.json` & `.md`) |
+| P0.7 | **Confirmation re-run** — the full gate a second time on fixed `v7`, zero code changes, frozen hashes | **OPEN** (blocked on building `v7` fixes) |
+| P0.8 | Gate-row pass/fail evaluation vs §3.2 (`11/12` checked criteria failed in v6, `prose` unmeasured) | **DONE** |
 
-### P2 — Verification and correctness
-
-| # | Task | Status |
-|---|---|---|
-| P2.1 | Kannada C13 native-speaker confirmation (second rater verified at working-reading level only) | OPEN |
-| P2.2 | G2 amendment sign-off (fresh set 16 → 20; prepared text in `docs/brutal-v6-build-report.md` §8 — gate file NOT rewritten until signed; never trim 20 → 16) | PREPARED, NOT SIGNED |
-| P2.3 | Fix the 3 dangling graph edges + wrong `hmga-6` id (§7) | OPEN (recorded, untouched in v3) |
-| P2.4 | Re-verify the un-verified citations (ChatGPT's Sukhdev Singh v. Sukhbir Kaur, Feb 2025, for HMA 25; Balkrishna / Babulal / Krishna Kumar Gupta for HMA 27) before citing | OPEN |
-| P2.5 | Verify the HMA 27 judgment paras 3–13, 15–17, 19 in full (settlement relied on the operative finding) | OPEN |
-| P2.6 | B-022 / hma-25 flagged as thinnest use in the bank (kept by both raters + adjudicator — watch it in the brutal results) | OPEN — watch item |
-
-### P3 — After the brutal run
+### P1 — Architecture & model upgrades to lift `1.9/10` brutal → `10/10` (`v7`)
 
 | # | Task | Status |
 |---|---|---|
-| P3.1 | File all v6 batch + final result JSONs in `results/` and update the §7 table with the measured brutal numbers | WAITING on P0.1 |
-| P3.2 | Fix whatever the brutal run exposes — one fix round, then a fresh confirmation re-run (P0.7). Never tune between batches of the same run | WAITING on P0.6 |
-| P3.3 | Generalisation fixes from the v6 deep dive (custody-regex overfit, guard margin, H1 knife-edge, divorce-gate sub-choice) | DESIGNED in `docs/v6-deep-dive-report.md`, NOT BUILT |
-| P3.4 | Standalone pipeline source (today the pipeline lives only in the notebooks + builders; `src/` has no runnable classifier yet) | MISSING — see `src/README.md` |
+| P1.1 | **Prose renderer & automated `Fp=0` check** (`G12`) | **BUILT & UNIT-TESTED** — `src/laya_prose_v2.py` + `tests/test_prose_renderer_v2.py` (`246/246` + `15/15` mutants pass, `Fp=0`, fixed `HMA s.27` leak in `v6-lane4`); **needs wiring into `v7` live notebook + blind rater audit** |
+| P1.2 | **Stage 0/1 semantic fact & issue extraction** (replacing English regex vetoes that caused `35/60` English silent misses) | **PROBED ON GPU (`v1–v4`) + DESIGNED** (`docs/v7-stage1-semantic-probes.md`: cuts English silent `60 -> 1/94`, `89.3%` recall, `0.786` zero-shot F1); **head training on clean synthetic data NEEDED** to push precision `0.70 -> >=0.95` |
+| P1.3 | **Graph v4 Stage 2 routing, Claimant-Sex/Role (`C8`), `PWDVA 17/18/19` split, Layer A (`Fb=0`), & 9-kind `escalate_v4`** | **GRAPH BUILT & ARCHITECTED** (`graph/laya-crpc-bns-section-decision-tree-v4.json`, `docs/v4-decision-graph-architecture.md`); **runtime Python `stage2_v4` / `court_for_v4` implementation PENDING** |
+| P1.4 | **Colab T4 GPU `fp16` latency & accuracy parity run** (`G14` cloud verification) | **OPEN** — RTX 5050 GPU already passes `0.303s/Q` batched (`docs/v7-multilingual-prose-latency-design.md`); Colab T4 needs cloud verification |
+| P1.5 | **Stage 1/2 routes for `hma-9`, `pwdva-22`, `hma-13b`, `hma-25` settlements, `hma-27` joint property** | **NODES WIRED IN GRAPH v4**; Stage 1/2 Python runtime + trained heads **PENDING** |
+| P1.6 | **Kannada `C13` / `G3` sentence-split `NLLB + PIXMELT` bilingual routing** | **PROBED (`14/16 = 87.5%` exact, `0.949` F1, `0` silent on `C13`, `0.35s/Q`)** in `docs/v7-multilingual-prose-latency-design.md`; **integration into `v7` runtime PENDING** |
+
+### P2 — Verification, governance & ground-truth alignment
+
+| # | Task | Status |
+|---|---|---|
+| P2.1 | Kannada C13 native-speaker confirmation | OPEN |
+| P2.2 | G2 amendment sign-off (`16 -> 20` fresh set) + `D-V4-1..4` (`H3/H10/H15` `16-Q` court, `16-Q` `safety` kind, brutal custody vocab `hmga-1956-s6`/`welfare-principle`, `hma-25` settlement `Fb` rule) | OPEN (documented in `docs/v4-decision-graph-architecture.md` §7) |
+| P2.3 | Fix the 3 pre-existing v2/v3 dangling graph edges + `'hmga-6'` typo + non-canonical `related_sections` | **DONE in Graph v4** (`src/build_graph_v4.py`, `tests/test_graph_v4.py`); `v2`/`v3` remain untouched frozen snapshots |
+| P2.4 | Independent verification of citations (*Sukhdev Singh v. Sukhbir Kaur*, *Balkrishna / Babulal / Krishna Kumar Gupta*) | OPEN |
+| P2.5 | Full HMA 27 judgment paras 3–13, 15–17, 19 check | OPEN |
+| P2.6 | `B-022` / `hma-25` settlement watch item (failed in `v6` due to `decree=False` Layer A veto) | DIAGNOSED; solved in Stage 2 `v4` (`lump_sum_settlement`) |
+
+### P3 — Packaging, `v7` build & confirmation
+
+| # | Task | Status |
+|---|---|---|
+| P3.1 | File all `v6-brutal` JSONs + summary into `results/` and update §7 + §9 | **DONE** |
+| P3.2 | Implement full `v7` pipeline (`Stage 0/1` trained heads + `NLLB` Kannada Stage 0 + `Stage 2 v4` + `laya_prose_v2` + `predict_batch`), run live 274-Q verification + `P0.7` confirmation re-run | **NEXT BUILD MILESTONE** |
+| P3.3 | Stage 1 regex-overfit / guard-margin / sub-choice generalisation fixes | PROBED (`docs/v7-stage1-semantic-probes.md`); merges into P3.2 |
+| P3.4 | Standalone Python package in `src/` | **PARTIAL** — `src/build_graph_v4.py`, `src/laya_prose_v2.py`, `src/run_v6_brutal_local.py`, `src/analyze_v6_brutal.py` now in `src/` + `tests/`; full unified classifier `v7` next |
 
 ---
 
@@ -431,9 +427,12 @@ Every item states its honest status. **Missing ≠ done. In progress ≠ done.**
 
 - Fresh retest that started this work (Nov 2026): `docs/test-report.md`,
   `docs/test-report-v2-layman.md`
-- 10/10 plan: `docs/laya-10-10-exact-plan.md` · Gate: `docs/laya-10-10-gate-definition.md`
-- v5 precision merge: `docs/v5-precision-report.md` · v6 deep dive: `docs/v6-deep-dive-report.md`
-- Brutal test design: `docs/brutal-test-200-plan.md` · v6 build: `docs/brutal-v6-build-report.md`
+- 10/10 plans & blueprints: `docs/laya-10-10-exact-plan.md`, `docs/laya-10-10-gate-definition.md`,
+  `docs/v4-decision-graph-architecture.md`, `docs/v7-stage1-semantic-probes.md`,
+  `docs/v7-multilingual-prose-latency-design.md`, `docs/pending-tasks-and-problems-ledger.md`
+- Live brutal summary & prior deep dives: `results/live-laya-colab-results-v6-brutal.md`,
+  `docs/v5-precision-report.md`, `docs/v6-deep-dive-report.md`, `docs/brutal-v6-build-report.md`
+- Brutal test design: `docs/brutal-test-200-plan.md`
 - Model consultations: `docs/chatgpt-v6-consultation.md`, `docs/gemini-v6-consultation.md`
 - The cancelled LLaMA head-to-head: `docs/backtest-laya-vs-llama8b.md`
   (owner cancelled it 2026-11-26 — only Laya inference is tested now)

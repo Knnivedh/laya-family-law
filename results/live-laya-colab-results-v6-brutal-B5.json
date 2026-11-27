@@ -1,0 +1,5990 @@
+{
+ "batch": "B5",
+ "question_ids": [
+  "B-101",
+  "B-102",
+  "B-103",
+  "B-104",
+  "B-105",
+  "B-106",
+  "B-107",
+  "B-108",
+  "B-109",
+  "B-110",
+  "B-111",
+  "B-112",
+  "B-113",
+  "B-114",
+  "B-115",
+  "B-116",
+  "B-117",
+  "B-118",
+  "B-119",
+  "B-120",
+  "B-121",
+  "B-122",
+  "B-123",
+  "B-124",
+  "B-125"
+ ],
+ "aggregate": {
+  "label": "B5",
+  "n": 25,
+  "exact": "6/25",
+  "exact_count": 6,
+  "mean_precision": 0.387,
+  "mean_recall": 0.413,
+  "micro_precision": 0.583,
+  "micro_recall": 0.412,
+  "micro_f1": 0.483,
+  "micro_tp_fp_fn": [
+   14,
+   10,
+   20
+  ],
+  "court_correct": "19/25",
+  "escalates_bool_correct": "9/25",
+  "escalates_kinds_correct_strict": "4/25",
+  "escalates_kinds_correct_fact_excluded": "9/25",
+  "silent_count": 12,
+  "silent_ids": [
+   "B-101",
+   "B-102",
+   "B-103",
+   "B-104",
+   "B-105",
+   "B-106",
+   "B-108",
+   "B-109",
+   "B-110",
+   "B-111",
+   "B-115",
+   "B-119"
+  ],
+  "forbidden_before_recheck_total": 1,
+  "forbidden_ids": [
+   "B-118"
+  ],
+  "model_errors": 0,
+  "model_error_ids": [],
+  "per_category_exact": {
+   "C5": "0/10",
+   "C6": "6/15"
+  },
+  "per_category_min_exact": 0.0,
+  "escalates_on_empty_kept": 3,
+  "hma27_gt_note_ids": [
+   "B-111",
+   "B-114",
+   "B-119",
+   "B-122",
+   "B-123"
+  ],
+  "latency_mean_s": 0.41,
+  "latency_max_s": 0.67
+ },
+ "per_question": [
+  {
+   "id": "B-101",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": false,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.32
+  },
+  {
+   "id": "B-102",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [
+    "ESCALATE — no section kept, court cannot be derived"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": false,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "court"
+   ],
+   "gt_escalation_kinds": [
+    "custody"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.3
+  },
+  {
+   "id": "B-103",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: maintenance blocked (dominant=divorce, full=0.0002<=0.01, lift=0.2800<0.80)",
+    "single-issue guard: violence blocked (dominant=divorce, full=0.0001<=0.01, lift=0.0002<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody",
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.4
+  },
+  {
+   "id": "B-104",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": false,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.29
+  },
+  {
+   "id": "B-105",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: birth_certificate blocked (dominant=custody, full=0.0004<=0.01, lift=0.0349<0.80)"
+   ],
+   "court_live": [
+    "ESCALATE — no section kept, court cannot be derived"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": false,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "court"
+   ],
+   "gt_escalation_kinds": [
+    "custody",
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.41
+  },
+  {
+   "id": "B-106",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: stridhan blocked (dominant=custody, full=0.0065<=0.01, lift=0.1241<0.80)",
+    "single-issue guard: violence blocked (dominant=custody, full=0.0000<=0.01, lift=0.0683<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=custody, full=0.0001<=0.01, lift=0.0553<0.80)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody",
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.67
+  },
+  {
+   "id": "B-107",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.333,
+   "recall": 1.0,
+   "tp": 1,
+   "fp": 2,
+   "fn": 0,
+   "pred_ids": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "single-issue guard: violence blocked (dominant=custody, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "custody"
+   ],
+   "gt_escalation_kinds": [
+    "custody",
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.31
+  },
+  {
+   "id": "B-108",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody",
+    "safety"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.38
+  },
+  {
+   "id": "B-109",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 3,
+   "pred_ids": [],
+   "gt_ids": [
+    "bnss-144",
+    "gwa-1890",
+    "pwdva-20"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": false,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody",
+    "quantum"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.38
+  },
+  {
+   "id": "B-110",
+   "category": "C5",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.36
+  },
+  {
+   "id": "B-111",
+   "category": "C6",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "hma-27"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: violence blocked (dominant=divorce, full=0.0001<=0.01, lift=0.0379<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.49
+  },
+  {
+   "id": "B-112",
+   "category": "C6",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 1,
+   "fp": 0,
+   "fn": 0,
+   "pred_ids": [
+    "hma-13"
+   ],
+   "gt_ids": [
+    "hma-13"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.47
+  },
+  {
+   "id": "B-113",
+   "category": "C6",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 0,
+   "pred_ids": [],
+   "gt_ids": [],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [
+    "ESCALATE — no section kept, court cannot be derived"
+   ],
+   "court_expected": [],
+   "court_correct": false,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "court"
+   ],
+   "gt_escalation_kinds": [
+    "procedure"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.28
+  },
+  {
+   "id": "B-114",
+   "category": "C6",
+   "exact": false,
+   "precision": 1.0,
+   "recall": 0.5,
+   "tp": 1,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [
+    "hma-13"
+   ],
+   "gt_ids": [
+    "hma-13",
+    "hma-27"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.41
+  },
+  {
+   "id": "B-115",
+   "category": "C6",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 1,
+   "pred_ids": [],
+   "gt_ids": [
+    "hma-26"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: stridhan blocked (dominant=custody, full=0.0002<=0.01, lift=0.0002<0.80)",
+    "single-issue guard: violence blocked (dominant=custody, full=0.0003<=0.01, lift=0.0283<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=custody, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.33
+  },
+  {
+   "id": "B-116",
+   "category": "C6",
+   "exact": false,
+   "precision": 0.333,
+   "recall": 0.5,
+   "tp": 1,
+   "fp": 2,
+   "fn": 1,
+   "pred_ids": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "gt_ids": [
+    "gwa-1890",
+    "hma-13"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "custody"
+   ],
+   "gt_escalation_kinds": [
+    "custody"
+   ],
+   "escalates_kinds_correct": true,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.46
+  },
+  {
+   "id": "B-117",
+   "category": "C6",
+   "exact": false,
+   "precision": 0.333,
+   "recall": 1.0,
+   "tp": 1,
+   "fp": 2,
+   "fn": 0,
+   "pred_ids": [
+    "bnss-144",
+    "hma-24",
+    "pwdva-20"
+   ],
+   "gt_ids": [
+    "hma-24"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: violence blocked (dominant=maintenance, full=0.0028<=0.01, lift=0.0663<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=maintenance, full=0.0008<=0.01, lift=0.0020<0.80)",
+    "hma-25: option 'permanent alimony at/after an HMA decree' removed from maintenance:maintenance-root before offering (Layer A), decree=false"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "quantum"
+   ],
+   "gt_escalation_kinds": [
+    "quantum"
+   ],
+   "escalates_kinds_correct": true,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.51
+  },
+  {
+   "id": "B-118",
+   "category": "C6",
+   "exact": false,
+   "precision": 0.667,
+   "recall": 1.0,
+   "tp": 2,
+   "fp": 1,
+   "fn": 0,
+   "pred_ids": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "gt_ids": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "forbidden_before_recheck": [
+    "HMA 24 with no proceeding pending"
+   ],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [
+    "HMA 24 with no proceeding pending"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: violence blocked (dominant=maintenance, full=0.0001<=0.01, lift=0.0257<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=maintenance, full=0.0000<=0.01, lift=0.0000<0.80)",
+    "hma-25: option 'permanent alimony at/after an HMA decree' removed from maintenance:maintenance-root before offering (Layer A), decree=false"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "quantum"
+   ],
+   "gt_escalation_kinds": [
+    "quantum"
+   ],
+   "escalates_kinds_correct": true,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.41
+  },
+  {
+   "id": "B-119",
+   "category": "C6",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 2,
+   "pred_ids": [],
+   "gt_ids": [
+    "hma-25",
+    "hma-27"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "fact",
+    "quantum"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": true,
+   "error": null,
+   "latency_s": 0.36
+  },
+  {
+   "id": "B-120",
+   "category": "C6",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 1,
+   "fp": 0,
+   "fn": 0,
+   "pred_ids": [
+    "hma-13"
+   ],
+   "gt_ids": [
+    "hma-13"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: violence blocked (dominant=divorce, full=0.0060<=0.01, lift=0.0482<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.41
+  },
+  {
+   "id": "B-121",
+   "category": "C6",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 0,
+   "pred_ids": [],
+   "gt_ids": [],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [],
+   "court_expected": [],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "procedure"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.24
+  },
+  {
+   "id": "B-122",
+   "category": "C6",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 3,
+   "fn": 1,
+   "pred_ids": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "gt_ids": [
+    "hma-27"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "hma-25: option 'permanent alimony at/after an HMA decree' removed from maintenance:maintenance-root before offering (Layer A), decree=false"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "quantum"
+   ],
+   "gt_escalation_kinds": [
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.57
+  },
+  {
+   "id": "B-123",
+   "category": "C6",
+   "exact": false,
+   "precision": 1.0,
+   "recall": 0.333,
+   "tp": 1,
+   "fp": 0,
+   "fn": 2,
+   "pred_ids": [
+    "hma-13"
+   ],
+   "gt_ids": [
+    "hma-13",
+    "hma-26",
+    "hma-27"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "custody",
+    "fact"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.51
+  },
+  {
+   "id": "B-124",
+   "category": "C6",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 3,
+   "fp": 0,
+   "fn": 0,
+   "pred_ids": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "gt_ids": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)",
+    "hma-25: option 'permanent alimony at/after an HMA decree' removed from maintenance:maintenance-root before offering (Layer A), decree=false"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "escalation_kinds": [
+    "quantum"
+   ],
+   "gt_escalation_kinds": [
+    "quantum"
+   ],
+   "escalates_kinds_correct": true,
+   "escalates_kinds_correct_fact_excluded": true,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.49
+  },
+  {
+   "id": "B-125",
+   "category": "C6",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 2,
+   "fp": 0,
+   "fn": 0,
+   "pred_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "gt_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "forbidden_proposed_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "escalation_kinds": [],
+   "gt_escalation_kinds": [
+    "fact",
+    "recovery"
+   ],
+   "escalates_kinds_correct": false,
+   "escalates_kinds_correct_fact_excluded": false,
+   "gt_kinds_unmapped": [],
+   "f20_rule_applied": false,
+   "silent": false,
+   "error": null,
+   "latency_s": 0.51
+  }
+ ],
+ "raw_live_runs": [
+  {
+   "id": "B-101",
+   "question": "I want my kids to stay with me, not with their father.",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0789,
+    "custody": 0.126,
+    "stridhan": 0.0002,
+    "residence": 0.1376,
+    "violence": 0.0559,
+    "divorce": 0.1691,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1931,
+    "divorce_pending": 0.1802,
+    "in_scope": 0.1939
+   },
+   "stage1_probs": {
+    "maintenance": 0.0789,
+    "custody": 0.126,
+    "stridhan": 0.0002,
+    "residence": 0.1376,
+    "violence": 0.0559,
+    "divorce": 0.1691,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1931,
+    "divorce_pending": 0.1802,
+    "in_scope": 0.1939
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0789,
+    "custody": 0.126,
+    "stridhan": 0.0002,
+    "residence": 0.1376,
+    "violence": 0.0559,
+    "divorce": 0.1691,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1931,
+    "divorce_pending": 0.1802,
+    "in_scope": 0.1939
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0559,
+    "divorce": 0.1691,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.1802
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want my kids to stay with me, not with their father.",
+    "custody": "I want my kids to stay with me, not with their father.",
+    "stridhan": "I want my kids to stay with me, not with their father.",
+    "residence": "I want my kids to stay with me, not with their father.",
+    "violence": "I want my kids to stay with me, not with their father.",
+    "divorce": "I want my kids to stay with me, not with their father.",
+    "birth_certificate": "I want my kids to stay with me, not with their father."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "aux",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0786,
+     "throws me out of the house": 0.0661,
+     "to stay in the house with my daughter": 0.8825
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.0977,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0827,
+     "gives no money for my son's school fees": 0.0772,
+     "money for his school fees while the case goes on": 0.0885,
+     "he gives no money for me and my child": 0.1074,
+     "My husband has not given me any money for three months": 0.0873
+    },
+    "custody": {
+     "I want my son to stay with me": 0.5069,
+     "I want my daughter to stay with me": 0.8379
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.1561
+    }
+   },
+   "aux_max": {
+    "residence": 0.8825,
+    "maintenance": 0.1074,
+    "custody": 0.8379,
+    "divorce_pending": 0.1561
+   },
+   "clauses": [
+    "I want my kids to stay with me, not with their father."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.1376,
+   "residence_r1": 0.1931,
+   "residence_r0_clause_max": 0.1376,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.8379,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.1691,
+   "divorce_pending_prob": 0.1802,
+   "divorce_signal": "pending",
+   "in_scope": false,
+   "in_scope_prob": 0.1939,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I want my kids to stay with me, not with their father."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [],
+   "court_source": "out-of-scope",
+   "court_top2": [
+    [
+     "divorce",
+     0.1802
+    ],
+    [
+     "violence",
+     0.0559
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.32
+  },
+  {
+   "id": "B-102",
+   "question": "My wife left with our two children and I do not know where they are. I want them to live with me.",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0291,
+    "custody": 0.1215,
+    "stridhan": 0.0,
+    "residence": 0.0602,
+    "violence": 0.0151,
+    "divorce": 0.1246,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.8013,
+    "divorce_pending": 0.1571,
+    "in_scope": 0.7743
+   },
+   "stage1_probs": {
+    "maintenance": 0.0291,
+    "custody": 0.1215,
+    "stridhan": 0.0,
+    "residence": 0.0602,
+    "violence": 0.0151,
+    "divorce": 0.1246,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.8013,
+    "divorce_pending": 0.1571,
+    "in_scope": 0.7743
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.105,
+    "custody": 0.134,
+    "stridhan": 0.0175,
+    "residence": 0.0764,
+    "violence": 0.0006,
+    "divorce": 0.0485,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1905,
+    "divorce_pending": 0.1376,
+    "in_scope": 0.8218
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0151,
+    "divorce": 0.1246,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.1571
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want them to live with me.",
+    "custody": "I want them to live with me.",
+    "stridhan": "I want them to live with me.",
+    "residence": "I want them to live with me.",
+    "violence": "I want them to live with me.",
+    "divorce": "I want them to live with me.",
+    "birth_certificate": "My wife left with our two children and I do not know where they are."
+   },
+   "fired_source": {
+    "maintenance": "clause",
+    "custody": "aux",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "full",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.076,
+     "throws me out of the house": 0.0982,
+     "to stay in the house with my daughter": 0.4509
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.0652,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0749,
+     "gives no money for my son's school fees": 0.0465,
+     "money for his school fees while the case goes on": 0.0001,
+     "he gives no money for me and my child": 0.0321,
+     "My husband has not given me any money for three months": 0.0475
+    },
+    "custody": {
+     "I want my son to stay with me": 0.1907,
+     "I want my daughter to stay with me": 0.1815
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.0806
+    }
+   },
+   "aux_max": {
+    "residence": 0.4509,
+    "maintenance": 0.0749,
+    "custody": 0.1907,
+    "divorce_pending": 0.0806
+   },
+   "clauses": [
+    "My wife left with our two children and I do not know where they are.",
+    "I want them to live with me."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0602,
+   "residence_r1": 0.8013,
+   "residence_r0_clause_max": 0.0764,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1907,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.1246,
+   "divorce_pending_prob": 0.1571,
+   "divorce_signal": "pending",
+   "in_scope": true,
+   "in_scope_prob": 0.8218,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I want them to live with me."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [
+    "Court: no section kept and question is in scope — escalate to a human; court cannot be derived from sub-threshold scores"
+   ],
+   "escalations_typed": [
+    {
+     "kind": "court",
+     "text": "Court: no section kept and question is in scope — escalate to a human; court cannot be derived from sub-threshold scores"
+    }
+   ],
+   "court_live": [
+    "ESCALATE — no section kept, court cannot be derived"
+   ],
+   "court_source": "fallback-escalate",
+   "court_top2": [
+    [
+     "divorce",
+     0.1571
+    ],
+    [
+     "violence",
+     0.0151
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.3
+  },
+  {
+   "id": "B-103",
+   "question": "My daughter is 16 and wants to live with me after I separate from my husband. Does her wish matter?",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0002,
+    "custody": 0.1332,
+    "stridhan": 0.0591,
+    "residence": 0.0733,
+    "violence": 0.0001,
+    "divorce": 0.7346,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1271,
+    "divorce_pending": 0.2214,
+    "in_scope": 0.5476
+   },
+   "stage1_probs": {
+    "maintenance": 0.0002,
+    "custody": 0.1332,
+    "stridhan": 0.0591,
+    "residence": 0.0733,
+    "violence": 0.0001,
+    "divorce": 0.7346,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1271,
+    "divorce_pending": 0.2214,
+    "in_scope": 0.5476
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0004,
+    "custody": 0.1417,
+    "stridhan": 0.0589,
+    "residence": 0.0759,
+    "violence": 0.0002,
+    "divorce": 0.7577,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.106,
+    "divorce_pending": 0.2125,
+    "in_scope": 0.4592
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0,
+    "divorce": 0.7577,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.2214
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "Does her wish matter?",
+    "custody": "My daughter is 16 and wants to live with me after I separate from my husband.",
+    "stridhan": "Does her wish matter?",
+    "residence": "Does her wish matter?",
+    "violence": "My daughter is 16 and wants to live with me after I separate from my husband.",
+    "divorce": "My daughter is 16 and wants to live with me after I separate from my husband.",
+    "birth_certificate": "My daughter is 16 and wants to live with me after I separate from my husband."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "aux",
+    "stridhan": "full",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0789,
+     "throws me out of the house": 0.0598,
+     "to stay in the house with my daughter": 0.1967
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1103,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.28,
+     "gives no money for my son's school fees": 0.0001,
+     "money for his school fees while the case goes on": 0.0002,
+     "he gives no money for me and my child": 0.0913,
+     "My husband has not given me any money for three months": 0.0796
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0551,
+     "I want my daughter to stay with me": 0.7049
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.1084
+    }
+   },
+   "aux_max": {
+    "residence": 0.1967,
+    "maintenance": 0.28,
+    "custody": 0.7049,
+    "divorce_pending": 0.1084
+   },
+   "clauses": [
+    "My daughter is 16 and wants to live with me after I separate from my husband.",
+    "Does her wish matter?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0733,
+   "residence_r1": 0.1271,
+   "residence_r0_clause_max": 0.0759,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.7049,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "divorce",
+    "dominant_full": 0.7346,
+    "blocked": [
+     [
+      "maintenance",
+      0.0002,
+      0.28
+     ],
+     [
+      "violence",
+      0.0001,
+      0.0002
+     ],
+     [
+      "birth_certificate",
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.7577,
+   "divorce_pending_prob": 0.2214,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.5476,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "My daughter is 16 and wants to live with me after I separate from my husband."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: maintenance blocked (dominant=divorce, full=0.0002<=0.01, lift=0.2800<0.80)",
+    "single-issue guard: violence blocked (dominant=divorce, full=0.0001<=0.01, lift=0.0002<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "provisional",
+   "court_top2": [
+    [
+     "divorce",
+     0.7577
+    ],
+    [
+     "maintenance",
+     0.0
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.4
+  },
+  {
+   "id": "B-104",
+   "question": "I want my son to live with me during the week and visit his father on weekends. Is that possible?",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.047,
+    "custody": 0.1146,
+    "stridhan": 0.0171,
+    "residence": 0.0883,
+    "violence": 0.0,
+    "divorce": 0.0521,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.2852,
+    "divorce_pending": 0.0019,
+    "in_scope": 0.1262
+   },
+   "stage1_probs": {
+    "maintenance": 0.047,
+    "custody": 0.1146,
+    "stridhan": 0.0171,
+    "residence": 0.0883,
+    "violence": 0.0,
+    "divorce": 0.0521,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.2852,
+    "divorce_pending": 0.0019,
+    "in_scope": 0.1262
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.087,
+    "custody": 0.1338,
+    "stridhan": 0.1,
+    "residence": 0.1245,
+    "violence": 0.0002,
+    "divorce": 0.0947,
+    "birth_certificate": 0.0127,
+    "residence_r1": 0.1352,
+    "divorce_pending": 0.0567,
+    "in_scope": 0.2019
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0002,
+    "divorce": 0.0947,
+    "birth_certificate": 0.0127,
+    "divorce_pending": 0.0567
+   },
+   "fired_issues": [],
+   "fired_clause": {
+    "maintenance": "I want my son to live with me during the week and visit his father on weekends.",
+    "custody": "I want my son to live with me during the week and visit his father on weekends.",
+    "stridhan": "Is that possible?",
+    "residence": "Is that possible?",
+    "violence": "Is that possible?",
+    "divorce": "I want my son to live with me during the week and visit his father on weekends.",
+    "birth_certificate": "Is that possible?"
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "aux",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0443,
+     "throws me out of the house": 0.0074,
+     "to stay in the house with my daughter": 0.1061
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.0801,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0807,
+     "gives no money for my son's school fees": 0.0846,
+     "money for his school fees while the case goes on": 0.0813,
+     "he gives no money for me and my child": 0.0712,
+     "My husband has not given me any money for three months": 0.1015
+    },
+    "custody": {
+     "I want my son to stay with me": 0.8935,
+     "I want my daughter to stay with me": 0.0185
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.0483
+    }
+   },
+   "aux_max": {
+    "residence": 0.1061,
+    "maintenance": 0.1015,
+    "custody": 0.8935,
+    "divorce_pending": 0.0483
+   },
+   "clauses": [
+    "I want my son to live with me during the week and visit his father on weekends.",
+    "Is that possible?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0883,
+   "residence_r1": 0.2852,
+   "residence_r0_clause_max": 0.1245,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.8935,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.0947,
+   "divorce_pending_prob": 0.0567,
+   "divorce_signal": "none",
+   "in_scope": false,
+   "in_scope_prob": 0.2019,
+   "sub_choices": {},
+   "sub_choice_body": {},
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [],
+   "court_source": "out-of-scope",
+   "court_top2": [
+    [
+     "divorce",
+     0.0947
+    ],
+    [
+     "birth_certificate",
+     0.0127
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.29
+  },
+  {
+   "id": "B-105",
+   "question": "My husband says that because I do not earn, the children will be given to him. Is that true?",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0802,
+    "custody": 0.5963,
+    "stridhan": 0.0799,
+    "residence": 0.105,
+    "violence": 0.112,
+    "divorce": 0.0323,
+    "birth_certificate": 0.0004,
+    "residence_r1": 0.162,
+    "divorce_pending": 0.1664,
+    "in_scope": 0.5801
+   },
+   "stage1_probs": {
+    "maintenance": 0.0802,
+    "custody": 0.5963,
+    "stridhan": 0.0799,
+    "residence": 0.105,
+    "violence": 0.112,
+    "divorce": 0.0323,
+    "birth_certificate": 0.0004,
+    "residence_r1": 0.162,
+    "divorce_pending": 0.1664,
+    "in_scope": 0.5801
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0789,
+    "custody": 0.713,
+    "stridhan": 0.0913,
+    "residence": 0.2133,
+    "violence": 0.1783,
+    "divorce": 0.0455,
+    "birth_certificate": 0.0349,
+    "residence_r1": 0.2015,
+    "divorce_pending": 0.2923,
+    "in_scope": 0.6974
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.1783,
+    "divorce": 0.0455,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.2923
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "My husband says that because I do not earn, the children will be given to him.",
+    "custody": "My husband says that because I do not earn, the children will be given to him.",
+    "stridhan": "My husband says that because I do not earn, the children will be given to him.",
+    "residence": "My husband says that because I do not earn, the children will be given to him.",
+    "violence": "My husband says that because I do not earn, the children will be given to him.",
+    "divorce": "My husband says that because I do not earn, the children will be given to him.",
+    "birth_certificate": "Is that true?"
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0909,
+     "throws me out of the house": 0.1619,
+     "to stay in the house with my daughter": 0.0884
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1446,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.087,
+     "gives no money for my son's school fees": 0.1478,
+     "money for his school fees while the case goes on": 0.0801,
+     "he gives no money for me and my child": 0.2491,
+     "My husband has not given me any money for three months": 0.1333
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0845,
+     "I want my daughter to stay with me": 0.0729
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.1319
+    }
+   },
+   "aux_max": {
+    "residence": 0.1619,
+    "maintenance": 0.2491,
+    "custody": 0.0845,
+    "divorce_pending": 0.1319
+   },
+   "clauses": [
+    "My husband says that because I do not earn, the children will be given to him.",
+    "Is that true?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.105,
+   "residence_r1": 0.162,
+   "residence_r0_clause_max": 0.2133,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.713,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "custody",
+    "dominant_full": 0.5963,
+    "blocked": [
+     [
+      "birth_certificate",
+      0.0004,
+      0.0349
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.0455,
+   "divorce_pending_prob": 0.2923,
+   "divorce_signal": "pending",
+   "in_scope": true,
+   "in_scope_prob": 0.6974,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "My husband says that because I do not earn, the children will be given to him."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: birth_certificate blocked (dominant=custody, full=0.0004<=0.01, lift=0.0349<0.80)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [
+    "Court: no section kept and question is in scope — escalate to a human; court cannot be derived from sub-threshold scores"
+   ],
+   "escalations_typed": [
+    {
+     "kind": "court",
+     "text": "Court: no section kept and question is in scope — escalate to a human; court cannot be derived from sub-threshold scores"
+    }
+   ],
+   "court_live": [
+    "ESCALATE — no section kept, court cannot be derived"
+   ],
+   "court_source": "fallback-escalate",
+   "court_top2": [
+    [
+     "divorce",
+     0.2923
+    ],
+    [
+     "violence",
+     0.1783
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.41
+  },
+  {
+   "id": "B-106",
+   "question": "My husband and I have been living separately for a year. Our 7-year-old son lives with me and goes to school near my house, and our 4-year-old daughter lives with my husband's mother in another town. I want both children to live with me under one roof. My husband says the court will split them. What will the court look at?",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0317,
+    "custody": 0.3506,
+    "stridhan": 0.0065,
+    "residence": 0.1018,
+    "violence": 0.0,
+    "divorce": 0.272,
+    "birth_certificate": 0.0001,
+    "residence_r1": 0.2372,
+    "divorce_pending": 0.7512,
+    "in_scope": 0.812
+   },
+   "stage1_probs": {
+    "maintenance": 0.0317,
+    "custody": 0.3506,
+    "stridhan": 0.0065,
+    "residence": 0.1018,
+    "violence": 0.0,
+    "divorce": 0.272,
+    "birth_certificate": 0.0001,
+    "residence_r1": 0.2372,
+    "divorce_pending": 0.7512,
+    "in_scope": 0.812
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.1515,
+    "custody": 0.4754,
+    "stridhan": 0.1241,
+    "residence": 0.1538,
+    "violence": 0.0683,
+    "divorce": 0.1809,
+    "birth_certificate": 0.0553,
+    "residence_r1": 0.7556,
+    "divorce_pending": 0.3766,
+    "in_scope": 0.8336
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0,
+    "divorce": 0.272,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.7512
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want both children to live with me under one roof.",
+    "custody": "What will the court look at?",
+    "stridhan": "What will the court look at?",
+    "residence": "Our 7-year-old son lives with me and goes to school near my house, and our 4-year-old daughter lives with my husband's mother in another town.",
+    "violence": "My husband says the court will split them.",
+    "divorce": "I have been living separately for a year.",
+    "birth_certificate": "What will the court look at?"
+   },
+   "fired_source": {
+    "maintenance": "clause",
+    "custody": "aux",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.1791,
+     "throws me out of the house": 0.0514,
+     "to stay in the house with my daughter": 0.125
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1016,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0964,
+     "gives no money for my son's school fees": 0.0549,
+     "money for his school fees while the case goes on": 0.001,
+     "he gives no money for me and my child": 0.0922,
+     "My husband has not given me any money for three months": 0.0834
+    },
+    "custody": {
+     "I want my son to stay with me": 0.5084,
+     "I want my daughter to stay with me": 0.2269
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.3537
+    }
+   },
+   "aux_max": {
+    "residence": 0.1791,
+    "maintenance": 0.1016,
+    "custody": 0.5084,
+    "divorce_pending": 0.3537
+   },
+   "clauses": [
+    "I have been living separately for a year.",
+    "Our 7-year-old son lives with me and goes to school near my house, and our 4-year-old daughter lives with my husband's mother in another town.",
+    "I want both children to live with me under one roof.",
+    "My husband says the court will split them.",
+    "What will the court look at?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.1018,
+   "residence_r1": 0.2372,
+   "residence_r0_clause_max": 0.1538,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.5084,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "custody",
+    "dominant_full": 0.3506,
+    "blocked": [
+     [
+      "stridhan",
+      0.0065,
+      0.1241
+     ],
+     [
+      "violence",
+      0.0,
+      0.0683
+     ],
+     [
+      "birth_certificate",
+      0.0001,
+      0.0553
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.272,
+   "divorce_pending_prob": 0.7512,
+   "divorce_signal": "pending",
+   "in_scope": true,
+   "in_scope_prob": 0.8336,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I have been living separately for a year."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: stridhan blocked (dominant=custody, full=0.0065<=0.01, lift=0.1241<0.80)",
+    "single-issue guard: violence blocked (dominant=custody, full=0.0000<=0.01, lift=0.0683<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=custody, full=0.0001<=0.01, lift=0.0553<0.80)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "provisional",
+   "court_top2": [
+    [
+     "divorce",
+     0.7512
+    ],
+    [
+     "maintenance",
+     0.0
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.67
+  },
+  {
+   "id": "B-107",
+   "question": "Can I get custody of my children if I live in a rented house?",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0991,
+    "custody": 0.5816,
+    "stridhan": 0.0292,
+    "residence": 0.0976,
+    "violence": 0.0,
+    "divorce": 0.1001,
+    "birth_certificate": 0.0272,
+    "residence_r1": 0.1716,
+    "divorce_pending": 0.0903,
+    "in_scope": 0.1571
+   },
+   "stage1_probs": {
+    "maintenance": 0.0991,
+    "custody": 0.5816,
+    "stridhan": 0.0292,
+    "residence": 0.0976,
+    "violence": 0.0,
+    "divorce": 0.1001,
+    "birth_certificate": 0.0272,
+    "residence_r1": 0.1716,
+    "divorce_pending": 0.0903,
+    "in_scope": 0.1571
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0991,
+    "custody": 0.5816,
+    "stridhan": 0.0292,
+    "residence": 0.0976,
+    "violence": 0.0,
+    "divorce": 0.1001,
+    "birth_certificate": 0.0272,
+    "residence_r1": 0.1716,
+    "divorce_pending": 0.0903,
+    "in_scope": 0.1571
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.5816,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0,
+    "divorce": 0.1001,
+    "birth_certificate": 0.0272,
+    "divorce_pending": 0.0903
+   },
+   "fired_issues": [
+    "custody"
+   ],
+   "fired_clause": {
+    "maintenance": "Can I get custody of my children if I live in a rented house?",
+    "custody": "Can I get custody of my children if I live in a rented house?",
+    "stridhan": "Can I get custody of my children if I live in a rented house?",
+    "residence": "Can I get custody of my children if I live in a rented house?",
+    "violence": "Can I get custody of my children if I live in a rented house?",
+    "divorce": "Can I get custody of my children if I live in a rented house?",
+    "birth_certificate": "Can I get custody of my children if I live in a rented house?"
+   },
+   "fired_source": {
+    "maintenance": "clause",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0283,
+     "throws me out of the house": 0.0336,
+     "to stay in the house with my daughter": 0.09
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.0892,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0965,
+     "gives no money for my son's school fees": 0.066,
+     "money for his school fees while the case goes on": 0.0279,
+     "he gives no money for me and my child": 0.0628,
+     "My husband has not given me any money for three months": 0.0827
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0948,
+     "I want my daughter to stay with me": 0.0745
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.0755
+    }
+   },
+   "aux_max": {
+    "residence": 0.09,
+    "maintenance": 0.0965,
+    "custody": 0.0948,
+    "divorce_pending": 0.0755
+   },
+   "clauses": [
+    "Can I get custody of my children if I live in a rented house?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0976,
+   "residence_r1": 0.1716,
+   "residence_r0_clause_max": 0.0976,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": true,
+   "custody_gated": false,
+   "custody_final_pre_gate": 0.5816,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "custody",
+    "dominant_full": 0.5816,
+    "blocked": [
+     [
+      "violence",
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.1001,
+   "divorce_pending_prob": 0.0903,
+   "divorce_signal": "none",
+   "in_scope": false,
+   "in_scope_prob": 0.1571,
+   "sub_choices": {
+    "custody:custody_sub_issue_choice": "A: Custody inside a matrimonial proceeding (HMA s.26)"
+   },
+   "sub_choice_body": {
+    "custody:custody_sub_issue_choice": "Can I get custody of my children if I live in a rented house?"
+   },
+   "candidates_before_stage2": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "candidates_before_gate": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "single-issue guard: violence blocked (dominant=custody, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "kept_ids": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Custody: who the child stays with is a welfare decision for the Family Court -- the bot names the route (GWA 1890) but does not say who gets the child. Escalate for interim custody and the welfare assessment. If either parent has said they will take the child away, that needs urgent human help."
+   ],
+   "escalations_typed": [
+    {
+     "kind": "custody",
+     "text": "Custody: who the child stays with is a welfare decision for the Family Court -- the bot names the route (GWA 1890) but does not say who gets the child. Escalate for interim custody and the welfare assessment. If either parent has said they will take the child away, that needs urgent human help."
+    }
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.31
+  },
+  {
+   "id": "B-108",
+   "question": "My husband is an alcoholic. I want my children to live with me and not be left alone with him.",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0823,
+    "custody": 0.3733,
+    "stridhan": 0.0,
+    "residence": 0.3528,
+    "violence": 0.1466,
+    "divorce": 0.6193,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.3706,
+    "divorce_pending": 0.3346,
+    "in_scope": 0.7613
+   },
+   "stage1_probs": {
+    "maintenance": 0.0823,
+    "custody": 0.3733,
+    "stridhan": 0.0,
+    "residence": 0.3528,
+    "violence": 0.1466,
+    "divorce": 0.6193,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.3706,
+    "divorce_pending": 0.3346,
+    "in_scope": 0.7613
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0963,
+    "custody": 0.1947,
+    "stridhan": 0.0001,
+    "residence": 0.3268,
+    "violence": 0.1745,
+    "divorce": 0.3329,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.2363,
+    "divorce_pending": 0.1982,
+    "in_scope": 0.8099
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.1745,
+    "divorce": 0.6193,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.3346
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "My husband is an alcoholic.",
+    "custody": "I want my children to live with me and not be left alone with him.",
+    "stridhan": "I want my children to live with me and not be left alone with him.",
+    "residence": "My husband is an alcoholic.",
+    "violence": "My husband is an alcoholic.",
+    "divorce": "My husband is an alcoholic.",
+    "birth_certificate": "My husband is an alcoholic."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "aux",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0922,
+     "throws me out of the house": 0.1088,
+     "to stay in the house with my daughter": 0.4587
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1065,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0747,
+     "gives no money for my son's school fees": 0.1001,
+     "money for his school fees while the case goes on": 0.069,
+     "he gives no money for me and my child": 0.0891,
+     "My husband has not given me any money for three months": 0.089
+    },
+    "custody": {
+     "I want my son to stay with me": 0.735,
+     "I want my daughter to stay with me": 0.7142
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.3199
+    }
+   },
+   "aux_max": {
+    "residence": 0.4587,
+    "maintenance": 0.1065,
+    "custody": 0.735,
+    "divorce_pending": 0.3199
+   },
+   "clauses": [
+    "My husband is an alcoholic.",
+    "I want my children to live with me and not be left alone with him."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.3528,
+   "residence_r1": 0.3706,
+   "residence_r0_clause_max": 0.3268,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.735,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.6193,
+   "divorce_pending_prob": 0.3346,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.8099,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "My husband is an alcoholic."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "provisional",
+   "court_top2": [
+    [
+     "divorce",
+     0.6193
+    ],
+    [
+     "violence",
+     0.1745
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.38
+  },
+  {
+   "id": "B-109",
+   "question": "I want my child to live with me after we separate, and I want his father to pay for his schooling.",
+   "gt_ids": [
+    "gwa-1890",
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "gwa-1890",
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.2539,
+    "custody": 0.2688,
+    "stridhan": 0.1295,
+    "residence": 0.0976,
+    "violence": 0.0001,
+    "divorce": 0.2229,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.3007,
+    "divorce_pending": 0.1831,
+    "in_scope": 0.1384
+   },
+   "stage1_probs": {
+    "maintenance": 0.2539,
+    "custody": 0.2688,
+    "stridhan": 0.1295,
+    "residence": 0.0976,
+    "violence": 0.0001,
+    "divorce": 0.2229,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.3007,
+    "divorce_pending": 0.1831,
+    "in_scope": 0.1384
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.3962,
+    "custody": 0.2518,
+    "stridhan": 0.114,
+    "residence": 0.1073,
+    "violence": 0.0001,
+    "divorce": 0.2874,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1207,
+    "divorce_pending": 0.1379,
+    "in_scope": 0.0799
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0001,
+    "divorce": 0.2874,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.1831
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want his father to pay for his schooling.",
+    "custody": "I want his father to pay for his schooling.",
+    "stridhan": "I want his father to pay for his schooling.",
+    "residence": "I want my child to live with me after we separate",
+    "violence": "I want his father to pay for his schooling.",
+    "divorce": "I want my child to live with me after we separate",
+    "birth_certificate": "I want my child to live with me after we separate"
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "aux",
+    "stridhan": "full",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0421,
+     "throws me out of the house": 0.0081,
+     "to stay in the house with my daughter": 0.5101
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.171,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.1199,
+     "gives no money for my son's school fees": 0.1348,
+     "money for his school fees while the case goes on": 0.637,
+     "he gives no money for me and my child": 0.0789,
+     "My husband has not given me any money for three months": 0.0757
+    },
+    "custody": {
+     "I want my son to stay with me": 0.6823,
+     "I want my daughter to stay with me": 0.2324
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.0811
+    }
+   },
+   "aux_max": {
+    "residence": 0.5101,
+    "maintenance": 0.637,
+    "custody": 0.6823,
+    "divorce_pending": 0.0811
+   },
+   "clauses": [
+    "I want my child to live with me after we separate",
+    "I want his father to pay for his schooling."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0976,
+   "residence_r1": 0.3007,
+   "residence_r0_clause_max": 0.1073,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.6823,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.2874,
+   "divorce_pending_prob": 0.1831,
+   "divorce_signal": "pending",
+   "in_scope": false,
+   "in_scope_prob": 0.1384,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I want my child to live with me after we separate"
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [],
+   "court_source": "out-of-scope",
+   "court_top2": [
+    [
+     "divorce",
+     0.2874
+    ],
+    [
+     "violence",
+     0.0001
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.38
+  },
+  {
+   "id": "B-110",
+   "question": "My wife has kept our son away from me for eight months. I want the court to give me my son.",
+   "gt_ids": [
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0367,
+    "custody": 0.2472,
+    "stridhan": 0.0001,
+    "residence": 0.0744,
+    "violence": 0.0324,
+    "divorce": 0.4857,
+    "birth_certificate": 0.0749,
+    "residence_r1": 0.1531,
+    "divorce_pending": 0.5498,
+    "in_scope": 0.82
+   },
+   "stage1_probs": {
+    "maintenance": 0.0367,
+    "custody": 0.2472,
+    "stridhan": 0.0001,
+    "residence": 0.0744,
+    "violence": 0.0324,
+    "divorce": 0.4857,
+    "birth_certificate": 0.0749,
+    "residence_r1": 0.1531,
+    "divorce_pending": 0.5498,
+    "in_scope": 0.82
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0587,
+    "custody": 0.2457,
+    "stridhan": 0.0684,
+    "residence": 0.1087,
+    "violence": 0.0371,
+    "divorce": 0.1047,
+    "birth_certificate": 0.1284,
+    "residence_r1": 0.3849,
+    "divorce_pending": 0.2712,
+    "in_scope": 0.8246
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0371,
+    "divorce": 0.4857,
+    "birth_certificate": 0.1284,
+    "divorce_pending": 0.5498
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want the court to give me my son.",
+    "custody": "I want the court to give me my son.",
+    "stridhan": "I want the court to give me my son.",
+    "residence": "My wife has kept our son away from me for eight months.",
+    "violence": "My wife has kept our son away from me for eight months.",
+    "divorce": "I want the court to give me my son.",
+    "birth_certificate": "I want the court to give me my son."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "full",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.104,
+     "throws me out of the house": 0.0875,
+     "to stay in the house with my daughter": 0.025
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.0624,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0854,
+     "gives no money for my son's school fees": 0.0712,
+     "money for his school fees while the case goes on": 0.0034,
+     "he gives no money for me and my child": 0.0861,
+     "My husband has not given me any money for three months": 0.0785
+    },
+    "custody": {
+     "I want my son to stay with me": 0.1808,
+     "I want my daughter to stay with me": 0.0638
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.2723
+    }
+   },
+   "aux_max": {
+    "residence": 0.104,
+    "maintenance": 0.0861,
+    "custody": 0.1808,
+    "divorce_pending": 0.2723
+   },
+   "clauses": [
+    "My wife has kept our son away from me for eight months.",
+    "I want the court to give me my son."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0744,
+   "residence_r1": 0.1531,
+   "residence_r0_clause_max": 0.1087,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.2472,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.4857,
+   "divorce_pending_prob": 0.5498,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.8246,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I want the court to give me my son."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "provisional",
+   "court_top2": [
+    [
+     "divorce",
+     0.5498
+    ],
+    [
+     "birth_certificate",
+     0.1284
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.36
+  },
+  {
+   "id": "B-111",
+   "question": "Our divorce petition has been running in the Family Court for a year. During the marriage we purchased a flat in both names. Can that court split the flat between us?",
+   "gt_ids": [
+    "hma-27"
+   ],
+   "gt_labels": [
+    "hma-27"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": true,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0744,
+    "custody": 0.1366,
+    "stridhan": 0.0695,
+    "residence": 0.0272,
+    "violence": 0.0001,
+    "divorce": 0.8557,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0977,
+    "divorce_pending": 0.8893,
+    "in_scope": 0.7914
+   },
+   "stage1_probs": {
+    "maintenance": 0.0744,
+    "custody": 0.1366,
+    "stridhan": 0.0695,
+    "residence": 0.0272,
+    "violence": 0.0001,
+    "divorce": 0.8557,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0977,
+    "divorce_pending": 0.8893,
+    "in_scope": 0.7914
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0845,
+    "custody": 0.1343,
+    "stridhan": 0.1177,
+    "residence": 0.1091,
+    "violence": 0.0379,
+    "divorce": 0.8638,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1546,
+    "divorce_pending": 0.8548,
+    "in_scope": 0.728
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0,
+    "divorce": 0.8638,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.8893
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "Can that court split the flat between us?",
+    "custody": "Our divorce petition has been running in the Family Court for a year.",
+    "stridhan": "During the marriage we purchased a flat in both names.",
+    "residence": "During the marriage we purchased a flat in both names.",
+    "violence": "Our divorce petition has been running in the Family Court for a year.",
+    "divorce": "Our divorce petition has been running in the Family Court for a year.",
+    "birth_certificate": "Our divorce petition has been running in the Family Court for a year."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "full",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0956,
+     "throws me out of the house": 0.1143,
+     "to stay in the house with my daughter": 0.0735
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.101,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.1172,
+     "gives no money for my son's school fees": 0.236,
+     "money for his school fees while the case goes on": 0.0376,
+     "he gives no money for me and my child": 0.09,
+     "My husband has not given me any money for three months": 0.1251
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0796,
+     "I want my daughter to stay with me": 0.0631
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.8463
+    }
+   },
+   "aux_max": {
+    "residence": 0.1143,
+    "maintenance": 0.236,
+    "custody": 0.0796,
+    "divorce_pending": 0.8463
+   },
+   "clauses": [
+    "Our divorce petition has been running in the Family Court for a year.",
+    "During the marriage we purchased a flat in both names.",
+    "Can that court split the flat between us?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0272,
+   "residence_r1": 0.0977,
+   "residence_r0_clause_max": 0.1091,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1366,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "divorce",
+    "dominant_full": 0.8557,
+    "blocked": [
+     [
+      "violence",
+      0.0001,
+      0.0379
+     ],
+     [
+      "birth_certificate",
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.8638,
+   "divorce_pending_prob": 0.8893,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.7914,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "Our divorce petition has been running in the Family Court for a year."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: violence blocked (dominant=divorce, full=0.0001<=0.01, lift=0.0379<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "provisional",
+   "court_top2": [
+    [
+     "divorce",
+     0.8893
+    ],
+    [
+     "maintenance",
+     0.0
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.49
+  },
+  {
+   "id": "B-112",
+   "question": "I want a divorce and my husband and I own a house together. Can I get half the house?",
+   "gt_ids": [
+    "hma-13"
+   ],
+   "gt_labels": [
+    "hma-13"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.1056,
+    "custody": 0.1769,
+    "stridhan": 0.124,
+    "residence": 0.0366,
+    "violence": 0.0009,
+    "divorce": 0.8373,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0682,
+    "divorce_pending": 0.1964,
+    "in_scope": 0.7486
+   },
+   "stage1_probs": {
+    "maintenance": 0.1056,
+    "custody": 0.1769,
+    "stridhan": 0.124,
+    "residence": 0.0366,
+    "violence": 0.0009,
+    "divorce": 0.8373,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0682,
+    "divorce_pending": 0.1964,
+    "in_scope": 0.7486
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.1102,
+    "custody": 0.1106,
+    "stridhan": 0.0903,
+    "residence": 0.5182,
+    "violence": 0.0442,
+    "divorce": 0.8842,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.8643,
+    "divorce_pending": 0.1124,
+    "in_scope": 0.4548
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0442,
+    "divorce": 0.8842,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.1964
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "Can I get half the house?",
+    "custody": "I own a house together.",
+    "stridhan": "I own a house together.",
+    "residence": "I own a house together.",
+    "violence": "I own a house together.",
+    "divorce": "I want a divorce",
+    "birth_certificate": "I want a divorce"
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "full",
+    "stridhan": "full",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0618,
+     "throws me out of the house": 0.0955,
+     "to stay in the house with my daughter": 0.0603
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.3229,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.104,
+     "gives no money for my son's school fees": 0.1233,
+     "money for his school fees while the case goes on": 0.1699,
+     "he gives no money for me and my child": 0.0921,
+     "My husband has not given me any money for three months": 0.1397
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0736,
+     "I want my daughter to stay with me": 0.062
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.1161
+    }
+   },
+   "aux_max": {
+    "residence": 0.0955,
+    "maintenance": 0.3229,
+    "custody": 0.0736,
+    "divorce_pending": 0.1161
+   },
+   "clauses": [
+    "I want a divorce",
+    "I own a house together.",
+    "Can I get half the house?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0366,
+   "residence_r1": 0.0682,
+   "residence_r0_clause_max": 0.5182,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1769,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.8842,
+   "divorce_pending_prob": 0.1964,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.7486,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I want a divorce and my husband and I own a house together. Can I get half the house?"
+   },
+   "candidates_before_stage2": [
+    "hma-13"
+   ],
+   "candidates_before_gate": [
+    "hma-13"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [
+    "hma-13"
+   ],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.47
+  },
+  {
+   "id": "B-113",
+   "question": "My husband and I jointly own a flat, but neither of us has filed any case. Can I claim a share of the flat now?",
+   "gt_ids": [],
+   "gt_labels": [],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0284,
+    "custody": 0.1429,
+    "stridhan": 0.1008,
+    "residence": 0.0927,
+    "violence": 0.0381,
+    "divorce": 0.0396,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1843,
+    "divorce_pending": 0.0976,
+    "in_scope": 0.7073
+   },
+   "stage1_probs": {
+    "maintenance": 0.0284,
+    "custody": 0.1429,
+    "stridhan": 0.1008,
+    "residence": 0.0927,
+    "violence": 0.0381,
+    "divorce": 0.0396,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1843,
+    "divorce_pending": 0.0976,
+    "in_scope": 0.7073
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.1023,
+    "custody": 0.1333,
+    "stridhan": 0.1128,
+    "residence": 0.2546,
+    "violence": 0.0004,
+    "divorce": 0.0285,
+    "birth_certificate": 0.0001,
+    "residence_r1": 0.5143,
+    "divorce_pending": 0.1029,
+    "in_scope": 0.3524
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0381,
+    "divorce": 0.0396,
+    "birth_certificate": 0.0001,
+    "divorce_pending": 0.1029
+   },
+   "fired_issues": [],
+   "fired_clause": {
+    "maintenance": "Can I claim a share of the flat now?",
+    "custody": "Can I claim a share of the flat now?",
+    "stridhan": "Can I claim a share of the flat now?",
+    "residence": "Can I claim a share of the flat now?",
+    "violence": "I jointly own a flat, but neither of us has filed any case.",
+    "divorce": "I jointly own a flat, but neither of us has filed any case.",
+    "birth_certificate": "Can I claim a share of the flat now?"
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "full",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "full",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0786,
+     "throws me out of the house": 0.0664,
+     "to stay in the house with my daughter": 0.1065
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.4388,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.1095,
+     "gives no money for my son's school fees": 0.146,
+     "money for his school fees while the case goes on": 0.0779,
+     "he gives no money for me and my child": 0.1122,
+     "My husband has not given me any money for three months": 0.125
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0511,
+     "I want my daughter to stay with me": 0.0297
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.0747
+    }
+   },
+   "aux_max": {
+    "residence": 0.1065,
+    "maintenance": 0.4388,
+    "custody": 0.0511,
+    "divorce_pending": 0.0747
+   },
+   "clauses": [
+    "I jointly own a flat, but neither of us has filed any case.",
+    "Can I claim a share of the flat now?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0927,
+   "residence_r1": 0.1843,
+   "residence_r0_clause_max": 0.2546,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1429,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.0396,
+   "divorce_pending_prob": 0.1029,
+   "divorce_signal": "none",
+   "in_scope": true,
+   "in_scope_prob": 0.7073,
+   "sub_choices": {},
+   "sub_choice_body": {},
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [
+    "Court: no section kept and question is in scope — escalate to a human; court cannot be derived from sub-threshold scores"
+   ],
+   "escalations_typed": [
+    {
+     "kind": "court",
+     "text": "Court: no section kept and question is in scope — escalate to a human; court cannot be derived from sub-threshold scores"
+    }
+   ],
+   "court_live": [
+    "ESCALATE — no section kept, court cannot be derived"
+   ],
+   "court_source": "fallback-escalate",
+   "court_top2": [
+    [
+     "divorce",
+     0.1029
+    ],
+    [
+     "violence",
+     0.0381
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.28
+  },
+  {
+   "id": "B-114",
+   "question": "I am going to file for divorce next month. We own a plot together. Can the divorce court divide the plot?",
+   "gt_ids": [
+    "hma-13",
+    "hma-27"
+   ],
+   "gt_labels": [
+    "hma-13",
+    "hma-27"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": false,
+    "being_filed": true,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0915,
+    "custody": 0.1369,
+    "stridhan": 0.1291,
+    "residence": 0.1031,
+    "violence": 0.0278,
+    "divorce": 0.8212,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1454,
+    "divorce_pending": 0.1837,
+    "in_scope": 0.711
+   },
+   "stage1_probs": {
+    "maintenance": 0.0915,
+    "custody": 0.1369,
+    "stridhan": 0.1291,
+    "residence": 0.1031,
+    "violence": 0.0278,
+    "divorce": 0.8212,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1454,
+    "divorce_pending": 0.1837,
+    "in_scope": 0.711
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0951,
+    "custody": 0.1385,
+    "stridhan": 0.5773,
+    "residence": 0.6258,
+    "violence": 0.0318,
+    "divorce": 0.9049,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.9059,
+    "divorce_pending": 0.2415,
+    "in_scope": 0.4936
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0318,
+    "divorce": 0.9049,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.2415
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "We own a plot together.",
+    "custody": "We own a plot together.",
+    "stridhan": "We own a plot together.",
+    "residence": "We own a plot together.",
+    "violence": "I am going to file for divorce next month.",
+    "divorce": "I am going to file for divorce next month.",
+    "birth_certificate": "I am going to file for divorce next month."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0936,
+     "throws me out of the house": 0.0907,
+     "to stay in the house with my daughter": 0.0855
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1263,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.1024,
+     "gives no money for my son's school fees": 0.072,
+     "money for his school fees while the case goes on": 0.0297,
+     "he gives no money for me and my child": 0.0887,
+     "My husband has not given me any money for three months": 0.1259
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0886,
+     "I want my daughter to stay with me": 0.0688
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.1052
+    }
+   },
+   "aux_max": {
+    "residence": 0.0936,
+    "maintenance": 0.1263,
+    "custody": 0.0886,
+    "divorce_pending": 0.1052
+   },
+   "clauses": [
+    "I am going to file for divorce next month.",
+    "We own a plot together.",
+    "Can the divorce court divide the plot?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.1031,
+   "residence_r1": 0.1454,
+   "residence_r0_clause_max": 0.6258,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1385,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "divorce",
+    "dominant_full": 0.8212,
+    "blocked": [
+     [
+      "birth_certificate",
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.9049,
+   "divorce_pending_prob": 0.2415,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.711,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I am going to file for divorce next month."
+   },
+   "candidates_before_stage2": [
+    "hma-13"
+   ],
+   "candidates_before_gate": [
+    "hma-13"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "kept_ids": [
+    "hma-13"
+   ],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.41
+  },
+  {
+   "id": "B-115",
+   "question": "My divorce case is pending and I want my 6-year-old son to stay with me until the case ends.",
+   "gt_ids": [
+    "hma-26"
+   ],
+   "gt_labels": [
+    "hma-26"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": true,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0945,
+    "custody": 0.3443,
+    "stridhan": 0.0002,
+    "residence": 0.0826,
+    "violence": 0.0003,
+    "divorce": 0.308,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.586,
+    "divorce_pending": 0.9063,
+    "in_scope": 0.812
+   },
+   "stage1_probs": {
+    "maintenance": 0.0945,
+    "custody": 0.3443,
+    "stridhan": 0.0002,
+    "residence": 0.0826,
+    "violence": 0.0003,
+    "divorce": 0.308,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.586,
+    "divorce_pending": 0.9063,
+    "in_scope": 0.812
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.1366,
+    "custody": 0.6315,
+    "stridhan": 0.0002,
+    "residence": 0.1826,
+    "violence": 0.0283,
+    "divorce": 0.1507,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.3713,
+    "divorce_pending": 0.8447,
+    "in_scope": 0.4636
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0,
+    "divorce": 0.308,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.9063
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want my 6-year-old son to stay with me until the case ends.",
+    "custody": "I want my 6-year-old son to stay with me until the case ends.",
+    "stridhan": "My divorce case is pending",
+    "residence": "I want my 6-year-old son to stay with me until the case ends.",
+    "violence": "My divorce case is pending",
+    "divorce": "I want my 6-year-old son to stay with me until the case ends.",
+    "birth_certificate": "My divorce case is pending"
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0763,
+     "throws me out of the house": 0.0788,
+     "to stay in the house with my daughter": 0.1213
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1322,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.1619,
+     "gives no money for my son's school fees": 0.0756,
+     "money for his school fees while the case goes on": 0.1152,
+     "he gives no money for me and my child": 0.0539,
+     "My husband has not given me any money for three months": 0.0932
+    },
+    "custody": {
+     "I want my son to stay with me": 0.4788,
+     "I want my daughter to stay with me": 0.1141
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.8019
+    }
+   },
+   "aux_max": {
+    "residence": 0.1213,
+    "maintenance": 0.1619,
+    "custody": 0.4788,
+    "divorce_pending": 0.8019
+   },
+   "clauses": [
+    "My divorce case is pending",
+    "I want my 6-year-old son to stay with me until the case ends."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0826,
+   "residence_r1": 0.586,
+   "residence_r0_clause_max": 0.1826,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.6315,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "custody",
+    "dominant_full": 0.3443,
+    "blocked": [
+     [
+      "stridhan",
+      0.0002,
+      0.0002
+     ],
+     [
+      "violence",
+      0.0003,
+      0.0283
+     ],
+     [
+      "birth_certificate",
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.308,
+   "divorce_pending_prob": 0.9063,
+   "divorce_signal": "pending",
+   "in_scope": true,
+   "in_scope_prob": 0.812,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I want my 6-year-old son to stay with me until the case ends."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: stridhan blocked (dominant=custody, full=0.0002<=0.01, lift=0.0002<0.80)",
+    "single-issue guard: violence blocked (dominant=custody, full=0.0003<=0.01, lift=0.0283<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=custody, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "provisional",
+   "court_top2": [
+    [
+     "divorce",
+     0.9063
+    ],
+    [
+     "maintenance",
+     0.0
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.33
+  },
+  {
+   "id": "B-116",
+   "question": "I am thinking of asking for a divorce and I want my daughter to live with me. Can I get custody?",
+   "gt_ids": [
+    "hma-13",
+    "gwa-1890"
+   ],
+   "gt_labels": [
+    "hma-13",
+    "gwa-1890"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0225,
+    "custody": 0.2481,
+    "stridhan": 0.0086,
+    "residence": 0.0615,
+    "violence": 0.0285,
+    "divorce": 0.8135,
+    "birth_certificate": 0.0038,
+    "residence_r1": 0.0917,
+    "divorce_pending": 0.0847,
+    "in_scope": 0.6583
+   },
+   "stage1_probs": {
+    "maintenance": 0.0225,
+    "custody": 0.2481,
+    "stridhan": 0.0086,
+    "residence": 0.0615,
+    "violence": 0.0285,
+    "divorce": 0.8135,
+    "birth_certificate": 0.0038,
+    "residence_r1": 0.0917,
+    "divorce_pending": 0.0847,
+    "in_scope": 0.6583
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.1207,
+    "custody": 0.774,
+    "stridhan": 0.0315,
+    "residence": 0.1487,
+    "violence": 0.0435,
+    "divorce": 0.892,
+    "birth_certificate": 0.0098,
+    "residence_r1": 0.2679,
+    "divorce_pending": 0.1771,
+    "in_scope": 0.5344
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.774,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0435,
+    "divorce": 0.892,
+    "birth_certificate": 0.0098,
+    "divorce_pending": 0.1771
+   },
+   "fired_issues": [
+    "custody",
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "Can I get custody?",
+    "custody": "Can I get custody?",
+    "stridhan": "Can I get custody?",
+    "residence": "I am thinking of asking for a divorce",
+    "violence": "Can I get custody?",
+    "divorce": "I am thinking of asking for a divorce",
+    "birth_certificate": "Can I get custody?"
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0352,
+     "throws me out of the house": 0.0275,
+     "to stay in the house with my daughter": 0.6541
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.497,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.1612,
+     "gives no money for my son's school fees": 0.0003,
+     "money for his school fees while the case goes on": 0.0121,
+     "he gives no money for me and my child": 0.0749,
+     "My husband has not given me any money for three months": 0.1091
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0785,
+     "I want my daughter to stay with me": 0.6438
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.08
+    }
+   },
+   "aux_max": {
+    "residence": 0.6541,
+    "maintenance": 0.497,
+    "custody": 0.6438,
+    "divorce_pending": 0.08
+   },
+   "clauses": [
+    "I am thinking of asking for a divorce",
+    "I want my daughter to live with me.",
+    "Can I get custody?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0615,
+   "residence_r1": 0.0917,
+   "residence_r0_clause_max": 0.1487,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": true,
+   "custody_gated": false,
+   "custody_final_pre_gate": 0.774,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.892,
+   "divorce_pending_prob": 0.1771,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.6583,
+   "sub_choices": {
+    "custody:custody_sub_issue_choice": "A: Custody inside a matrimonial proceeding (HMA s.26)",
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "custody:custody_sub_issue_choice": "I am thinking of asking for a divorce and I want my daughter to live with me. Can I get custody?",
+    "procedure:divorce-gate": "I am thinking of asking for a divorce"
+   },
+   "candidates_before_stage2": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "candidates_before_gate": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false"
+   ],
+   "kept_ids": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Custody: who the child stays with is a welfare decision for the Family Court -- the bot names the route (GWA 1890) but does not say who gets the child. Escalate for interim custody and the welfare assessment. If either parent has said they will take the child away, that needs urgent human help."
+   ],
+   "escalations_typed": [
+    {
+     "kind": "custody",
+     "text": "Custody: who the child stays with is a welfare decision for the Family Court -- the bot names the route (GWA 1890) but does not say who gets the child. Escalate for interim custody and the welfare assessment. If either parent has said they will take the child away, that needs urgent human help."
+    }
+   ],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.46
+  },
+  {
+   "id": "B-117",
+   "question": "My divorce case has been going on for a year and I have no income. Can I get monthly money while the case is pending?",
+   "gt_ids": [
+    "hma-24"
+   ],
+   "gt_labels": [
+    "hma-24"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": true,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": true,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.7012,
+    "custody": 0.1352,
+    "stridhan": 0.0678,
+    "residence": 0.0443,
+    "violence": 0.0028,
+    "divorce": 0.1734,
+    "birth_certificate": 0.0008,
+    "residence_r1": 0.072,
+    "divorce_pending": 0.8994,
+    "in_scope": 0.3551
+   },
+   "stage1_probs": {
+    "maintenance": 0.7012,
+    "custody": 0.1352,
+    "stridhan": 0.0678,
+    "residence": 0.0443,
+    "violence": 0.0028,
+    "divorce": 0.1734,
+    "birth_certificate": 0.0008,
+    "residence_r1": 0.072,
+    "divorce_pending": 0.8994,
+    "in_scope": 0.3551
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.6246,
+    "custody": 0.1617,
+    "stridhan": 0.0817,
+    "residence": 0.0608,
+    "violence": 0.0663,
+    "divorce": 0.1104,
+    "birth_certificate": 0.002,
+    "residence_r1": 0.0719,
+    "divorce_pending": 0.8357,
+    "in_scope": 0.2341
+   },
+   "stage1_final": {
+    "maintenance": 0.7012,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0,
+    "divorce": 0.1734,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.8994
+   },
+   "fired_issues": [
+    "maintenance",
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "Can I get monthly money while the case is pending?",
+    "custody": "Can I get monthly money while the case is pending?",
+    "stridhan": "Can I get monthly money while the case is pending?",
+    "residence": "I have no income.",
+    "violence": "My divorce case has been going on for a year",
+    "divorce": "Can I get monthly money while the case is pending?",
+    "birth_certificate": "Can I get monthly money while the case is pending?"
+   },
+   "fired_source": {
+    "maintenance": "full",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.081,
+     "throws me out of the house": 0.0715,
+     "to stay in the house with my daughter": 0.041
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1875,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.5408,
+     "gives no money for my son's school fees": 0.6732,
+     "money for his school fees while the case goes on": 0.3426,
+     "he gives no money for me and my child": 0.2162,
+     "My husband has not given me any money for three months": 0.1445
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0324,
+     "I want my daughter to stay with me": 0.0153
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.7831
+    }
+   },
+   "aux_max": {
+    "residence": 0.081,
+    "maintenance": 0.6732,
+    "custody": 0.0324,
+    "divorce_pending": 0.7831
+   },
+   "clauses": [
+    "My divorce case has been going on for a year",
+    "I have no income.",
+    "Can I get monthly money while the case is pending?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0443,
+   "residence_r1": 0.072,
+   "residence_r0_clause_max": 0.0608,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": true,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1617,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "maintenance",
+    "dominant_full": 0.7012,
+    "blocked": [
+     [
+      "violence",
+      0.0028,
+      0.0663
+     ],
+     [
+      "birth_certificate",
+      0.0008,
+      0.002
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.1734,
+   "divorce_pending_prob": 0.8994,
+   "divorce_signal": "pending",
+   "in_scope": false,
+   "in_scope_prob": 0.3551,
+   "sub_choices": {
+    "maintenance:maintenance-root": "interim maintenance during a pending HMA proceeding",
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "maintenance:maintenance-root": "Can I get monthly money while the case is pending?",
+    "procedure:divorce-gate": "Can I get monthly money while the case is pending?"
+   },
+   "candidates_before_stage2": [
+    "bnss-144",
+    "hma-24",
+    "pwdva-20"
+   ],
+   "candidates_before_gate": [
+    "bnss-144",
+    "hma-24",
+    "pwdva-20"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: violence blocked (dominant=maintenance, full=0.0028<=0.01, lift=0.0663<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=maintenance, full=0.0008<=0.01, lift=0.0020<0.80)",
+    "hma-25: option 'permanent alimony at/after an HMA decree' removed from maintenance:maintenance-root before offering (Layer A), decree=false"
+   ],
+   "kept_ids": [
+    "bnss-144",
+    "hma-24",
+    "pwdva-20"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "escalations_typed": [
+    {
+     "kind": "quantum",
+     "text": "Quantum: husband's income / school fees unknown — escalate the amount, never invent it"
+    },
+    {
+     "kind": "fact",
+     "text": "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+    }
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.51
+  },
+  {
+   "id": "B-118",
+   "question": "I need money every month while I decide whether to file for divorce. There is no case yet.",
+   "gt_ids": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": true,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.145,
+    "custody": 0.1002,
+    "stridhan": 0.0377,
+    "residence": 0.0602,
+    "violence": 0.0001,
+    "divorce": 0.1736,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0816,
+    "divorce_pending": 0.1692,
+    "in_scope": 0.1057
+   },
+   "stage1_probs": {
+    "maintenance": 0.145,
+    "custody": 0.1002,
+    "stridhan": 0.0377,
+    "residence": 0.0602,
+    "violence": 0.0001,
+    "divorce": 0.1736,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0816,
+    "divorce_pending": 0.1692,
+    "in_scope": 0.1057
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.5284,
+    "custody": 0.1294,
+    "stridhan": 0.1044,
+    "residence": 0.0777,
+    "violence": 0.0257,
+    "divorce": 0.6218,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.046,
+    "divorce_pending": 0.1633,
+    "in_scope": 0.1138
+   },
+   "stage1_final": {
+    "maintenance": 0.5284,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0,
+    "divorce": 0.6218,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.1692
+   },
+   "fired_issues": [
+    "maintenance",
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I need money every month while I decide whether to file for divorce.",
+    "custody": "There is no case yet.",
+    "stridhan": "I need money every month while I decide whether to file for divorce.",
+    "residence": "I need money every month while I decide whether to file for divorce.",
+    "violence": "There is no case yet.",
+    "divorce": "I need money every month while I decide whether to file for divorce.",
+    "birth_certificate": "I need money every month while I decide whether to file for divorce."
+   },
+   "fired_source": {
+    "maintenance": "clause",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0573,
+     "throws me out of the house": 0.0021,
+     "to stay in the house with my daughter": 0.0815
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1347,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.1378,
+     "gives no money for my son's school fees": 0.0745,
+     "money for his school fees while the case goes on": 0.0841,
+     "he gives no money for me and my child": 0.0899,
+     "My husband has not given me any money for three months": 0.0989
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0779,
+     "I want my daughter to stay with me": 0.0745
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.0867
+    }
+   },
+   "aux_max": {
+    "residence": 0.0815,
+    "maintenance": 0.1378,
+    "custody": 0.0779,
+    "divorce_pending": 0.0867
+   },
+   "clauses": [
+    "I need money every month while I decide whether to file for divorce.",
+    "There is no case yet."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0602,
+   "residence_r1": 0.0816,
+   "residence_r0_clause_max": 0.0777,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": true,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1294,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "maintenance",
+    "dominant_full": 0.145,
+    "blocked": [
+     [
+      "violence",
+      0.0001,
+      0.0257
+     ],
+     [
+      "birth_certificate",
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.6218,
+   "divorce_pending_prob": 0.1692,
+   "divorce_signal": "both",
+   "in_scope": false,
+   "in_scope_prob": 0.1138,
+   "sub_choices": {
+    "maintenance:maintenance-root": "interim maintenance during a pending HMA proceeding",
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "maintenance:maintenance-root": "I need money every month while I decide whether to file for divorce.",
+    "procedure:divorce-gate": "I need money every month while I decide whether to file for divorce."
+   },
+   "candidates_before_stage2": [
+    "bnss-144",
+    "hma-13",
+    "hma-24",
+    "pwdva-20"
+   ],
+   "candidates_before_gate": [
+    "bnss-144",
+    "hma-13",
+    "hma-24",
+    "pwdva-20"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: violence blocked (dominant=maintenance, full=0.0001<=0.01, lift=0.0257<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=maintenance, full=0.0000<=0.01, lift=0.0000<0.80)",
+    "hma-25: option 'permanent alimony at/after an HMA decree' removed from maintenance:maintenance-root before offering (Layer A), decree=false"
+   ],
+   "kept_ids": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "dropped": [
+    [
+     "hma-24",
+     "no HMA proceeding pending"
+    ]
+   ],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "escalations_typed": [
+    {
+     "kind": "quantum",
+     "text": "Quantum: husband's income / school fees unknown — escalate the amount, never invent it"
+    },
+    {
+     "kind": "fact",
+     "text": "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+    }
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.41
+  },
+  {
+   "id": "B-119",
+   "question": "Our divorce matter is pending in Family Court. I want a one-time settlement and a share of our jointly owned shop.",
+   "gt_ids": [
+    "hma-25",
+    "hma-27"
+   ],
+   "gt_labels": [
+    "hma-25",
+    "hma-27"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": true,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.1655,
+    "custody": 0.101,
+    "stridhan": 0.0397,
+    "residence": 0.0534,
+    "violence": 0.0001,
+    "divorce": 0.668,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.067,
+    "divorce_pending": 0.8624,
+    "in_scope": 0.5977
+   },
+   "stage1_probs": {
+    "maintenance": 0.1655,
+    "custody": 0.101,
+    "stridhan": 0.0397,
+    "residence": 0.0534,
+    "violence": 0.0001,
+    "divorce": 0.668,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.067,
+    "divorce_pending": 0.8624,
+    "in_scope": 0.5977
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.095,
+    "custody": 0.1309,
+    "stridhan": 0.078,
+    "residence": 0.0969,
+    "violence": 0.0262,
+    "divorce": 0.1144,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1119,
+    "divorce_pending": 0.8483,
+    "in_scope": 0.6878
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0262,
+    "divorce": 0.668,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.8624
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want a one-time settlement and a share of our jointly owned shop.",
+    "custody": "Our divorce matter is pending in Family Court.",
+    "stridhan": "I want a one-time settlement and a share of our jointly owned shop.",
+    "residence": "Our divorce matter is pending in Family Court.",
+    "violence": "Our divorce matter is pending in Family Court.",
+    "divorce": "I want a one-time settlement and a share of our jointly owned shop.",
+    "birth_certificate": "Our divorce matter is pending in Family Court."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.088,
+     "throws me out of the house": 0.0535,
+     "to stay in the house with my daughter": 0.0839
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.2007,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0917,
+     "gives no money for my son's school fees": 0.0927,
+     "money for his school fees while the case goes on": 0.1169,
+     "he gives no money for me and my child": 0.0768,
+     "My husband has not given me any money for three months": 0.1922
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0707,
+     "I want my daughter to stay with me": 0.0566
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.8432
+    }
+   },
+   "aux_max": {
+    "residence": 0.088,
+    "maintenance": 0.2007,
+    "custody": 0.0707,
+    "divorce_pending": 0.8432
+   },
+   "clauses": [
+    "Our divorce matter is pending in Family Court.",
+    "I want a one-time settlement and a share of our jointly owned shop."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0534,
+   "residence_r1": 0.067,
+   "residence_r0_clause_max": 0.0969,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1309,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.668,
+   "divorce_pending_prob": 0.8624,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.6878,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I want a one-time settlement and a share of our jointly owned shop."
+   },
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "provisional",
+   "court_top2": [
+    [
+     "divorce",
+     0.8624
+    ],
+    [
+     "violence",
+     0.0262
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.36
+  },
+  {
+   "id": "B-120",
+   "question": "I want to separate from my husband. We bought a car together. If I file for divorce, can the court give me the car?",
+   "gt_ids": [
+    "hma-13"
+   ],
+   "gt_labels": [
+    "hma-13"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0903,
+    "custody": 0.1544,
+    "stridhan": 0.1729,
+    "residence": 0.098,
+    "violence": 0.006,
+    "divorce": 0.8577,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1007,
+    "divorce_pending": 0.1698,
+    "in_scope": 0.5854
+   },
+   "stage1_probs": {
+    "maintenance": 0.0903,
+    "custody": 0.1544,
+    "stridhan": 0.1729,
+    "residence": 0.098,
+    "violence": 0.006,
+    "divorce": 0.8577,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1007,
+    "divorce_pending": 0.1698,
+    "in_scope": 0.5854
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.1144,
+    "custody": 0.1708,
+    "stridhan": 0.1184,
+    "residence": 0.1092,
+    "violence": 0.0482,
+    "divorce": 0.8416,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0978,
+    "divorce_pending": 0.2729,
+    "in_scope": 0.2818
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0,
+    "divorce": 0.8577,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.2729
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "If I file for divorce, can the court give me the car?",
+    "custody": "If I file for divorce, can the court give me the car?",
+    "stridhan": "If I file for divorce, can the court give me the car?",
+    "residence": "I want to separate from my husband.",
+    "violence": "I want to separate from my husband.",
+    "divorce": "I want to separate from my husband.",
+    "birth_certificate": "I want to separate from my husband."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "clause",
+    "stridhan": "full",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.1088,
+     "throws me out of the house": 0.0999,
+     "to stay in the house with my daughter": 0.0871
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1682,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.1013,
+     "gives no money for my son's school fees": 0.2372,
+     "money for his school fees while the case goes on": 0.1267,
+     "he gives no money for me and my child": 0.145,
+     "My husband has not given me any money for three months": 0.1756
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0826,
+     "I want my daughter to stay with me": 0.0685
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.1092
+    }
+   },
+   "aux_max": {
+    "residence": 0.1088,
+    "maintenance": 0.2372,
+    "custody": 0.0826,
+    "divorce_pending": 0.1092
+   },
+   "clauses": [
+    "I want to separate from my husband.",
+    "We bought a car together.",
+    "If I file for divorce, can the court give me the car?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.098,
+   "residence_r1": 0.1007,
+   "residence_r0_clause_max": 0.1092,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1708,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "divorce",
+    "dominant_full": 0.8577,
+    "blocked": [
+     [
+      "violence",
+      0.006,
+      0.0482
+     ],
+     [
+      "birth_certificate",
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.8577,
+   "divorce_pending_prob": 0.2729,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.5854,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I want to separate from my husband."
+   },
+   "candidates_before_stage2": [
+    "hma-13"
+   ],
+   "candidates_before_gate": [
+    "hma-13"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: violence blocked (dominant=divorce, full=0.0060<=0.01, lift=0.0482<0.80)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)"
+   ],
+   "kept_ids": [
+    "hma-13"
+   ],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.41
+  },
+  {
+   "id": "B-121",
+   "question": "No case exists between us so far, and the only house we have stands solely in my husband's name. Do I have any claim to a portion of it as property?",
+   "gt_ids": [],
+   "gt_labels": [],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0302,
+    "custody": 0.1108,
+    "stridhan": 0.0913,
+    "residence": 0.0768,
+    "violence": 0.0009,
+    "divorce": 0.0769,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1331,
+    "divorce_pending": 0.0874,
+    "in_scope": 0.1959
+   },
+   "stage1_probs": {
+    "maintenance": 0.0302,
+    "custody": 0.1108,
+    "stridhan": 0.0913,
+    "residence": 0.0768,
+    "violence": 0.0009,
+    "divorce": 0.0769,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1331,
+    "divorce_pending": 0.0874,
+    "in_scope": 0.1959
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0247,
+    "custody": 0.1044,
+    "stridhan": 0.4262,
+    "residence": 0.0874,
+    "violence": 0.0015,
+    "divorce": 0.0973,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.2635,
+    "divorce_pending": 0.0837,
+    "in_scope": 0.2403
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0015,
+    "divorce": 0.0973,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.0874
+   },
+   "fired_issues": [],
+   "fired_clause": {
+    "maintenance": "Do I have any claim to a portion of it as property?",
+    "custody": "No case exists between us so far, and the only house we have stands solely in my husband's name.",
+    "stridhan": "Do I have any claim to a portion of it as property?",
+    "residence": "No case exists between us so far, and the only house we have stands solely in my husband's name.",
+    "violence": "No case exists between us so far, and the only house we have stands solely in my husband's name.",
+    "divorce": "No case exists between us so far, and the only house we have stands solely in my husband's name.",
+    "birth_certificate": "No case exists between us so far, and the only house we have stands solely in my husband's name."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "full",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.1241,
+     "throws me out of the house": 0.0948,
+     "to stay in the house with my daughter": 0.0806
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1012,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0774,
+     "gives no money for my son's school fees": 0.0693,
+     "money for his school fees while the case goes on": 0.0366,
+     "he gives no money for me and my child": 0.1,
+     "My husband has not given me any money for three months": 0.0969
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0247,
+     "I want my daughter to stay with me": 0.0008
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.0303
+    }
+   },
+   "aux_max": {
+    "residence": 0.1241,
+    "maintenance": 0.1012,
+    "custody": 0.0247,
+    "divorce_pending": 0.0303
+   },
+   "clauses": [
+    "No case exists between us so far, and the only house we have stands solely in my husband's name.",
+    "Do I have any claim to a portion of it as property?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0768,
+   "residence_r1": 0.1331,
+   "residence_r0_clause_max": 0.0874,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1108,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.0973,
+   "divorce_pending_prob": 0.0874,
+   "divorce_signal": "none",
+   "in_scope": false,
+   "in_scope_prob": 0.2403,
+   "sub_choices": {},
+   "sub_choice_body": {},
+   "candidates_before_stage2": [],
+   "candidates_before_gate": [],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [],
+   "court_source": "out-of-scope",
+   "court_top2": [
+    [
+     "divorce",
+     0.0973
+    ],
+    [
+     "violence",
+     0.0015
+    ]
+   ],
+   "error": null,
+   "latency_s": 0.24
+  },
+  {
+   "id": "B-122",
+   "question": "My divorce case has been pending in Family Court for over a year. Last month I learned that my husband sold our jointly owned flat without telling me or asking my consent. The buyer has now asked me to vacate the portion I still occupy. I want to know whether the divorce court can undo the sale or give me my share from the sale money.",
+   "gt_ids": [
+    "hma-27"
+   ],
+   "gt_labels": [
+    "hma-27"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": true,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": true,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.026,
+    "custody": 0.0884,
+    "stridhan": 0.1094,
+    "residence": 0.0292,
+    "violence": 0.0,
+    "divorce": 0.0661,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1146,
+    "divorce_pending": 0.8702,
+    "in_scope": 0.7949
+   },
+   "stage1_probs": {
+    "maintenance": 0.026,
+    "custody": 0.0884,
+    "stridhan": 0.1094,
+    "residence": 0.0292,
+    "violence": 0.0,
+    "divorce": 0.0661,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1146,
+    "divorce_pending": 0.8702,
+    "in_scope": 0.7949
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0402,
+    "custody": 0.1252,
+    "stridhan": 0.0895,
+    "residence": 0.2466,
+    "violence": 0.0296,
+    "divorce": 0.8523,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1487,
+    "divorce_pending": 0.8679,
+    "in_scope": 0.3329
+   },
+   "stage1_final": {
+    "maintenance": 0.1962,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0296,
+    "divorce": 0.8523,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.8702
+   },
+   "fired_issues": [
+    "maintenance",
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want to know whether the divorce court can undo the sale or give me my share from the sale money.",
+    "custody": "I want to know whether the divorce court can undo the sale or give me my share from the sale money.",
+    "stridhan": "I want to know whether the divorce court can undo the sale or give me my share from the sale money.",
+    "residence": "The buyer has now asked me to vacate the portion I still occupy.",
+    "violence": "My divorce case has been pending in Family Court for over a year.",
+    "divorce": "I want to know whether the divorce court can undo the sale or give me my share from the sale money.",
+    "birth_certificate": "My divorce case has been pending in Family Court for over a year."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "clause",
+    "stridhan": "full",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.079,
+     "throws me out of the house": 0.0543,
+     "to stay in the house with my daughter": 0.0647
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1545,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0747,
+     "gives no money for my son's school fees": 0.1357,
+     "money for his school fees while the case goes on": 0.1398,
+     "he gives no money for me and my child": 0.1243,
+     "My husband has not given me any money for three months": 0.1962
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0312,
+     "I want my daughter to stay with me": 0.005
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.8601
+    }
+   },
+   "aux_max": {
+    "residence": 0.079,
+    "maintenance": 0.1962,
+    "custody": 0.0312,
+    "divorce_pending": 0.8601
+   },
+   "clauses": [
+    "My divorce case has been pending in Family Court for over a year.",
+    "Last month I learned that my husband sold our jointly owned flat without telling me or asking my consent.",
+    "The buyer has now asked me to vacate the portion I still occupy.",
+    "I want to know whether the divorce court can undo the sale or give me my share from the sale money."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0292,
+   "residence_r1": 0.1146,
+   "residence_r0_clause_max": 0.2466,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": true,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1252,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.8523,
+   "divorce_pending_prob": 0.8702,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.7949,
+   "sub_choices": {
+    "maintenance:maintenance-root": "monetary reliefs for expenses and child costs (domestic violence / economic abuse)",
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "maintenance:maintenance-root": "I want to know whether the divorce court can undo the sale or give me my share from the sale money.",
+    "procedure:divorce-gate": "I want to know whether the divorce court can undo the sale or give me my share from the sale money."
+   },
+   "candidates_before_stage2": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "candidates_before_gate": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "hma-25: option 'permanent alimony at/after an HMA decree' removed from maintenance:maintenance-root before offering (Layer A), decree=false"
+   ],
+   "kept_ids": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "escalations_typed": [
+    {
+     "kind": "quantum",
+     "text": "Quantum: husband's income / school fees unknown — escalate the amount, never invent it"
+    },
+    {
+     "kind": "fact",
+     "text": "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+    }
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.57
+  },
+  {
+   "id": "B-123",
+   "question": "I will be filing for divorce next week. We have a jointly owned house and a 9-year-old son. I want the house divided and my son to stay with me.",
+   "gt_ids": [
+    "hma-13",
+    "hma-27",
+    "hma-26"
+   ],
+   "gt_labels": [
+    "hma-13",
+    "hma-27",
+    "hma-26"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": false,
+    "being_filed": true,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.069,
+    "custody": 0.2673,
+    "stridhan": 0.0001,
+    "residence": 0.0356,
+    "violence": 0.0001,
+    "divorce": 0.9089,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0741,
+    "divorce_pending": 0.7478,
+    "in_scope": 0.7142
+   },
+   "stage1_probs": {
+    "maintenance": 0.069,
+    "custody": 0.2673,
+    "stridhan": 0.0001,
+    "residence": 0.0356,
+    "violence": 0.0001,
+    "divorce": 0.9089,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0741,
+    "divorce_pending": 0.7478,
+    "in_scope": 0.7142
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.1004,
+    "custody": 0.1502,
+    "stridhan": 0.0295,
+    "residence": 0.1521,
+    "violence": 0.0268,
+    "divorce": 0.8961,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.1847,
+    "divorce_pending": 0.3784,
+    "in_scope": 0.2448
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0268,
+    "divorce": 0.9089,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.7478
+   },
+   "fired_issues": [
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I want the house divided",
+    "custody": "I want the house divided",
+    "stridhan": "We have a jointly owned house and a 9-year-old son.",
+    "residence": "I want the house divided",
+    "violence": "I will be filing for divorce next week.",
+    "divorce": "I will be filing for divorce next week.",
+    "birth_certificate": "I will be filing for divorce next week."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "aux",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0917,
+     "throws me out of the house": 0.1663,
+     "to stay in the house with my daughter": 0.0727
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1265,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0679,
+     "gives no money for my son's school fees": 0.0924,
+     "money for his school fees while the case goes on": 0.1401,
+     "he gives no money for me and my child": 0.074,
+     "My husband has not given me any money for three months": 0.2096
+    },
+    "custody": {
+     "I want my son to stay with me": 0.7712,
+     "I want my daughter to stay with me": 0.0689
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.1386
+    }
+   },
+   "aux_max": {
+    "residence": 0.1663,
+    "maintenance": 0.2096,
+    "custody": 0.7712,
+    "divorce_pending": 0.1386
+   },
+   "clauses": [
+    "I will be filing for divorce next week.",
+    "We have a jointly owned house and a 9-year-old son.",
+    "I want the house divided",
+    "my son to stay with me."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0356,
+   "residence_r1": 0.0741,
+   "residence_r0_clause_max": 0.1521,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.7712,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.9089,
+   "divorce_pending_prob": 0.7478,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.7142,
+   "sub_choices": {
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "procedure:divorce-gate": "I will be filing for divorce next week."
+   },
+   "candidates_before_stage2": [
+    "hma-13"
+   ],
+   "candidates_before_gate": [
+    "hma-13"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [
+    "hma-13"
+   ],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.51
+  },
+  {
+   "id": "B-124",
+   "question": "I want a divorce from my husband and I need monthly money. We own no property together.",
+   "gt_ids": [
+    "hma-13",
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "hma-13",
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": false,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": true,
+    "gold_fact": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0969,
+    "custody": 0.0715,
+    "stridhan": 0.0298,
+    "residence": 0.0904,
+    "violence": 0.0261,
+    "divorce": 0.9647,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0637,
+    "divorce_pending": 0.3117,
+    "in_scope": 0.8341
+   },
+   "stage1_probs": {
+    "maintenance": 0.0969,
+    "custody": 0.0715,
+    "stridhan": 0.0298,
+    "residence": 0.0904,
+    "violence": 0.0261,
+    "divorce": 0.9647,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0637,
+    "divorce_pending": 0.3117,
+    "in_scope": 0.8341
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.7723,
+    "custody": 0.1029,
+    "stridhan": 0.1459,
+    "residence": 0.1258,
+    "violence": 0.0659,
+    "divorce": 0.9625,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0408,
+    "divorce_pending": 0.1995,
+    "in_scope": 0.828
+   },
+   "stage1_final": {
+    "maintenance": 0.7723,
+    "custody": 0.0,
+    "stridhan": 0.0,
+    "residence": 0.0,
+    "violence": 0.0659,
+    "divorce": 0.9647,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.3117
+   },
+   "fired_issues": [
+    "maintenance",
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "I need monthly money.",
+    "custody": "We own no property together.",
+    "stridhan": "I need monthly money.",
+    "residence": "I want a divorce from my husband",
+    "violence": "I want a divorce from my husband",
+    "divorce": "I want a divorce from my husband",
+    "birth_certificate": "I want a divorce from my husband"
+   },
+   "fired_source": {
+    "maintenance": "clause",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "aux",
+    "violence": "clause",
+    "divorce": "full",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.0894,
+     "throws me out of the house": 0.1801,
+     "to stay in the house with my daughter": 0.0036
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.1281,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0957,
+     "gives no money for my son's school fees": 0.1051,
+     "money for his school fees while the case goes on": 0.1348,
+     "he gives no money for me and my child": 0.1095,
+     "My husband has not given me any money for three months": 0.1154
+    },
+    "custody": {
+     "I want my son to stay with me": 0.0615,
+     "I want my daughter to stay with me": 0.042
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.1007
+    }
+   },
+   "aux_max": {
+    "residence": 0.1801,
+    "maintenance": 0.1348,
+    "custody": 0.0615,
+    "divorce_pending": 0.1007
+   },
+   "clauses": [
+    "I want a divorce from my husband",
+    "I need monthly money.",
+    "We own no property together."
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0904,
+   "residence_r1": 0.0637,
+   "residence_r0_clause_max": 0.1258,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": true,
+   "gold_fact": false,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1029,
+   "single_issue_guard": {
+    "armed": true,
+    "dominant": "divorce",
+    "dominant_full": 0.9647,
+    "blocked": [
+     [
+      "birth_certificate",
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.9647,
+   "divorce_pending_prob": 0.3117,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.8341,
+   "sub_choices": {
+    "maintenance:maintenance-root": "full maintenance picture (all routes together)",
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "maintenance:maintenance-root": "I want a divorce from my husband and I need monthly money. We own no property together.",
+    "procedure:divorce-gate": "I want a divorce from my husband"
+   },
+   "candidates_before_stage2": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "candidates_before_gate": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: stridhan gated, gold_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)",
+    "single-issue guard: birth_certificate blocked (dominant=divorce, full=0.0000<=0.01, lift=0.0000<0.80)",
+    "hma-25: option 'permanent alimony at/after an HMA decree' removed from maintenance:maintenance-root before offering (Layer A), decree=false"
+   ],
+   "kept_ids": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-20"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "escalations_typed": [
+    {
+     "kind": "quantum",
+     "text": "Quantum: husband's income / school fees unknown — escalate the amount, never invent it"
+    },
+    {
+     "kind": "fact",
+     "text": "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+    }
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.49
+  },
+  {
+   "id": "B-125",
+   "question": "My divorce case is pending. My gold is with my in-laws and we also own a house together. Can the divorce court deal with both?",
+   "gt_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "gt_labels": [
+    "bns-316",
+    "hma-27"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": true,
+    "being_filed": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false,
+    "residence_claim": false,
+    "money_fact": false,
+    "gold_fact": true
+   },
+   "stage1_raw": {
+    "maintenance": 0.05,
+    "custody": 0.1521,
+    "stridhan": 0.6285,
+    "residence": 0.0711,
+    "violence": 0.0111,
+    "divorce": 0.4514,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0819,
+    "divorce_pending": 0.8395,
+    "in_scope": 0.8093
+   },
+   "stage1_probs": {
+    "maintenance": 0.05,
+    "custody": 0.1521,
+    "stridhan": 0.6285,
+    "residence": 0.0711,
+    "violence": 0.0111,
+    "divorce": 0.4514,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.0819,
+    "divorce_pending": 0.8395,
+    "in_scope": 0.8093
+   },
+   "stage1_clause_max": {
+    "maintenance": 0.0522,
+    "custody": 0.1639,
+    "stridhan": 0.7065,
+    "residence": 0.1812,
+    "violence": 0.0305,
+    "divorce": 0.5212,
+    "birth_certificate": 0.0,
+    "residence_r1": 0.3821,
+    "divorce_pending": 0.8447,
+    "in_scope": 0.7743
+   },
+   "stage1_final": {
+    "maintenance": 0.0,
+    "custody": 0.0,
+    "stridhan": 0.7065,
+    "residence": 0.0,
+    "violence": 0.0305,
+    "divorce": 0.5212,
+    "birth_certificate": 0.0,
+    "divorce_pending": 0.8447
+   },
+   "fired_issues": [
+    "stridhan",
+    "divorce"
+   ],
+   "fired_clause": {
+    "maintenance": "My gold is with my in-laws and we also own a house together.",
+    "custody": "Can the divorce court deal with both?",
+    "stridhan": "My gold is with my in-laws and we also own a house together.",
+    "residence": "My gold is with my in-laws and we also own a house together.",
+    "violence": "My divorce case is pending.",
+    "divorce": "Can the divorce court deal with both?",
+    "birth_certificate": "My divorce case is pending."
+   },
+   "fired_source": {
+    "maintenance": "aux",
+    "custody": "clause",
+    "stridhan": "clause",
+    "residence": "clause",
+    "violence": "clause",
+    "divorce": "clause",
+    "birth_certificate": "clause"
+   },
+   "aux_scores": {
+    "residence": {
+     "They changed the lock and I cannot enter my house": 0.1034,
+     "throws me out of the house": 0.0894,
+     "to stay in the house with my daughter": 0.1118
+    },
+    "maintenance": {
+     "I need money while my case is going on, but I have not filed any case yet": 0.289,
+     "I need maintenance but I do not have my husband's salary slips and I do not know what he earns": 0.0979,
+     "gives no money for my son's school fees": 0.1199,
+     "money for his school fees while the case goes on": 0.0732,
+     "he gives no money for me and my child": 0.0989,
+     "My husband has not given me any money for three months": 0.1113
+    },
+    "custody": {
+     "I want my son to stay with me": 0.1436,
+     "I want my daughter to stay with me": 0.1135
+    },
+    "divorce_pending": {
+     "My divorce case is already going on in the Family Court": 0.7581
+    }
+   },
+   "aux_max": {
+    "residence": 0.1118,
+    "maintenance": 0.289,
+    "custody": 0.1436,
+    "divorce_pending": 0.7581
+   },
+   "clauses": [
+    "My divorce case is pending.",
+    "My gold is with my in-laws and we also own a house together.",
+    "Can the divorce court deal with both?"
+   ],
+   "clause_errors": [],
+   "aux_errors": [],
+   "residence_r0": 0.0711,
+   "residence_r1": 0.0819,
+   "residence_r0_clause_max": 0.1812,
+   "residence_claim": false,
+   "residence_gated": true,
+   "money_fact": false,
+   "gold_fact": true,
+   "custody_claim": false,
+   "custody_gated": true,
+   "custody_final_pre_gate": 0.1639,
+   "single_issue_guard": {
+    "armed": false,
+    "dominant": null,
+    "dominant_full": null,
+    "blocked": []
+   },
+   "residence_sub_choice_info": {},
+   "divorce_asked_prob": 0.5212,
+   "divorce_pending_prob": 0.8447,
+   "divorce_signal": "both",
+   "in_scope": true,
+   "in_scope_prob": 0.8093,
+   "sub_choices": {
+    "stridhan:stridhan-subissue": "stridhan_held_not_returned",
+    "stridhan:civil-vs-criminal": "civil_only_s27",
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "sub_choice_body": {
+    "stridhan:stridhan-subissue": "My gold is with my in-laws and we also own a house together.",
+    "stridhan:civil-vs-criminal": "My gold is with my in-laws and we also own a house together.",
+    "procedure:divorce-gate": "Can the divorce court deal with both?"
+   },
+   "candidates_before_stage2": [
+    "bns-316",
+    "hma-27"
+   ],
+   "candidates_before_gate": [
+    "bns-316",
+    "hma-27"
+   ],
+   "gated_out": [
+    "residence: gated, no residence claim in facts (residence_claim=false)",
+    "evidence gate: maintenance gated, money_fact=false",
+    "custody: gated, no who-gets-the-child / guardianship claim in any clause (custody_claim=false)"
+   ],
+   "kept_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "dropped": [],
+   "escalations": [],
+   "escalations_typed": [],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_source": "kept",
+   "court_top2": [],
+   "error": null,
+   "latency_s": 0.51
+  }
+ ],
+ "frozen_hashes": {
+  "bank_sha256": "934a2b2265ac137c96939e1fbeca3682a037010e42f972bfd459c2fcac4ec717",
+  "graph_file": "laya-crpc-bns-section-decision-tree-v3.json",
+  "notebook_version": "v6-brutal"
+ },
+ "hardware": {
+  "loader_used": "laya.load(local PIXMELT snapshot dir)",
+  "load_seconds": 7.6,
+  "errors_before_success": {}
+ }
+}
