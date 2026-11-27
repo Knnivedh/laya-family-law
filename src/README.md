@@ -1,7 +1,10 @@
 # src/ — builders and helpers
 
-**Honest note: there is no standalone pipeline source yet.** The live
-classification pipeline (Stage 1 typed decisions + Stage 2 graph recheck +
+**Family-law maintenance intake** is available through the local LAYA model.
+Run `python -m src.laya_family --interactive` from the repository root.
+See the [runtime guide](../docs/laya-family-law-runtime.md).
+
+The legacy full-benchmark classification pipeline (Stage 1 typed decisions + Stage 2 graph recheck +
 scoring) currently lives inside the Colab notebooks in `../notebooks/`. This
 directory holds the deterministic builder scripts that generate those notebooks
 plus the graph merge / replay helpers used during development.
@@ -32,6 +35,5 @@ notebook was edited; stop and investigate.
 
 ## Missing (pending task P3.4)
 
-A runnable standalone classifier (importable module that takes a question +
-graph and returns the section set, without Colab) does not exist yet. That is a
-planned build, not something hidden in this directory.
+Full standalone benchmark coverage is tracked under P3.4. The local
+maintenance intake handles the routes listed in the runtime guide.
