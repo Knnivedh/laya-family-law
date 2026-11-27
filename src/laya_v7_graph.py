@@ -43,6 +43,8 @@ FAMILY_COURT_SECTIONS = frozenset({
 })
 MAGISTRATE_SECTIONS = frozenset({
     "bnss-144",
+    "bnss-144-3",
+    "bnss-146",
     "pwdva-17",
     "pwdva-18",
     "pwdva-19",
@@ -55,6 +57,10 @@ REGISTRAR_SECTIONS = frozenset({"births-deaths-act-1969"})
 SECTION_FORUM_AUTHORITY = {
     **{s: ("Family Court", "FCA s.7(1)") for s in FAMILY_COURT_SECTIONS},
     "bnss-144": ("Magistrate", "BNSS s.144 / JMFC (note: FCA s.7(2)(a) where Family Court established)"),
+    # R-LANE08: forum for the v4.1 post-order sub-routes (used once they
+    # become eligible; today they are conditional-only — see §1b below).
+    "bnss-144-3": ("Magistrate", "BNSS s.144(3) / JMFC (arrears recovery)"),
+    "bnss-146": ("Magistrate", "BNSS s.146 / JMFC (variation on change of circumstances)"),
     "bns-316": ("Magistrate", "BNSS Sch. I / BNS s.316 (civil property claim in Family Court FCA s.7 Expl.(c))"),
     **{s: ("Magistrate", "PWDVA s.27 / JMFC") for s in ("pwdva-17", "pwdva-18", "pwdva-19", "pwdva-20", "pwdva-22")},
     "births-deaths-act-1969": ("Registrar", "RBD Act 1969 ss.7-13"),
@@ -121,6 +127,22 @@ def layer_a_filter_options(node_id: str, options: list[str], facts: dict[str, An
                 drop_reason = "male_self_maintenance_excluded"
             elif (sex == "male" or role == "parent") and "pwdva" in low:
                 drop_reason = "pwdva_woman_only_s2a"
+        elif node_id == "maintenance:post-order-enforcement":
+            # R-LANE08: v4.1 post-order sub-routes. The "Recovery ... (BNSS
+            # s.144(3))" option needs an existing order + an arrears ask; the
+            # "Variation ... (BNSS s.146)" option needs a variation ask (the
+            # split fact itself required an order phrase — see extractor
+            # _post_order_split_facts). The generic arrears/shortfall option
+            # needs an existing order or a variation ask.
+            existing_order = proved_true(facts, "existing_order_enforcement")
+            arrears_asked = proved_true(facts, "arrears_recovery_asked")
+            variation_asked = proved_true(facts, "maintenance_variation_asked")
+            if "144(3)" in low and not (existing_order and arrears_asked):
+                drop_reason = "no_arrears_recovery_ask"
+            elif "variation" in low and not variation_asked:
+                drop_reason = "no_maintenance_variation_ask"
+            elif "arrears / shortfall" in low and not (existing_order or variation_asked):
+                drop_reason = "no_existing_order_for_post_order"
         elif node_id == "procedure:divorce-gate":
             if not divorce_asked or "divorce" in (facts.get("negated_issues") or set()):
                 if "13" in low:
@@ -358,6 +380,10 @@ def evaluate_stage2_v7(
     money_fact = proved_true(facts, "money_fact")
     child_only = proved_true(facts, "child_maintenance_only")
     existing_order = proved_true(facts, "existing_order_enforcement")
+    # R-LANE08: post-order split facts (emitted by extractor
+    # _post_order_split_facts; absent -> False).
+    arrears_recovery_asked = proved_true(facts, "arrears_recovery_asked")
+    maintenance_variation_asked = proved_true(facts, "maintenance_variation_asked")
     interim_only = proved_true(facts, "interim_only_asked")
     interim_parallel = proved_true(facts, "interim_unpaid_with_joint_or_parallel")
     post_decree_lump = proved_true(facts, "post_decree_lump_sum_enforcement")
@@ -493,6 +519,32 @@ def evaluate_stage2_v7(
                         _add_disp("bnss-144", "eligible", "subsistence_maintenance_bnss144")
                         if sex != "male" and dom_rel and not child_only:
                             _add_disp("pwdva-20", "eligible", "pwdva_s20_monetary_relief")
+
+    # --- 1b. Post-order enforcement sub-routes (v4.1: bnss-144-3 / bnss-146) ---
+    # R-LANE08: before this lane, evaluate_stage2_v7 had NO disposition for
+    # either section — a leaf with no route (the v6 hma-9/pwdva-22 class of
+    # gap, except worse: those two at least had a graph branch). They are
+    # recorded here as CONDITIONAL, not eligible, on purpose: promoting them
+    # to kept_ids today would break the live pipeline, because EN prose
+    # (laya_prose_v2.KNOWN_SECTIONS) has no bnss-144-3/bnss-146 template and
+    # render_prose returns an INVALID_RECORD_HANDOFF (status "error") for any
+    # unknown kept id. Eligible promotion needs (a) EN prose templates for
+    # both sections (prose lane, not this lane's file) and (b) a statute fact
+    # proving the order is BNSS s.144, not a pre-1 Jul 2024 CrPC s.125 order
+    # (BNSS s.531 savings — no such fact exists in v7 evidence yet; Lane 03).
+    # Conditional dispositions still put both sections in
+    # candidates_before_gate, so the route is now measurable instead of
+    # invisible. Kept ids are unchanged by this block (no 16-Q impact: no
+    # 16-Q item has existing_order set).
+    if maint_requested and (arrears_recovery_asked or maintenance_variation_asked):
+        if arrears_recovery_asked:
+            _add_disp("bnss-144-3", "conditional", "arrears_recovery_asked_post_order",
+                      ["existing_order_statute_bnss144"])
+            gated_out.append("bnss-144-3: gated (conditional only — EN prose template + BNSS-order statute check pending)")
+        if maintenance_variation_asked:
+            _add_disp("bnss-146", "conditional", "maintenance_variation_asked_post_order",
+                      ["existing_order_statute_bnss144"])
+            gated_out.append("bnss-146: gated (conditional only — EN prose template + BNSS-order statute check pending)")
 
     # --- 2. Matrimonial slice (HMA 13, 13B, 9) ---
     if (_wanted("divorce") or divorce_asked) and ("divorce" not in negated) and not js_only:

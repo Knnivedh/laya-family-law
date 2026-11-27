@@ -71,6 +71,12 @@ class LanguagePack:
     native_audit_signoff: str = ""
     # TODO marker: True while the pack is a stub awaiting a native speaker.
     todo: bool = False
+    # Lane 05 (recall swarm): fact/issue-key surface-form lexicon — maps
+    # Kannada-script, Kanglish spelling-variant and code-mixed forms to the
+    # corpus fact/issue keys (same patterns as
+    # laya_lang_normalizer.kannada_issue_hints). Verification-only signals;
+    # the graph never reads a pack.
+    fact_key_lexicon: dict[str, str] = field(default_factory=dict)
 
     @property
     def ready_for_production(self) -> bool:
@@ -97,21 +103,53 @@ KANNADA_PACK = LanguagePack(
     roman_detector=_kn_roman_detector,
     negation_demand_lexicon={
         # demand_made=False: speaker says they did NOT ask/demand.
-        # (Matches evidence.py:561 — ಕೇಳಿಲ್ಲ / ಕೇಳಲಿಲ್ಲ — plus roman forms.)
-        "demand_made": r"ಕೇಳಿಲ್ಲ|ಕೇಳಲಿಲ್ಲ|ಕೇಳೇ\s*ಇಲ್ಲ|ಕೇಳಲೇ\s*ಇಲ್ಲ|\bkelilla\b|\bkelalilla\b",
+        # (Matches evidence.py:561 — ಕೇಳಿಲ್ಲ / ಕೇಳಲಿಲ್ಲ — plus roman forms.
+        # Lane 05 adds ಕೇಳಿಯೇ ಇಲ್ಲ / ಎಂದೂ ಕೇಳಿಲ್ಲ and roman "keliye illa" /
+        # "yavattu kelilla" / "endu kelilla" from scripts/kn_templates.py.)
+        "demand_made": r"ಕೇಳಿಲ್ಲ|ಕೇಳಲಿಲ್ಲ|ಕೇಳೇ\s*ಇಲ್ಲ|ಕೇಳಲೇ\s*ಇಲ್ಲ|ಕೇಳಿಯೇ\s*ಇಲ್ಲ|ಎಂದೂ\s*ಕೇಳಿಲ್ಲ|\bkelilla\b|\bkelalilla\b|\bkeliye\s+illa\b|\byavattu\s+kelilla\b|\bendu\s+kelilla\b",
         # violence denied (Kannada): "he never hit me" family of forms.
-        "violence_denied": r"ಹೊಡೆದಿಲ್ಲ|ಹೊಡೆಯಲಿಲ್ಲ|ಹಿಂಸೆ\s*ಇಲ್ಲ|ಬೆದರಿಕೆ\s*ಇಲ್ಲ",
+        # Lane 05 adds the roman forms.
+        "violence_denied": r"ಹೊಡೆದಿಲ್ಲ|ಹೊಡೆಯಲಿಲ್ಲ|ಹಿಂಸೆ\s*ಇಲ್ಲ|ಬೆದರಿಕೆ\s*ಇಲ್ಲ|\bhodedilla\b|\bhodilla\b",
         # residence denied: speaker does not want the house / staying there.
-        "residence_denied": r"ಮನೆಯಲ್ಲಿ\s*ಇರಲು\s*ಬೇಡ|ಮನೆ\s*ಬೇಡ",
+        # Lane 05 adds the roman forms.
+        "residence_denied": r"ಮನೆಯಲ್ಲಿ\s*ಇರಲು\s*ಬೇಡ|ಮನೆ\s*ಬೇಡ|\bmane\s+beda\b|\bmaneyalli\s+iralu\s+beda\b",
+        # stridhan safe in the speaker's own possession (no claim):
+        # "gold is with me" family of forms (KN + roman).
+        "stridhan_claim": r"ಚಿನ್ನ\s*ನನ್ನ\s*ಬಳಿಯೇ|ಬಂಗಾರ\s*ನನ್ನ\s*ಬಳಿಯೇ|chinna\s+nanna\s+baliye|bangara\s+nanna\s+baliye",
+        # custody not wanted (KN + roman).
+        "custody_claim": r"ಪಾಲನೆ\s*ಬೇಡ|\bpaalane\s+beda\b|\bpalane\s+beda\b|\bcustody\s+beda\b",
     },
     template_catalog={
         "prose_kn": "src/laya_prose_kn.py (Lane 09 — deterministic Kannada templates)",
         "prose_en_fallback": "src/laya_prose_v2.py",
+        # Lane 05 (recall swarm): KN/Kanglish paraphrase templates feeding
+        # the synthetic corpus builder (Lane 02 wires them in).
+        "kn_templates": "scripts/kn_templates.py (Lane 05 — 25 blocks, DRAFT pending P2.1)",
     },
     benchmark_manifest={
         "C13 (16-Q Kannada)": "16 items, bar 16/16 exact",
         "Sealed Kannada-8": "8 items, bar 8/8 exact (blind, aggregate only)",
         "Kanglish held-out suite": "n >= 30 newly commissioned items, bar >= 95% exact, 0 silent, 0 FP",
+        # Lane 05: validation-split KN coverage measured on
+        # data/synthetic_v7_1/validation.jsonl (500 records; KN-family 272).
+        "KN validation coverage (Lane 05)": "before: restitution 5, birth_certificate 7, dv_compensation 6, procedure 8, joint_property 13, stridhan 18, violence 17, divorce 22, custody 39, residence 46, maintenance 134 (requested, kn+kn_roman); after wiring see docs/recall_swarm_state/lane-05-kannada.md",
+    },
+    # Fact/issue-key surface-form lexicon (Lane 05): Kannada-script,
+    # Kanglish spelling-variant and code-mixed forms -> corpus keys.
+    # Mirrors laya_lang_normalizer._ISSUE_FORM_PATTERNS.
+    fact_key_lexicon={
+        "money_fact": r"ಜೀವನಾಂಶ|jeevanamsha|jeevanamsa|jeevanaamsha|jivanaamsha|maintenance\s+beku|maintanance\s+beku|duddu\s+kodalla",
+        "custody_claim": r"ಪಾಲನೆ|paalane|palane|custody\s+beku",
+        "residence_claim": r"ಮನೆಯಲ್ಲಿ\s*ಇರ|ಮನೆಯಲ್ಲೇ\s*ಇರ|maneyalli\s+irabeku|maneyalle\s+irabeku|residence\s+beku|mane\s+bittu\s+hoguvudilla",
+        "stridhan_claim": r"ಚಿನ್ನ|ಬಂಗಾರ|chinna|bangara|stridhan|streedhan",
+        "divorce_asked": r"ವಿಚ್ಛೇದನ|vichhedana|vichchhedana|vichhedana|divorce\s+beku",
+        "joint_property_claim": r"ಜಂಟಿ\s*ಆಸ್ತಿ|janti\s+asti|joint\s+property",
+        "birth_cert_asked": r"ಜನನ\s*ಪ್ರಮಾಣಪತ್ರ|janana\s+pramanapatra|birth\s+certificate\s+beku",
+        "dv_injury_comp_asked": r"ಪರಿಹಾರ|parihara|compensation\s+beku",
+        "restitution_asked": r"ಮರಳಿ\s*ಬರ|marali\s+bar|marali\s+banni|vapas\s+barabeku",
+        "violence": r"ಹೊಡೆಯುತ್ತಾನೆ|ಹೊಡೆದ|ಹಿಂಸೆ|hodeyuttane|hodita|himse|bedarisuttane",
+        "demand_made": r"ಕೇಳಿದ್ದೇನೆ|ಕೇಳಿದೆ|ಬೇಡಿಕೆ\s*ಇಟ್ಟಿದ್ದೇನೆ|\bkelidde\b|\bkeliddene\b|\bbedike\s+ittiddene\b",
+        "coercive_eviction_or_lockout": r"ಮನೆಯಿಂದ\s*(?:ಆಚೆ|ಹೊರಗೆ)\s*ಹಾಕಿದ್ದಾರೆ|maneyinda\s+horahak|horage\s+haakidare|beega\s+hakid",
     },
     # P2.1 native Kannada speaker audit is still OPEN (plan §6.2, V71-P6-3).
     # Do not fill this in without the signed audit report.
@@ -188,3 +226,55 @@ def get_language_pack(lang_code: str, *, allow_stub: bool = False) -> LanguagePa
 def list_ready_packs() -> list[str]:
     """Lang codes whose packs are complete (audit sign-off still tracked separately)."""
     return sorted(code for code, pack in LANGUAGE_PACKS.items() if not pack.todo)
+
+
+def _self_test() -> None:
+    """CPU self-test: run ``python3 -m src.laya_lang_pack``."""
+    import re as _re
+
+    kn = get_language_pack("kn")
+    assert kn.ready_for_production is False, "kn has no P2.1 sign-off yet"
+    assert "kn_templates" in kn.template_catalog, kn.template_catalog
+    # Lane 05: every fact_key_lexicon key is a corpus fact key and every
+    # pattern compiles; negation lexicon patterns compile too.
+    fact_keys = {
+        "divorce_asked", "mutual_consent", "judicial_separation_only",
+        "restitution_asked", "proceeding_pending_hma", "being_filed",
+        "decree", "money_fact", "lump_sum_settlement",
+        "existing_order_enforcement", "interim_asked", "custody_claim",
+        "child_fact", "minor_child", "child_maintenance_only",
+        "school_fees_fact", "child_safety_risk", "residence_claim",
+        "coercive_eviction_or_lockout", "explicit_residence_order_only",
+        "violence", "dv_injury_comp_asked", "stridhan_claim",
+        "stridhan_sold_or_mortgaged", "demand_made",
+        "joint_property_claim", "birth_cert_asked", "in_scope",
+    }
+    for key, pat in kn.fact_key_lexicon.items():
+        assert key in fact_keys, key
+        _re.compile(pat)
+    for key, pat in kn.negation_demand_lexicon.items():
+        assert key in fact_keys or key.endswith("_denied"), key
+        _re.compile(pat)
+    # Cross-check: the fact_key_lexicon matches the normalizer's issue
+    # hints on the template vocabulary (same forms -> same keys).
+    from .laya_lang_normalizer import kannada_issue_hints
+
+    probe = (
+        "Nanage jeevanamsa beku. Nanna maguvina paalane nanage beku. "
+        "Nanna streedhan vapas beku. Namma janti astiyalli nanna palu kodi."
+    )
+    hints = kannada_issue_hints(probe)
+    assert hints["issues"].get("maintenance") is True, hints
+    assert hints["issues"].get("custody") is True, hints
+    assert hints["issues"].get("stridhan") is True, hints
+    assert hints["issues"].get("joint_property") is True, hints
+    assert list_ready_packs() == ["en", "kn"], list_ready_packs()
+    print(
+        "laya_lang_pack self-test PASS: kn fact_key_lexicon "
+        f"{len(kn.fact_key_lexicon)} keys, negation lexicon "
+        f"{len(kn.negation_demand_lexicon)} keys, P2.1 still open"
+    )
+
+
+if __name__ == "__main__":
+    _self_test()

@@ -41,6 +41,14 @@ LAYA_NOUL_PROMPTS: dict[str, dict[str, str]] = {
     "div_p": {"type": "noul", "instructions": "Does the speaker want to get a divorce or end the marriage (not merely stating a divorce case is already pending)?"},
     "jp_p": {"type": "noul", "instructions": "Do the spouses jointly own a house, flat, plot, shop, or car that the speaker wants divided or shared?"},
     "bc_p": {"type": "noul", "instructions": "Is this question about getting, registering late, or correcting a child's birth certificate?"},
+    # R-LANE08 (recall swarm): restitution + DV-compensation probes. The
+    # 9-prompt set had NO neural route for hma-9 or pwdva-22 — both were
+    # evidence-anchor-only, so any paraphrase the anchors miss (e.g. "my
+    # wife is not coming back to me", "pay my hospital bills after he beat
+    # me") was a guaranteed neural miss. Thresholds are UNCALIBRATED (no ROC
+    # data on this CPU-only VM) — RTX re-calibration is a follow-up.
+    "restit_p": {"type": "noul", "instructions": "Does the speaker want their husband or wife who left home to come back and resume living together as husband and wife (not a divorce)?"},
+    "dvcomp_p": {"type": "noul", "instructions": "Does the speaker ask for compensation, damages, or payment of medical or hospital costs for injuries caused by domestic violence?"},
 }
 
 CONSTRAINED_SLOTS: tuple[tuple[str, tuple[str, ...], str], ...] = (
@@ -450,6 +458,17 @@ def _merge_laya_and_grounded(
 
     _boost("birth_cert_asked", "birth_certificate", bc_full, 0.22)
 
+    # R-LANE08: restitution + DV-compensation neural boosts (new restit_p /
+    # dvcomp_p probes above). Thresholds UNCALIBRATED — see prompt comment.
+    # Restitution is exclusive with divorce (graph gates it too); DV comp
+    # needs a violence signal (proved violence or the vio probe firing).
+    restit_p = max(probs.get("full_restit_p", 0.0), probs.get("restit_p", 0.0))
+    if not proved_true(facts, "divorce_asked"):
+        _boost("restitution_asked", "restitution", restit_p, 0.55)
+    dvcomp_p = max(probs.get("full_dvcomp_p", 0.0), probs.get("dvcomp_p", 0.0))
+    if proved_true(facts, "violence") or vio_p > 0.0:
+        _boost("dv_injury_comp_asked", "dv_compensation", dvcomp_p, 0.45)
+
     has_div_anchor = bool(re.search(r"\b(?:divorce|divorcing|end\s+(?:the|our|this|my)\s+marriage|dissolve|separate\s+from)\b", raw_txt, re.I))
     div_context_only = (
         proved_true(facts, "proceeding_pending_hma")
@@ -477,6 +496,11 @@ def _apply_structured_slots(
     mapping: a parent claiming child support only is neither role "spouse"
     nor role "parent"), of (the caller resets open_fact_markers from
     grounded after this step, which would wipe it — needs Lane 05 work).
+    NOTE (R-LANE08): slot "eo" covers existing-order enforcement only — it
+    cannot split BNSS s.144(3) arrears recovery from s.146 variation. That
+    split is emitted as arrears_recovery_asked / maintenance_variation_asked
+    by _post_order_split_facts() in extract_v7_batch (all modes), and Stage 2
+    reads those facts directly.
     """
     def _boost_slot(fkey: str, slot_val: str | None, *, neg_key: str | None = None, issue_key: str | None = None) -> bool:
         if slot_val != "Y":
@@ -523,6 +547,84 @@ def _apply_structured_slots(
         facts["stridhan_held_or_disposed"] = FactEvidence(key="stridhan_held_or_disposed", status="supported", value=True, source="model", confidence=0.7)
     _boost_slot("joint_property_claim", slots.get("jp"), neg_key="joint_property", issue_key="joint_property")
     _boost_slot("birth_cert_asked", slots.get("bc"), neg_key="birth_certificate", issue_key="birth_certificate")
+
+
+# R-LANE08 (recall swarm): post-order enforcement split — BNSS s.144(3)
+# arrears recovery vs s.146 variation. The v7 evidence layer emits only one
+# generic existing_order_enforcement fact (its _ARREARS_VARY_RE conflates
+# both, and its _ENHANCE_COST_RE guard actively excludes "prices gone up,
+# increase it" variation asks from existing_order altogether), and Stage 2
+# had NO disposition for bnss-144-3 / bnss-146 at all — the v6 example of a
+# leaf with no route. These extractor-side emissions split the two asks so
+# Stage 2 can consider each sub-route; they are deliberately NOT anchors in
+# evidence.py (Lane 03 owns that file — it may promote/strengthen them there).
+# Phrasings are the ones laypeople actually use (Kaanoon reference read,
+# 2026-11-27): "court ordered maintenance but he is not paying" / "recover
+# the arrears" for 144(3); "amount is not enough, prices gone up, increase
+# it" / "circumstances changed" for 146.
+_ARREARS_RECOVERY_RE = re.compile(
+    r"\b(?:arrears|amounts?\s+already\s+due|"
+    r"unpaid\s+(?:maintenance|instalments?|installments?|amounts?)|"
+    r"overdue\s+(?:maintenance|instalments?|installments?|payments?)|"
+    r"missed\s+(?:\d+\s+)?(?:months?|instalments?|installments?|payments?)\s+of\s+maintenance|"
+    r"(?:not\s+paying|has\s+not\s+paid|stopped\s+paying|not\s+paid)\b.{0,40}\bmaintenance|"
+    r"recover\b.{0,30}\b(?:arrears|balance|unpaid|amounts?\s+due)|"
+    r"execution\s+petition|warrant\b.{0,25}\b(?:recovery|arrest)|"
+    r"shortfall\s+in\s+maintenance)\b",
+    re.I,
+)
+# Order phrase (extractor-side mirror of the order half of the evidence
+# existing-order anchor): needed because the evidence _ENHANCE_COST_RE guard
+# suppresses existing_order on variation asks, so gating the variation fact
+# on existing_order would make it dead on arrival.
+_MAINT_ORDER_PHRASE_RE = re.compile(
+    r"\b(?:court\s+(?:ordered|fixed|granted)|ordered\s+(?:me\s+)?(?:maintenance|support)|"
+    r"maintenance\s+(?:was\s+)?(?:ordered|fixed|granted)|existing\s+(?:maintenance\s+)?order|"
+    r"order\s+(?:made|passed|issued|granted)\s+under|"
+    r"(?:fixed|ordered)\s+(?:me\s+|my\s+)?(?:maintenance|interim\s+maintenance|lump\s+sum))\b",
+    re.I,
+)
+_MAINTENANCE_VARIATION_RE = re.compile(
+    # Stem forms (increas\w* etc.): a trailing \b after "increase" can never
+    # match "increased"/"revised" — same dead-alternative trap as the
+    # evidence _DV_COMP_RE "injur" bug (see audit §5). Cover both orders:
+    # "increase the maintenance" and "get it increased" / "amount be revised".
+    r"\b(?:increas\w*|rais\w*|enhanc\w*|reduc\w*|lower\w*|decreas\w*|var\w+|modif\w+|chang\w+|revis\w+|review\w*)\b.{0,40}\b(?:maintenance|allowance|amount)\b|"
+    r"\b(?:amount|allowance)\b.{0,12}\b(?:increas\w*|revis\w*|reduc\w*|chang\w*|rais\w*)\b|"
+    r"\b(?:it|the\s+amount|the\s+allowance)\s+(?:increas\w*|rais\w*|revis\w*|reduc\w*)\b|"
+    r"\bchange\s+of\s+circumstances\b|"
+    r"\bcircumstances\s+(?:have\s+)?changed\b.{0,40}\b(?:increas\w*|var\w+|chang\w+|revis\w+|review\w*|maintenance)\b|"
+    r"\brevis\w*\b.{0,25}\bmaintenance\b",
+    re.I,
+)
+
+
+def _post_order_split_facts(analysis_text: str, existing_order: bool) -> dict[str, FactEvidence]:
+    """Emit arrears_recovery_asked / maintenance_variation_asked (R-LANE08).
+
+    Recovery is gated on the grounded existing_order fact. Variation is
+    gated on an order phrase + variation phrase in the text itself (see
+    _MAINT_ORDER_PHRASE_RE note: the evidence enhance-cost guard would
+    otherwise suppress it). Keys are absent when there is no order signal at
+    all, so downstream proved_true() defaults to False.
+    """
+    out: dict[str, FactEvidence] = {}
+    if existing_order:
+        hit = bool(_ARREARS_RECOVERY_RE.search(analysis_text))
+        out["arrears_recovery_asked"] = FactEvidence(
+            key="arrears_recovery_asked",
+            status="supported" if hit else "denied",
+            value=hit, source="extractor", confidence=0.8,
+        )
+    order_phrase = bool(_MAINT_ORDER_PHRASE_RE.search(analysis_text))
+    if order_phrase or existing_order:
+        hit = bool(_MAINTENANCE_VARIATION_RE.search(analysis_text))
+        out["maintenance_variation_asked"] = FactEvidence(
+            key="maintenance_variation_asked",
+            status="supported" if hit else "denied",
+            value=hit, source="extractor", confidence=0.8,
+        )
+    return out
 
 
 def extract_v7_batch(
@@ -585,6 +687,8 @@ def extract_v7_batch(
         )
         facts: dict[str, Any] = dict(grounded["facts"])
         facts["_raw_analysis"] = analysis_text
+        # R-LANE08: post-order split facts (bnss-144-3 vs bnss-146) — all modes.
+        facts.update(_post_order_split_facts(analysis_text, proved_true(facts, "existing_order_enforcement")))
         issues: dict[str, IssueEvidence] = dict(grounded["issues"])
         negated = set(grounded["negated_issues"])
 

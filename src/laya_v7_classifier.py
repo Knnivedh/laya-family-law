@@ -27,14 +27,18 @@ Clause-vs-full fusion (plan §1.2):
     vetoes ONLY that clause (it is excluded from the clause max-pool); sibling
     clauses are unaffected. Other intents come from the full-question encoding.
 
-Corpus contract C2 (docs/10x_swarm_state.md): JSONL, one record per example:
+Corpus contract C2 (docs/10x_swarm_state.md) + schema R2
+(data/synthetic_v7_1/schema.json): JSONL, one record per example:
     {id, lang, text, issues: {issue: intent}, facts: {fact: state},
-     enums: {claimant_sex, claimant_role, modality_time}, spans: [...]}
-The data loader in this module codes against that schema. It is tolerant:
-unknown issue/fact keys are logged and ignored, missing keys default to
-"uncertain" (issues) / "unknown" (facts), and span dicts are accepted with
-{start, end, text} plus optional {clause_idx, label}. See ASSUMPTIONS in
-docs/10x_swarm_state/lane-03-p1-3.md if Lane 02's actual schema differs.
+     enums: {claimant_sex, claimant_role, modality_time},
+     spans: [{start, end, text, key, kind}]}
+where a span's ``key`` is a fact-or-issue name and ``kind`` is "fact" |
+"issue" (schema.json "span"). The loader derives each span's clause_idx
+from its char offsets against split_clauses() (the corpus carries no
+clause_idx), and keeps key/kind so the gate/span heads get real
+supervision. Legacy Lane 03 sample corpora using {clause_idx, label}
+are still accepted. See ASSUMPTIONS in docs/10x_swarm_state/lane-03-p1-3.md
+as amended by docs/recall_swarm_state/lane-04-classifier.md (PC-2 fix).
 
 Torch / transformers are imported lazily and guarded: importing this module,
 splitting clauses, loading a corpus and computing fusion defaults all work
@@ -59,35 +63,46 @@ from typing import Any, Iterable
 ISSUE_INTENTS = ("requested", "incidental", "denied", "uncertain")
 FACT_STATES = ("supported", "denied", "unknown", "conflicting")
 
-# 11 issues: the 10 issue triggers of src/laya_v7_evidence.py
-# (extract_grounded_v7) plus "procedure" (forum / how-to questions, from
-# forum_question_asked / procedure_how_to_asked). The plan says 11 issues
-# but never enumerates them; Lane 02 reconciles at merge if its set differs.
+# 11 issues: exactly the schema order in data/synthetic_v7_1/schema.json
+# (contract R2). The plan says 11 issues but never enumerates them; the
+# evidence module's 10 triggers + "procedure" (forum / how-to questions)
+# is the set, reconciled against the schema by Lane 04 (PC-2 fix,
+# 2026-11-27): set-identical to the schema, order now matches it too, so
+# label indices line up with the corpus schema by construction.
 ISSUES = (
     "maintenance",
     "custody",
+    "residence",
+    "divorce",
     "stridhan",
     "joint_property",
-    "residence",
     "violence",
     "dv_compensation",
-    "divorce",
     "restitution",
     "birth_certificate",
     "procedure",
 )
 
-# 28 atomic facts: the Stage 0/1 facts consumed by Stage 2 (src/laya_v7_graph.py
-# + src/laya_v7_evidence.py), excluding enum-valued keys (claimant_sex /
-# claimant_role — separate enum heads), the scope meta-fact (in_scope) and
-# derived/meta keys (no_dispute_empty, first_demand_never_made,
-# forum_question_asked, procedure_how_to_asked, interim_only_asked,
-# interim_unpaid_with_joint_or_parallel). "interim_asked" is used here as the
-# canonical name for the graph's dead key (graph L453/L468); the evidence
-# module's "interim_only_asked" is a narrower variant and maps to it only
-# when the corpus uses that spelling (see _FACT_ALIASES).
+# 28 atomic facts: exactly the schema order in data/synthetic_v7_1/schema.json
+# (contract R2). PC-2 fix (Lane 04, 2026-11-27): Lane 03's list had
+# "stridhan_held_or_disposed" (a DERIVED downstream fact — graph L210
+# derives it from stridhan_claim; it appears in NO corpus record) and was
+# missing "in_scope" (present in all 5,000 records: supported 4,712 /
+# denied 288 — the out-of-scope signal, 5.8% denied). Training the old list
+# would have left one head permanently unsupervised (all-"unknown") and
+# silently dropped in_scope as an "unknown key" on every record. in_scope
+# is a real 4-state fact head here: supported = in scope, denied = out of
+# scope; it drives the graph's in_scope=False OOS escalation (graph L400)
+# and the V71-P1-5 clarification fallback. Enum-valued keys (claimant_sex /
+# claimant_role — separate enum heads) stay out, as do derived/meta keys
+# (no_dispute_empty, first_demand_never_made, forum_question_asked,
+# procedure_how_to_asked, interim_only_asked,
+# interim_unpaid_with_joint_or_parallel). "interim_asked" is the canonical
+# name for the graph's dead key (graph L453/L468); the evidence module's
+# "interim_only_asked" is a narrower variant and maps to it only when the
+# corpus uses that spelling (see _FACT_ALIASES). The stridhan disposition
+# signal the corpus DOES carry is "stridhan_sold_or_mortgaged".
 FACTS = (
-    "money_fact",
     "divorce_asked",
     "mutual_consent",
     "judicial_separation_only",
@@ -95,26 +110,27 @@ FACTS = (
     "proceeding_pending_hma",
     "being_filed",
     "decree",
+    "money_fact",
     "lump_sum_settlement",
     "existing_order_enforcement",
     "interim_asked",
-    "child_maintenance_only",
-    "minor_child",
-    "child_fact",
-    "school_fees_fact",
     "custody_claim",
+    "child_fact",
+    "minor_child",
+    "child_maintenance_only",
+    "school_fees_fact",
     "child_safety_risk",
     "residence_claim",
-    "violence",
     "coercive_eviction_or_lockout",
     "explicit_residence_order_only",
+    "violence",
     "dv_injury_comp_asked",
     "stridhan_claim",
-    "stridhan_held_or_disposed",
     "stridhan_sold_or_mortgaged",
     "demand_made",
     "joint_property_claim",
     "birth_cert_asked",
+    "in_scope",
 )
 
 ENUMS = {
@@ -263,6 +279,18 @@ def _normalise_label(value: Any, allowed: tuple[str, ...], default: str) -> str:
     return default
 
 
+def _clause_index_for_offset(clauses: list[dict[str, Any]],
+                             start: int, end: int) -> int | None:
+    """Clause index containing a span's midpoint (None if no clauses)."""
+    if not clauses:
+        return None
+    mid = (start + end) // 2
+    for i, c in enumerate(clauses):
+        if c["start"] <= mid < c["end"] or (mid == c["end"] and i == len(clauses) - 1):
+            return i
+    return len(clauses) - 1
+
+
 def load_corpus_jsonl(
     path: str | Path, *, strict: bool = False
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -271,12 +299,14 @@ def load_corpus_jsonl(
     Returns (records, report). Each record is normalised to:
         {id, lang, text, issues: {issue: intent}, facts: {fact: state},
          enums: {claimant_sex, claimant_role, modality_time},
-         spans: [{start, end, text, clause_idx?, label?}],
+         spans: [{start, end, text, key, kind, clause_idx}],
          clauses: [{text, start, end}]}
 
     Missing issues default to "uncertain", missing facts to "unknown",
     missing enums to the "unknown" member (U / other / present).
     Unknown keys are counted in the report and (unless strict) ignored.
+    Span clause_idx is DERIVED from char offsets (schema spans carry no
+    clause_idx); key/kind are kept verbatim from the corpus.
     """
     path = Path(path)
     records: list[dict[str, Any]] = []
@@ -351,6 +381,7 @@ def load_corpus_jsonl(
                         else ("U" if head == "claimant_sex" else "other")
                     )
 
+            clauses = split_clauses(text)
             spans: list[dict[str, Any]] = []
             for sp in raw.get("spans") or []:
                 if not isinstance(sp, dict):
@@ -359,10 +390,18 @@ def load_corpus_jsonl(
                     start, end = int(sp["start"]), int(sp["end"])
                 except (KeyError, TypeError, ValueError):
                     continue
+                # Schema shape: {start, end, text, key, kind} where key is a
+                # fact-or-issue name and kind is "fact" | "issue". Legacy
+                # Lane 03 samples used {clause_idx, label} instead.
+                ci = sp.get("clause_idx")
+                if not isinstance(ci, int):
+                    ci = _clause_index_for_offset(clauses, start, end)
                 spans.append({
                     "start": start, "end": end,
                     "text": str(sp.get("text") or text[start:end]),
-                    "clause_idx": sp.get("clause_idx"),
+                    "key": sp.get("key"),
+                    "kind": sp.get("kind"),
+                    "clause_idx": ci,
                     "label": sp.get("label"),
                 })
             report["n_spans"] += len(spans)
@@ -371,7 +410,7 @@ def load_corpus_jsonl(
                 "id": rec_id, "lang": lang, "text": text,
                 "issues": issues, "facts": facts, "enums": enums,
                 "spans": spans,
-                "clauses": split_clauses(text),
+                "clauses": clauses,
             })
             report["n_ok"] += 1
     return records, report
@@ -382,12 +421,14 @@ def encode_labels(record: dict[str, Any]) -> dict[str, Any]:
 
     Returns {issue: [11], fact: [28], enums: {head: int},
              gate: [n_clauses, 3], span_mask: per-clause 0/1}.
-    Gate weak labels (see module docstring / status file): a clause is
-    labelled denied=1 if any fact the corpus marks "denied" is attributable
-    to it via spans, hypothetical=1 if modality_time is hypothetical/quoted,
-    third_party=1 only if a span is explicitly labelled "third_party".
-    Without span attribution the gate labels are 0 — the gate head then
-    learns its signal from the clause text itself at training time.
+    Gate labels (Lane 04: now REAL supervision, not all-zero): a clause is
+    labelled denied=1 if a span in it names a fact the corpus marks
+    "denied" (or an issue marked "denied"); hypothetical=1 if modality_time
+    is hypothetical/quoted; third_party=1 only if a span is explicitly
+    labelled "third_party" (the corpus schema has no third-party span
+    label, so this stays 0 unless Lane 02 adds one — the gate head still
+    learns its signal from clause text at training time). Without any span
+    in a clause the gate labels are 0 for that clause.
     """
     issue = [ISSUE_INTENT_INDEX[record["issues"][n]] for n in ISSUES]
     fact = [FACT_STATE_INDEX[record["facts"][n]] for n in FACTS]
@@ -404,12 +445,158 @@ def encode_labels(record: dict[str, Any]) -> dict[str, Any]:
         ci = sp.get("clause_idx")
         if isinstance(ci, int) and 0 <= ci < n_clauses:
             span_mask[ci] = 1
+            key = sp.get("key")
+            # Schema spans carry key (fact/issue name) + kind, not a label:
+            # a span naming a denied fact/issue marks its clause denied.
+            if key in FACTS and record["facts"].get(key) == "denied":
+                gate[ci][0] = 1
+            elif key in ISSUES and record["issues"].get(key) == "denied":
+                gate[ci][0] = 1
             if (sp.get("label") or "") == "third_party":
                 gate[ci][2] = 1
             if (sp.get("label") or "") == "denied":
                 gate[ci][0] = 1
     return {"issue": issue, "fact": fact, "enums": enums,
             "gate": gate, "span_mask": span_mask}
+
+
+# ---------------------------------------------------------------------------
+# Model-side scoring hook (Lane 04 — for Lane 07's tests/recall_eval.py)
+# ---------------------------------------------------------------------------
+
+def _f1_from_counts(tp: int, fp: int, fn: int) -> float:
+    if tp == 0:
+        return 0.0
+    prec = tp / (tp + fp) if tp + fp else 0.0
+    rec = tp / (tp + fn) if tp + fn else 0.0
+    return 2 * prec * rec / (prec + rec) if prec + rec else 0.0
+
+
+def _head_scores(gold: list[int], pred: list[int], n_classes: int) -> dict[str, Any]:
+    """Macro/micro-F1 + accuracy for one single-label head (pure python)."""
+    per_class = []
+    tp_tot = fp_tot = fn_tot = 0
+    for c in range(n_classes):
+        tp = sum(1 for g, p in zip(gold, pred) if g == c and p == c)
+        fp = sum(1 for g, p in zip(gold, pred) if g != c and p == c)
+        fn = sum(1 for g, p in zip(gold, pred) if g == c and p != c)
+        per_class.append(round(_f1_from_counts(tp, fp, fn), 4))
+        tp_tot += tp
+        fp_tot += fp
+        fn_tot += fn
+    micro = _f1_from_counts(tp_tot, fp_tot, fn_tot)
+    return {"macro_f1": round(sum(per_class) / len(per_class), 4) if per_class else 0.0,
+            "micro_f1": round(micro, 4),
+            "accuracy": round(tp_tot / len(gold), 4) if gold else 0.0,
+            "per_class_f1": per_class}
+
+
+def score_label_predictions(gold_records: list[dict[str, Any]],
+                            pred_records: list[dict[str, Any]]) -> dict[str, Any]:
+    """Score predict_text()-style predictions against normalised gold records.
+
+    Pure python (no torch) — this is the MODEL-SIDE per-head scoring
+    function. NOTE ON NAMES (Lane 04 + Lane 07 coordination, 2026-11-27):
+    tests/recall_eval.py has its own ``score_predictions(records,
+    predicted_sections)`` which scores SECTION-SET exact — a different
+    function with the same name. This one is deliberately named
+    ``score_label_predictions`` to avoid the collision: it scores per-head
+    label F1 (issue/fact/enum), NOT sections. The two scorers compose:
+    predict_text() -> recall_eval.predict_sections_from_stage1() ->
+    recall_eval.score_predictions() gives the section-exact R1 number;
+    this function gives the per-head diagnostics behind it. Lane 04
+    confirms Lane 07's proposed shared signature
+    ``predict_sections_from_stage1(issues, facts, enums, *,
+    custody_vocab="v3_bundled") -> set[str]`` as written in
+    tests/recall_eval.py; it accepts predict_text()-style dicts AND plain
+    intent/state/value strings.
+
+    Returns {"n", "issue", "fact", "claimant_sex", "claimant_role",
+             "modality_time", "issue_requested_recall",
+             "mean_macro_f1_issue_fact", "in_scope": {...}}.
+    """
+    gold_issue: list[int] = []
+    pred_issue: list[int] = []
+    gold_fact: list[int] = []
+    pred_fact: list[int] = []
+    gold_enum: dict[str, list[int]] = {h: [] for h in ENUMS}
+    pred_enum: dict[str, list[int]] = {h: [] for h in ENUMS}
+    for gold, pred in zip(gold_records, pred_records):
+        for name in ISSUES:
+            gold_issue.append(ISSUE_INTENT_INDEX[gold["issues"][name]])
+            pred_issue.append(ISSUE_INTENT_INDEX[
+                pred["issues"][name]["intent"]])
+        for name in FACTS:
+            gold_fact.append(FACT_STATE_INDEX[gold["facts"][name]])
+            pred_fact.append(FACT_STATE_INDEX[
+                pred["facts"][name]["state"]])
+        for head, vals in ENUMS.items():
+            gold_enum[head].append(ENUM_INDEX[head][gold["enums"][head]])
+            pred_enum[head].append(ENUM_INDEX[head][
+                pred["enums"][head]["value"]])
+    req = ISSUE_INTENT_INDEX["requested"]
+    tp = sum(1 for g, p in zip(gold_issue, pred_issue) if g == req and p == req)
+    fn = sum(1 for g, p in zip(gold_issue, pred_issue) if g == req and p != req)
+    issue_m = _head_scores(gold_issue, pred_issue, len(ISSUE_INTENTS))
+    fact_m = _head_scores(gold_fact, pred_fact, len(FACT_STATES))
+    in_gold = [gold["facts"]["in_scope"] for gold in gold_records]
+    in_pred = [pred["facts"]["in_scope"]["state"] for pred in pred_records]
+    in_acc = (sum(1 for g, p in zip(in_gold, in_pred) if g == p)
+              / len(in_gold)) if in_gold else 0.0
+    denied_tp = sum(1 for g, p in zip(in_gold, in_pred)
+                    if g == "denied" and p == "denied")
+    denied_n = sum(1 for g in in_gold if g == "denied")
+    metrics: dict[str, Any] = {
+        "n": len(gold_records),
+        "issue": issue_m,
+        "fact": fact_m,
+        "issue_requested_recall": round(tp / (tp + fn), 4) if tp + fn else 1.0,
+        "mean_macro_f1_issue_fact": round(
+            (issue_m["macro_f1"] + fact_m["macro_f1"]) / 2, 4),
+        "in_scope": {
+            "accuracy": round(in_acc, 4),
+            "denied_recall": round(denied_tp / denied_n, 4) if denied_n else 1.0,
+            "n_denied_gold": denied_n,
+        },
+    }
+    for head in ENUMS:
+        metrics[head] = _head_scores(gold_enum[head], pred_enum[head],
+                                     len(ENUMS[head]))
+    return metrics
+
+
+def evaluate_checkpoint(checkpoint_path: str | Path, val_path: str | Path, *,
+                        device: str = "cpu", limit: int | None = None,
+                        config: ClassifierConfig | None = None,
+                        return_predictions: bool = False):
+    """Score a saved checkpoint on a held-out validation JSONL (torch needed).
+
+    CPU-runnable (slow on CPU — the intended run is the RTX 5050 GPU box;
+    see docs/rtx-recall-training-commands.md §4). Loads the checkpoint with
+    load_checkpoint(), runs predict_text() per validation record, and scores
+    with score_label_predictions(). With return_predictions=True it also
+    returns (metrics, gold_records, pred_records) so a caller (e.g. the
+    --eval-checkpoint mode of scripts/train_v71_classifier.py) can feed the
+    predictions through Lane 07's predict_sections_from_stage1() +
+    recall_eval.score_predictions() for the section-exact R1 number — the
+    classifier module itself never imports the harness (the harness imports
+    this module, so the dependency runs one way only). Returns the
+    score_label_predictions() dict plus {"checkpoint": str, "val_file": str}.
+    """
+    model, cfg = load_checkpoint(checkpoint_path, device=device)
+    cfg = config or cfg
+    from transformers import AutoTokenizer  # noqa: PLC0415 - torch-only path
+    tokenizer = AutoTokenizer.from_pretrained(cfg.backbone)
+    gold, _ = load_corpus_jsonl(val_path)
+    if limit is not None:
+        gold = gold[:limit]
+    preds = [predict_text(model, tokenizer, rec["text"], cfg) for rec in gold]
+    metrics = score_label_predictions(gold, preds)
+    metrics["checkpoint"] = str(checkpoint_path)
+    metrics["val_file"] = str(val_path)
+    if return_predictions:
+        return metrics, gold, preds
+    return metrics
 
 
 # ---------------------------------------------------------------------------
