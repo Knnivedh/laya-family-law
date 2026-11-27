@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """LAYA v7.1 V71-P1-2 — clean synthetic + hard-negative corpus builder.
 
-Generates a deterministic, seeded 5,000-example bilingual (EN + KN + Kanglish)
+Generates a deterministic, seeded 8,000-example bilingual (EN + KN + Kanglish)
 training/validation corpus PURELY from statutory grammars, paraphrase templates
 and hard-negative perturbations. NEVER from test banks: no test-bank, ground-truth
 or fixture question text is read, copied or paraphrased by this builder. Every
@@ -71,19 +71,28 @@ training run treats the KN split as gold (see lane status file).
 
 Determinism: random.Random(SEED); same seed + same code => byte-identical
 JSONL. No network, no GPU, no torch, stdlib only.
+
+FREEZE (coordinator, 2026-11-27): once data/synthetic_v7_1/validation.jsonl
+exists it is FROZEN — a rebuild regenerates train.jsonl only and never
+rewrites validation.jsonl (see main(); --new-split only when the
+coordinator orders a new split version). manifest.json records
+frozen_validation_sha256 / frozen_validation_at / frozen_validation_note;
+all validation-split numbers are measured against that exact file.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 import re
 import sys
 from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 
 SEED = 7102
-N_TOTAL = 5000
+N_TOTAL = 8000
 N_VAL = 500
 
 ISSUES = [
@@ -234,11 +243,14 @@ _reg(B("maint_post_decree", "core",
     enums=dict(SPOUSE)))
 _reg(B("maint_arrears", "hn_e",
     en=["The court already ordered my husband to pay [[maintenance:maintenance]], but he has not paid for {duration}. I want the unpaid amount.",
-        "My husband was ordered to pay monthly support, and he has missed payments for {duration}. How do I recover the arrears?"],
+        "My husband was ordered to pay monthly support, and he has missed payments for {duration}. How do I recover the arrears?",
+        "The court ordered him to pay, and he paid for three months, then he stopped. What do I do now to get the unpaid money?"],
     kn=["ಕೋರ್ಟ್ ಈಗಾಗಲೇ ನನ್ನ ಗಂಡ ಜೀವನಾಂಶ ಕೊಡಬೇಕು ಎಂದು ಆದೇಶಿಸಿದೆ, ಆದರೆ ಅವನು {duration} ಕೊಟ್ಟಿಲ್ಲ. ಬಾಕಿ ಹಣ ಬೇಕು.",
-        "ನನ್ನ ಗಂಡ ತಿಂಗಳ ಬೆಂಬಲ ಕೊಡಬೇಕು ಎಂದು ಆದೇಶವಿದೆ, {duration} ಕೊಟ್ಟಿಲ್ಲ. ಬಾಕಿ ಹಣವನ್ನು ಹೇಗೆ ಪಡೆಯುವುದು?"],
+        "ನನ್ನ ಗಂಡ ತಿಂಗಳ ಬೆಂಬಲ ಕೊಡಬೇಕು ಎಂದು ಆದೇಶವಿದೆ, {duration} ಕೊಟ್ಟಿಲ್ಲ. ಬಾಕಿ ಹಣವನ್ನು ಹೇಗೆ ಪಡೆಯುವುದು?",
+        "ಕೋರ್ಟ್ ಅವನು ಕೊಡಬೇಕು ಎಂದು ಆದೇಶಿಸಿತು, ಅವನು ಮೂರು ತಿಂಗಳು ಕೊಟ್ಟನು, ನಂತರ ನಿಲ್ಲಿಸಿದನು. ಬಾಕಿ ಹಣ ಪಡೆಯಲು ಈಗ ನಾನು ಏನು ಮಾಡಬೇಕು?"],
     ro=["Court egagale nanna ganda jeevanamsha kodabeku anta adeshiside, adare avanu {duration} kottilla. Baki hana beku.",
-        "Nanna ganda tingala bembala kodabeku anta adeshavide, {duration} kottilla. Baki hanavannu hege padeyuvudu?"],
+        "Nanna ganda tingala bembala kodabeku anta adeshavide, {duration} kottilla. Baki hanavannu hege padeyuvudu?",
+        "Court avanu kodabeku anta adeshisitu, avanu mooru tingalu kottanu, nantara nillisidanu. Baki hana padeyalu ega nanu enu madabeku?"],
     issues={"maintenance": "requested"},
     facts={"money_fact": "supported", "existing_order_enforcement": "supported",
            "in_scope": "supported"},
@@ -302,11 +314,14 @@ _reg(B("maint_child_self", "core",
 # --- core: custody ------------------------------------------------------
 _reg(B("custody_mother", "core",
     en=["I want [[custody:custody]] of my {child_age}-year-old {child_word}. My {child_word} should live with me.",
-        "Who will get my {child_age}-year-old {child_word}? I am asking that my {child_word} remain in my care."],
+        "Who will get my {child_age}-year-old {child_word}? I am asking that my {child_word} remain in my care.",
+        "Is there any legal way for me to get custody of my baby? My husband took our baby away from me."],
     kn=["ನನ್ನ {child_age} ವರ್ಷದ {child_word}ನ [[custody:ಪಾಲನೆ]] ನನಗೆ ಬೇಕು. ನನ್ನ {child_word} ನನ್ನ ಜೊತೆ ಇರಬೇಕು.",
-        "ನನ್ನ {child_age} ವರ್ಷದ {child_word} ಯಾರಿಗೆ ಸಿಗುತ್ತಾರೆ? ನನ್ನ {child_word} ನನ್ನ ಆರೈಕೆಯಲ್ಲಿ ಇರಬೇಕು ಎಂದು ಕೇಳುತ್ತಿದ್ದೇನೆ."],
+        "ನನ್ನ {child_age} ವರ್ಷದ {child_word} ಯಾರಿಗೆ ಸಿಗುತ್ತಾರೆ? ನನ್ನ {child_word} ನನ್ನ ಆರೈಕೆಯಲ್ಲಿ ಇರಬೇಕು ಎಂದು ಕೇಳುತ್ತಿದ್ದೇನೆ.",
+        "ನನ್ನ ಮಗುವಿನ ಪಾಲನೆ ಪಡೆಯಲು ಯಾವುದಾದರೂ ಕಾನೂನುಬದ್ಧ ಮಾರ್ಗವಿದೆಯೇ? ನನ್ನ ಗಂಡ ನಮ್ಮ ಮಗುವನ್ನು ನನ್ನಿಂದ ಕರೆದುಕೊಂಡು ಹೋಗಿದ್ದಾನೆ."],
     ro=["Nanna {child_age} varshada {child_word}na [[custody:paalane]] nanage beku. Nanna {child_word} nanna jothe irabeku.",
-        "Nanna {child_age} varshada {child_word} yarige siguttare? Nanna {child_word} nanna aaraikeyalli irabekendu keluttiddene."],
+        "Nanna {child_age} varshada {child_word} yarige siguttare? Nanna {child_word} nanna aaraikeyalli irabekendu keluttiddene.",
+        "Nanna maguvina paalane padeyalu yavudadaru kanunubaddha margavideye? Nanna ganda namma maguvannu nanninda karedukondu hogiddane."],
     issues={"custody": "requested"},
     facts={"custody_claim": "supported", "child_fact": "supported",
            "minor_child": "supported", "in_scope": "supported"},
@@ -374,21 +389,27 @@ _reg(B("lockout", "hn_b",
     enums=dict(SPOUSE)))
 _reg(B("violence_beats", "core",
     en=["My husband [[violence:beats me]] at home. I am afraid for my safety and I need protection.",
-        "My husband hits me whenever he drinks. I need help to stop the [[violence:violence]] at home."],
+        "My husband hits me whenever he drinks. I need help to stop the [[violence:violence]] at home.",
+        "My husband is a habitual drinker and beats me regularly. Last week he hurt my hand badly, and I had to rush to hospital."],
     kn=["ನನ್ನ ಗಂಡ ಮನೆಯಲ್ಲಿ [[violence:ನನ್ನನ್ನು ಹೊಡೆಯುತ್ತಾನೆ]]. ನನ್ನ ಸುರಕ್ಷತೆಗಾಗಿ ನನಗೆ ರಕ್ಷಣೆ ಬೇಕು.",
-        "ನನ್ನ ಗಂಡ ಕುಡಿದಾಗಲೆಲ್ಲ ನನ್ನನ್ನು ಹೊಡೆಯುತ್ತಾನೆ. ಮನೆಯಲ್ಲಿ [[violence:ಹಿಂಸೆ]] ನಿಲ್ಲಿಸಲು ಸಹಾಯ ಬೇಕು."],
+        "ನನ್ನ ಗಂಡ ಕುಡಿದಾಗಲೆಲ್ಲ ನನ್ನನ್ನು ಹೊಡೆಯುತ್ತಾನೆ. ಮನೆಯಲ್ಲಿ [[violence:ಹಿಂಸೆ]] ನಿಲ್ಲಿಸಲು ಸಹಾಯ ಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ಅಭ್ಯಾಸದ ಕುಡುಕ, ನನ್ನನ್ನು ನಿಯಮಿತವಾಗಿ ಹೊಡೆಯುತ್ತಾನೆ. ಕಳೆದ ವಾರ ಅವನು ನನ್ನ ಕೈಗೆ ತೀವ್ರವಾಗಿ ಗಾಯ ಮಾಡಿದನು, ನಾನು ಆಸ್ಪತ್ರೆಗೆ ಓಡಬೇಕಾಯಿತು."],
     ro=["Nanna ganda maneyalli [[violence:nannannu hodeyuttane]]. Nanna surakshategagi nanage rakshane beku.",
-        "Nanna ganda kudidagale nannannu hodeyuttane. Maneyalli [[violence:himse]] nillisalu sahaya beku."],
+        "Nanna ganda kudidagale nannannu hodeyuttane. Maneyalli [[violence:himse]] nillisalu sahaya beku.",
+        "Nanna ganda abhyasada kuduka, nannannu niyamitavagi hodeyuttane. Kaleda vara avanu nanna kaige teevravagi gaya madidanu, nanu aspatrege odabekayitu."],
     issues={"violence": "requested"},
     facts={"violence": "supported", "in_scope": "supported"},
     enums=dict(SPOUSE)))
 _reg(B("violence_threats", "core",
     en=["My husband [[violence:says he will kill me]] if I tell anyone about it. I live in fear every day.",
-        "My in-laws abuse me with bad words and threaten to throw me out. I need protection from this harassment."],
+        "My in-laws abuse me with bad words and threaten to throw me out. I need protection from this harassment.",
+        "My husband says I should not dare to ask for a single rupee, or he will beat me again. I live in fear of asking for anything."],
     kn=["ನಾನು ಯಾರಿಗಾದರೂ ಹೇಳಿದರೆ ನನ್ನ ಗಂಡ [[violence:ನನ್ನ ಪ್ರಾಣ ತೆಗೆಯುತ್ತೇನೆ ಎಂದು ಹೇಳುತ್ತಾನೆ]]. ಪ್ರತಿದಿನ ಭಯದಲ್ಲಿ ಬದುಕುತ್ತಿದ್ದೇನೆ.",
-        "ನನ್ನ ಅತ್ತೆ-ಮಾವ ಕೆಟ್ಟ ಮಾತುಗಳಿಂದ ನನ್ನನ್ನು ನಿಂದಿಸುತ್ತಾರೆ ಮತ್ತು ಹೊರಹಾಕುವುದಾಗಿ ಬೆದರಿಸುತ್ತಾರೆ. ಈ ಕಿರುಕುಳದಿಂದ ರಕ್ಷಣೆ ಬೇಕು."],
+        "ನನ್ನ ಅತ್ತೆ-ಮಾವ ಕೆಟ್ಟ ಮಾತುಗಳಿಂದ ನನ್ನನ್ನು ನಿಂದಿಸುತ್ತಾರೆ ಮತ್ತು ಹೊರಹಾಕುವುದಾಗಿ ಬೆದರಿಸುತ್ತಾರೆ. ಈ ಕಿರುಕುಳದಿಂದ ರಕ್ಷಣೆ ಬೇಕು.",
+        "ಒಂದು ರೂಪಾಯಿಯನ್ನೂ ಕೇಳಲು ಧೈರ್ಯ ಮಾಡಬಾರದು ಎಂದು ನನ್ನ ಗಂಡ ಹೇಳುತ್ತಾನೆ, ಇಲ್ಲದಿದ್ದರೆ ಮತ್ತೆ ಹೊಡೆಯುತ್ತೇನೆ ಎನ್ನುತ್ತಾನೆ. ಏನನ್ನೂ ಕೇಳಲು ನನಗೆ ಭಯವಾಗುತ್ತದೆ."],
     ro=["Nanu yarigadaroo helidare nanna ganda [[violence:nanna prana tegeyuttene anta heluttane]]. Pratidina bhayadalli badukuttiddene.",
-        "Nanna atte-mava ketta matugalinda nannannu nindisuttare mattu horahakuvudagi bedarisuttare. Ee kirukula inda rakshane beku."],
+        "Nanna atte-mava ketta matugalinda nannannu nindisuttare mattu horahakuvudagi bedarisuttare. Ee kirukula inda rakshane beku.",
+        "Ondu rupayiyannu kelalu dhairya madabaradu anta nanna ganda heluttane, illadiddare matte hodeyuttene ennuttane. Enannu kelalu nanage bhayavaguttade."],
     issues={"violence": "requested"},
     facts={"violence": "supported", "in_scope": "supported"},
     enums=dict(SPOUSE)))
@@ -498,11 +519,14 @@ _reg(B("divorce_decree_done", "hn_c",
 # --- core: stridhan / joint property / birth certificate -----------------
 _reg(B("stridhan_held", "core",
     en=["My [[stridhan_claim:gold worth {gold_value}]] given by my parents is held by my husband's family. I have asked for it back several times and they [[demand_made:refuse to give it back]].",
-        "My wedding jewellery is kept by my in-laws. I asked for it back and they refused to give it."],
+        "My wedding jewellery is kept by my in-laws. I asked for it back and they refused to give it.",
+        "I have kept a list of all my jewellery, with photos, and everything is in my husband's house. I have asked for it back many times."],
     kn=["ನನ್ನ ಪೋಷಕರು ಕೊಟ್ಟ [[stridhan_claim:{gold_value} ಮೌಲ್ಯದ ಚಿನ್ನ]]ವನ್ನು ನನ್ನ ಗಂಡನ ಮನೆಯವರು ಇಟ್ಟುಕೊಂಡಿದ್ದಾರೆ. ಹಲವು ಬಾರಿ ಕೇಳಿದರೂ ಅದನ್ನು [[demand_made:ಹಿಂದಿರುಗಿಸಲು ನಿರಾಕರಿಸುತ್ತಿದ್ದಾರೆ]].",
-        "ನನ್ನ ಮದುವೆಯ ಆಭರಣಗಳನ್ನು ನನ್ನ ಅತ್ತೆ-ಮಾವ ಇಟ್ಟುಕೊಂಡಿದ್ದಾರೆ. ವಾಪಸ್ ಕೇಳಿದೆ, ಅವರು ಕೊಡಲು ನಿರಾಕರಿಸಿದರು."],
+        "ನನ್ನ ಮದುವೆಯ ಆಭರಣಗಳನ್ನು ನನ್ನ ಅತ್ತೆ-ಮಾವ ಇಟ್ಟುಕೊಂಡಿದ್ದಾರೆ. ವಾಪಸ್ ಕೇಳಿದೆ, ಅವರು ಕೊಡಲು ನಿರಾಕರಿಸಿದರು.",
+        "ನನ್ನ ಎಲ್ಲಾ ಆಭರಣಗಳ ಪಟ್ಟಿಯನ್ನು ಫೋಟೋಗಳೊಂದಿಗೆ ಇಟ್ಟುಕೊಂಡಿದ್ದೇನೆ, ಎಲ್ಲವೂ ನನ್ನ ಗಂಡನ ಮನೆಯಲ್ಲಿದೆ. ಹಲವು ಬಾರಿ ವಾಪಸ್ ಕೇಳಿದ್ದೇನೆ."],
     ro=["Nanna poshakaru kotta [[stridhan_claim:{gold_value} maulyada chinnavannu]] nanna gandana maneyavaru ittukondiddare. Halavu bari kelidaru adannu [[demand_made:hindirugisalu nirakarisuttiddare]].",
-        "Nanna maduveya abharanagalannu nanna atte-mava ittukondiddare. Vapas kelide, avaru kodalu nirakarisidaru."],
+        "Nanna maduveya abharanagalannu nanna atte-mava ittukondiddare. Vapas kelide, avaru kodalu nirakarisidaru.",
+        "Nanna ella abharanagala pattiyannu photogalondige ittukondiddene, ellavu nanna gandana maneyallide. Halavu bari vapas keliddene."],
     issues={"stridhan": "requested"},
     facts={"stridhan_claim": "supported", "demand_made": "supported",
            "in_scope": "supported"},
@@ -607,6 +631,648 @@ _reg(B("procedure_how_file", "core",
         "Nanna ganda hana kodadiddaga court sahaya kelalu modala hejje enu?"],
     issues={"procedure": "requested"},
     facts={"in_scope": "supported"},
+    enums=dict(SPOUSE)))
+
+# --- recall-swarm expansion (Lane 02, 8,000; thin clusters + hn_g/hn_h) ---
+# Added 2026-11-27 for the unseen-question recall target (>= 70% exact).
+# Every sentence below was written fresh from the statutory concepts
+# (BNSS s.144 / s.144(3) / s.146, HMA ss.9/13/13B/24/25/26/27, PWDVA
+# ss.17/18/19/20/22, GWA 1890, HMGA s.6, BNS s.316, Births & Deaths Act
+# 1969). NEVER from test banks, never from Kaanoon Q&A text: Kaanoon
+# (kaanoon.com, read 2026-11-27: 2 searches + 1 public page fetch)
+# informed only the PHRASING PATTERNS used here — dated narrative openers,
+# numbered multi-question asks ("My questions are: first... second..."),
+# arrears/execution framing ("he paid for three months, then stopped"),
+# "can I fight my own case / how do I file this myself" procedure asks,
+# post-decree stridhan recovery, and husband-side questions. No Kaanoon
+# question or answer text was copied. Lane 11's study-sample patterns file
+# (docs/kaanoon_phrasing_patterns.md) had NOT landed when these blocks
+# were written; see the lane status file for the reconciliation note.
+# Thin clusters targeted: conflict 50, birth_certificate 135,
+# procedure 135, dv_compensation 134, restitution 118 (manifest counts),
+# plus child_safety_risk 50, being_filed 66, judicial_separation_only 73.
+# New clusters: hn_g = incidental-mention traps (issue mentioned as
+# background, must NOT become requested); hn_h = modality traps
+# (hypothetical / quoted / past-tense, incl. past violence that stopped).
+_reg(B("birth_cert_late", "core",
+    en=["My {child_age}-year-old {child_word} was born at home and never got a [[birth_certificate:birth certificate]]. I need one now for school admission.",
+        "My {child_word} has no [[birth_certificate:birth certificate]] because the birth was never registered. How do I register it now, after so many years?"],
+    kn=["ನನ್ನ {child_age} ವರ್ಷದ {child_word} ಮನೆಯಲ್ಲಿ ಹುಟ್ಟಿದನು, [[birth_certificate:ಜನನ ಪ್ರಮಾಣಪತ್ರ]] ಸಿಕ್ಕಿಲ್ಲ. ಶಾಲಾ ಪ್ರವೇಶಕ್ಕೆ ಈಗ ಅದು ಬೇಕು.",
+        "ನನ್ನ {child_word}ನ ಜನನವನ್ನು ನೋಂದಾಯಿಸಿಲ್ಲ, ಅದಕ್ಕಾಗಿ [[birth_certificate:ಜನನ ಪ್ರಮಾಣಪತ್ರ]] ಇಲ್ಲ. ಇಷ್ಟು ವರ್ಷಗಳ ನಂತರ ಅದನ್ನು ಹೇಗೆ ನೋಂದಾಯಿಸುವುದು?"],
+    ro=["Nanna {child_age} varshada {child_word} maneyalli huttidanu, [[birth_certificate:janana pramanapatra]] sikkilla. Shala praveshakke ega adu beku.",
+        "Nanna {child_word}na janana vannu nondaisilla, adakkagi [[birth_certificate:janana pramanapatra]] illa. Ishtu varshagala nantara adannu hege nondaisuvudu?"],
+    issues={"birth_certificate": "requested"},
+    facts={"birth_cert_asked": "supported", "child_fact": "supported",
+           "minor_child": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("birth_cert_correction", "core",
+    en=["The name on my {child_word}'s [[birth_certificate:birth certificate]] is spelled wrong. I want to correct the spelling on the certificate.",
+        "My {child_word}'s [[birth_certificate:birth certificate]] shows the wrong date of birth. How do I get the date corrected?"],
+    kn=["ನನ್ನ {child_word}ನ [[birth_certificate:ಜನನ ಪ್ರಮಾಣಪತ್ರ]]ದಲ್ಲಿ ಹೆಸರು ತಪ್ಪಾಗಿ ಬರೆದಿದೆ. ಪ್ರಮಾಣಪತ್ರದಲ್ಲಿ ಹೆಸರನ್ನು ಸರಿಪಡಿಸಬೇಕು.",
+        "ನನ್ನ {child_word}ನ [[birth_certificate:ಜನನ ಪ್ರಮಾಣಪತ್ರ]]ದಲ್ಲಿ ಹುಟ್ಟಿದ ದಿನಾಂಕ ತಪ್ಪಾಗಿದೆ. ದಿನಾಂಕವನ್ನು ಹೇಗೆ ಸರಿಪಡಿಸುವುದು?"],
+    ro=["Nanna {child_word}na [[birth_certificate:janana pramanapatra]]dalli hesaru tappagi baredide. Pramanapatradalli hesarannu saripadisabeku.",
+        "Nanna {child_word}na [[birth_certificate:janana pramanapatra]]dalli huttida dinanka tappagide. Dinankavannu hege saripadisuvudu?"],
+    issues={"birth_certificate": "requested"},
+    facts={"birth_cert_asked": "supported", "child_fact": "supported",
+           "minor_child": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("birth_cert_lost", "core",
+    en=["I have lost my {child_word}'s [[birth_certificate:birth certificate]]. I need a duplicate copy for school admission.",
+        "My {child_word}'s [[birth_certificate:birth certificate]] was lost when we shifted house. Where do I apply for a new copy?"],
+    kn=["ನನ್ನ {child_word}ನ [[birth_certificate:ಜನನ ಪ್ರಮಾಣಪತ್ರ]] ಕಳೆದುಹೋಗಿದೆ. ಶಾಲಾ ಪ್ರವೇಶಕ್ಕಾಗಿ ನಕಲು ಪ್ರತಿ ಬೇಕು.",
+        "ನಾವು ಮನೆ ಬದಲಾಯಿಸಿದಾಗ ನನ್ನ {child_word}ನ [[birth_certificate:ಜನನ ಪ್ರಮಾಣಪತ್ರ]] ಕಳೆದುಹೋಯಿತು. ಹೊಸ ಪ್ರತಿಗಾಗಿ ಎಲ್ಲಿ ಅರ್ಜಿ ಹಾಕಬೇಕು?"],
+    ro=["Nanna {child_word}na [[birth_certificate:janana pramanapatra]] kaledu hogide. Shala praveshakagi nakalu prati beku.",
+        "Navu mane badalayisidaga nanna {child_word}na [[birth_certificate:janana pramanapatra]] kaledu hoyitu. Hosa pratigagi elli arji hakabeku?"],
+    issues={"birth_certificate": "requested"},
+    facts={"birth_cert_asked": "supported", "child_fact": "supported",
+           "minor_child": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("procedure_documents", "core",
+    en=["What papers do I need to file a case for [[procedure:maintenance]]? I want to know which documents to carry to court.",
+        "I want to start a case for my child's custody. Which documents will the court ask for first?"],
+    kn=["[[procedure:ಜೀವನಾಂಶ]]ಕ್ಕಾಗಿ ಕೇಸ್ ಹಾಕಲು ಯಾವ ಕಾಗದಗಳು ಬೇಕು? ಕೋರ್ಟ್‌ಗೆ ಯಾವ ದಾಖಲೆಗಳನ್ನು ತೆಗೆದುಕೊಂಡು ಹೋಗಬೇಕು ಎಂದು ತಿಳಿಯಬೇಕು.",
+        "ನನ್ನ ಮಗುವಿನ ಪಾಲನೆಗಾಗಿ ಕೇಸ್ ಪ್ರಾರಂಭಿಸಲು ಬಯಸುತ್ತೇನೆ. ಕೋರ್ಟ್ ಮೊದಲು ಯಾವ ದಾಖಲೆಗಳನ್ನು ಕೇಳುತ್ತದೆ?"],
+    ro=["[[procedure:Jeevanamsha]]kkagi case hakalu yava kagadagalu beku? Court ge yava dakhalegalannu tegedukondu hogabeku anta tiliyabeku.",
+        "Nanna maguvina palanegagi case prarambhisalu bayasuttene. Court modalu yava dakhalegalannu keluttade?"],
+    issues={"procedure": "requested"},
+    facts={"in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("procedure_fees", "core",
+    en=["How much does it cost to file a case in court? Do I have to pay any court fees for a maintenance case?",
+        "I have no money to hire a lawyer. Can I get free legal help to file my family case?"],
+    kn=["ಕೋರ್ಟ್‌ನಲ್ಲಿ ಕೇಸ್ ಹಾಕಲು ಎಷ್ಟು ಖರ್ಚಾಗುತ್ತದೆ? ಜೀವನಾಂಶ ಕೇಸ್‌ಗೆ ಕೋರ್ಟ್ ಶುಲ್ಕ ಕೊಡಬೇಕೇ?",
+        "ವಕೀಲರನ್ನು ನೇಮಿಸಲು ನನ್ನ ಬಳಿ ಹಣವಿಲ್ಲ. ನನ್ನ ಕೌಟುಂಬಿಕ ಕೇಸ್‌ಗೆ ಉಚಿತ ಕಾನೂನು ಸಹಾಯ ಸಿಗಬಹುದೇ?"],
+    ro=["Court nalli case hakalu eshtu kharchaguttade? Jeevanamsha case ge court shulka kodabeke?",
+        "Vakilarannu nemisalu nanna bali hanavilla. Nanna koutumbika case ge uchita kanoonu sahaya sigabahude?"],
+    issues={"procedure": "requested"},
+    facts={"in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("procedure_timeline", "core",
+    en=["How long will my maintenance case take in court? When will the first hearing happen?",
+        "I filed my case two months ago and nothing has happened yet. How long do family cases usually take?",
+        "Is there any time limit for filing my maintenance case? I want to know how much time I have."],
+    kn=["ನನ್ನ ಜೀವನಾಂಶ ಕೇಸ್ ಕೋರ್ಟ್‌ನಲ್ಲಿ ಎಷ್ಟು ಸಮಯ ತೆಗೆದುಕೊಳ್ಳುತ್ತದೆ? ಮೊದಲ ವಿಚಾರಣೆ ಯಾವಾಗ ನಡೆಯುತ್ತದೆ?",
+        "ನಾನು ಎರಡು ತಿಂಗಳ ಹಿಂದೆ ಕೇಸ್ ಹಾಕಿದೆ, ಇನ್ನೂ ಏನೂ ಆಗಿಲ್ಲ. ಕೌಟುಂಬಿಕ ಕೇಸ್‌ಗಳು ಸಾಮಾನ್ಯವಾಗಿ ಎಷ್ಟು ಸಮಯ ತೆಗೆದುಕೊಳ್ಳುತ್ತವೆ?",
+        "ನನ್ನ ಜೀವನಾಂಶ ಕೇಸ್ ಹಾಕಲು ಯಾವುದಾದರೂ ಸಮಯ ಮಿತಿ ಇದೆಯೇ? ನನಗೆ ಎಷ್ಟು ಸಮಯವಿದೆ ಎಂದು ತಿಳಿಯಬೇಕು."],
+    ro=["Nanna jeevanamsha case court nalli eshtu samaya tegedukolluttade? Modala vicharane yavaga nadeyuttade?",
+        "Nanu eradu tingala hinde case hakide, innu enu agilla. Koutumbika case galu samanyavagi eshtu samaya tegedukolluttave?",
+        "Nanna jeevanamsha case hakalu yavudadaru samaya miti ideye? Nanage eshtu samayavide anta tiliyabeku?"],
+    issues={"procedure": "requested"},
+    facts={"in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("child_risk_alcoholic", "core",
+    en=["My husband drinks every day and shouts at our {child_age}-year-old {child_word}. I fear he will hurt my {child_word}, so I want [[custody:custody]] of my {child_word}.",
+        "My husband comes home drunk and frightens our {child_word}. My {child_word} is not safe with him, and I want my {child_word} to remain under my care."],
+    kn=["ನನ್ನ ಗಂಡ ಪ್ರತಿದಿನ ಕುಡಿದು ನಮ್ಮ {child_age} ವರ್ಷದ {child_word}ನನ್ನು ಗದರಿಸುತ್ತಾನೆ. ಅವನು ನನ್ನ {child_word}ನಿಗೆ ತೊಂದರೆ ಕೊಡುತ್ತಾನೆ ಎಂದು ಭಯವಿದೆ, ಅದಕ್ಕಾಗಿ ನನ್ನ {child_word}ನ [[custody:ಪಾಲನೆ]] ಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ಕುಡಿದು ಮನೆಗೆ ಬಂದು ನಮ್ಮ {child_word}ನನ್ನು ಹೆದರಿಸುತ್ತಾನೆ. ನನ್ನ {child_word} ಅವನ ಜೊತೆ ಸುರಕ್ಷಿತವಾಗಿಲ್ಲ, ನನ್ನ {child_word} ನನ್ನ ಆರೈಕೆಯಲ್ಲಿ ಇರಬೇಕು."],
+    ro=["Nanna ganda pratidina kudidu namma {child_age} varshada {child_word}nannu gadarisuttane. Avanu nanna {child_word}nige tondare koduttane anta bhayavide, adakkagi nanna {child_word}na [[custody:paalane]] beku.",
+        "Nanna ganda kudidu manege bandu namma {child_word}nannu hedisuttane. Nanna {child_word} avana jothe surakshitavagilla, nanna {child_word} nanna aaraikeyalli irabeku."],
+    issues={"custody": "requested"},
+    facts={"custody_claim": "supported", "child_safety_risk": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("child_risk_abduction", "core",
+    en=["My husband says he will take our {child_age}-year-old {child_word} away to his village and never bring the {child_word} back. I want [[custody:custody]] so he cannot take my {child_word}.",
+        "My husband has threatened to hide our {child_word} from me. I am afraid he will take my {child_word} away."],
+    kn=["ನನ್ನ ಗಂಡ ನಮ್ಮ {child_age} ವರ್ಷದ {child_word}ನನ್ನು ತನ್ನ ಊರಿಗೆ ಕರೆದುಕೊಂಡು ಹೋಗಿ ಮರಳಿ ತರುವುದಿಲ್ಲ ಎಂದು ಹೇಳುತ್ತಾನೆ. ಅವನು ನನ್ನ {child_word}ನನ್ನು ತೆಗೆದುಕೊಂಡು ಹೋಗದಂತೆ ನನ್ನ {child_word}ನ [[custody:ಪಾಲನೆ]] ಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ನಮ್ಮ {child_word}ನನ್ನು ನನ್ನಿಂದ ಮರೆಮಾಡುವುದಾಗಿ ಬೆದರಿಸಿದ್ದಾನೆ. ಅವನು ನನ್ನ {child_word}ನನ್ನು ಕರೆದುಕೊಂಡು ಹೋಗುತ್ತಾನೆ ಎಂದು ಭಯವಿದೆ."],
+    ro=["Nanna ganda namma {child_age} varshada {child_word}nannu tanna oorige karedukondu hogi marali taruvudilla anta heluttane. Avanu nanna {child_word}nannu tegedukondu hogadante nanna {child_word}na [[custody:paalane]] beku.",
+        "Nanna ganda namma {child_word}nannu nanninda maremaduvudagi bedarisiddane. Avanu nanna {child_word}nannu karedukondu hoguttane anta bhayavide."],
+    issues={"custody": "requested"},
+    facts={"custody_claim": "supported", "child_safety_risk": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("child_risk_neglect", "core",
+    en=["My husband leaves our {child_age}-year-old {child_word} alone at home all day and does not give the {child_word} food on time. I want [[custody:custody]] of my {child_word}.",
+        "My {child_word} is left alone at home while my husband goes out. My {child_word} is not looked after properly, and I want my {child_word} with me."],
+    kn=["ನನ್ನ ಗಂಡ ನಮ್ಮ {child_age} ವರ್ಷದ {child_word}ನನ್ನು ದಿನವಿಡೀ ಮನೆಯಲ್ಲಿ ಒಬ್ಬಂಟಿಯಾಗಿ ಬಿಟ್ಟು ಸಮಯಕ್ಕೆ ಊಟ ಕೊಡುವುದಿಲ್ಲ. ನನ್ನ {child_word}ನ [[custody:ಪಾಲನೆ]] ಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ಹೊರಗೆ ಹೋಗುವಾಗ ನನ್ನ {child_word} ಮನೆಯಲ್ಲಿ ಒಬ್ಬಂಟಿಯಾಗಿ ಇರುತ್ತಾನೆ. ನನ್ನ {child_word}ನನ್ನು ಸರಿಯಾಗಿ ನೋಡಿಕೊಳ್ಳುವುದಿಲ್ಲ, ನನ್ನ {child_word} ನನ್ನ ಜೊತೆ ಇರಬೇಕು."],
+    ro=["Nanna ganda namma {child_age} varshada {child_word}nannu dinavidi maneyalli obbantiyagi bittu samayakke uta koduvudilla. Nanna {child_word}na [[custody:paalane]] beku.",
+        "Nanna ganda horage hoguvaga nanna {child_word} maneyalli obbantiyagi iruttane. Nanna {child_word}nannu sariyagi nodikolluvudilla, nanna {child_word} nanna jothe irabeku."],
+    issues={"custody": "requested"},
+    facts={"custody_claim": "supported", "child_safety_risk": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("mutual_agreed_terms", "core",
+    en=["My husband and I both agree to end the marriage, and we have agreed on maintenance and our {child_word}'s custody. We want a [[mutual_consent:mutual consent divorce]].",
+        "We have settled everything between us — money, the house, and our {child_word}. Now we both want a divorce by [[mutual_consent:mutual consent]]."],
+    kn=["ನನ್ನ ಗಂಡ ಮತ್ತು ನಾನು ಮದುವೆ ಕೊನೆಗೊಳಿಸಲು ಒಪ್ಪಿದ್ದೇವೆ, ಜೀವನಾಂಶ ಮತ್ತು ನಮ್ಮ {child_word}ನ ಪಾಲನೆಯ ಬಗ್ಗೆಯೂ ಒಪ್ಪಿದ್ದೇವೆ. ನಮಗೆ [[mutual_consent:ಪರಸ್ಪರ ಒಪ್ಪಿಗೆಯ ವಿಚ್ಛೇದನ]] ಬೇಕು.",
+        "ನಾವು ಎಲ್ಲವನ್ನೂ ನಮ್ಮ ನಡುವೆ ಬಗೆಹರಿಸಿಕೊಂಡಿದ್ದೇವೆ — ಹಣ, ಮನೆ, ಮತ್ತು ನಮ್ಮ {child_word}. ಈಗ ನಾವಿಬ್ಬರೂ [[mutual_consent:ಪರಸ್ಪರ ಒಪ್ಪಿಗೆ]]ಯಿಂದ ವಿಚ್ಛೇದನ ಬಯಸುತ್ತೇವೆ."],
+    ro=["Nanna ganda mattu nanu maduve konegolisalu oppideve, jeevanamsha mattu namma {child_word}na palaneya baggeyu oppideve. Namage [[mutual_consent:paraspara oppigeya vichchhedana]] beku.",
+        "Navu ellavannu namma naduve bageharisikondiddeve — hana, mane, mattu namma {child_word}. Eega navibbaru [[mutual_consent:paraspara oppige]]yinda vichchhedana bayasutteve."],
+    issues={"divorce": "requested"},
+    facts={"divorce_asked": "supported", "mutual_consent": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("multi_ask_maint_stridhan", "core",
+    en=["My questions are: first, can I get [[maintenance:maintenance]] from my husband who gives me nothing, and second, can I get my [[stridhan_claim:gold]] back from my in-laws?",
+        "I have two questions. Can I ask for monthly support from my husband, and can I ask for my wedding jewellery to be returned?"],
+    kn=["ನನ್ನ ಪ್ರಶ್ನೆಗಳು: ಮೊದಲು, ಏನೂ ಕೊಡದ ನನ್ನ ಗಂಡನಿಂದ [[maintenance:ಜೀವನಾಂಶ]] ಪಡೆಯಬಹುದೇ, ಎರಡನೆಯದಾಗಿ, ನನ್ನ [[stridhan_claim:ಚಿನ್ನ]]ವನ್ನು ಅತ್ತೆ-ಮಾವನಿಂದ ವಾಪಸ್ ಪಡೆಯಬಹುದೇ?",
+        "ನನಗೆ ಎರಡು ಪ್ರಶ್ನೆಗಳಿವೆ. ನನ್ನ ಗಂಡನಿಂದ ತಿಂಗಳ ಬೆಂಬಲ ಕೇಳಬಹುದೇ, ಮತ್ತು ನನ್ನ ಮದುವೆಯ ಆಭರಣಗಳನ್ನು ವಾಪಸ್ ಕೇಳಬಹುದೇ?"],
+    ro=["Nanna prashnegalu: modalu, enu kodada nanna gandana inda [[maintenance:jeevanamsha]] padeyabahude, eradaneyadagi, nanna [[stridhan_claim:chinna]]vannu atte-mavaninda vapas padeyabahude?",
+        "Nanage eradu prashnegalive. Nanna gandana inda tingala bembala kelabahude, mattu nanna maduveya abharanagalannu vapas kelabahude?"],
+    issues={"maintenance": "requested", "stridhan": "requested"},
+    facts={"money_fact": "supported", "stridhan_claim": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("multi_ask_custody_maint", "core",
+    en=["My questions are: first, can I get [[custody:custody]] of my {child_age}-year-old {child_word}, and second, can I get [[maintenance:maintenance]] for my {child_word}?",
+        "I have two questions. Who will get my {child_word}, and will my husband have to pay for my {child_word}'s school fees?"],
+    kn=["ನನ್ನ ಪ್ರಶ್ನೆಗಳು: ಮೊದಲು, ನನ್ನ {child_age} ವರ್ಷದ {child_word}ನ [[custody:ಪಾಲನೆ]] ಪಡೆಯಬಹುದೇ, ಎರಡನೆಯದಾಗಿ, ನನ್ನ {child_word}ಗಾಗಿ [[maintenance:ಜೀವನಾಂಶ]] ಪಡೆಯಬಹುದೇ?",
+        "ನನಗೆ ಎರಡು ಪ್ರಶ್ನೆಗಳಿವೆ. ನನ್ನ {child_word} ಯಾರಿಗೆ ಸಿಗುತ್ತಾರೆ, ಮತ್ತು ನನ್ನ ಗಂಡ ನನ್ನ {child_word}ನ ಶಾಲಾ ಶುಲ್ಕ ಕೊಡಬೇಕೇ?"],
+    ro=["Nanna prashnegalu: modalu, nanna {child_age} varshada {child_word}na [[custody:paalane]] padeyabahude, eradaneyadagi, nanna {child_word}gagi [[maintenance:jeevanamsha]] padeyabahude?",
+        "Nanage eradu prashnegalive. Nanna {child_word} yarige siguttare, mattu nanna ganda nanna {child_word}na shala shulka kodabeke?"],
+    issues={"custody": "requested", "maintenance": "requested"},
+    facts={"custody_claim": "supported", "money_fact": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "school_fees_fact": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("dv_comp_medical", "hn_b",
+    en=["My husband beat me so badly that I had to stay in hospital for a week. I want [[dv_compensation:compensation]] for my hospital bills and treatment.",
+        "I spent a lot of money on medicines after my husband beat me. I want the court to order him to pay for my treatment."],
+    kn=["ನನ್ನ ಗಂಡ ನನ್ನನ್ನು ತುಂಬಾ ಹೊಡೆದನು, ನಾನು ಒಂದು ವಾರ ಆಸ್ಪತ್ರೆಯಲ್ಲಿ ಇರಬೇಕಾಯಿತು. ನನ್ನ ಆಸ್ಪತ್ರೆ ಬಿಲ್ ಮತ್ತು ಚಿಕಿತ್ಸೆಗಾಗಿ [[dv_compensation:ಪರಿಹಾರ]] ಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ಹೊಡೆದ ನಂತರ ಔಷಧಿಗಳಿಗೆ ಬಹಳ ಹಣ ಖರ್ಚು ಮಾಡಿದೆ. ಚಿಕಿತ್ಸೆಗಾಗಿ ಹಣ ಕೊಡುವಂತೆ ಕೋರ್ಟ್ ಅವನಿಗೆ ಆದೇಶಿಸಬೇಕು."],
+    ro=["Nanna ganda nannannu tumba hodedanu, nanu ondu vara aspatreyalli irabekayitu. Nanna aspatre bill mattu chikitsegagi [[dv_compensation:parihara]] beku.",
+        "Nanna ganda hodedanantara aushadhigalige bahala hana kharchu madide. Chikitsegagi hana koduvante court avanige adeshisabeku."],
+    issues={"violence": "requested", "dv_compensation": "requested"},
+    facts={"violence": "supported", "dv_injury_comp_asked": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("dv_comp_mental", "hn_b",
+    en=["My husband and in-laws torture me with bad words every day. I want [[dv_compensation:compensation]] for this mental harassment.",
+        "I have suffered mental torture at home for years. Can I ask for money as compensation for the suffering?"],
+    kn=["ನನ್ನ ಗಂಡ ಮತ್ತು ಅತ್ತೆ-ಮಾವ ಪ್ರತಿದಿನ ಕೆಟ್ಟ ಮಾತುಗಳಿಂದ ನನ್ನನ್ನು ಹಿಂಸಿಸುತ್ತಾರೆ. ಈ ಮಾನಸಿಕ ಕಿರುಕುಳಕ್ಕಾಗಿ [[dv_compensation:ಪರಿಹಾರ]] ಬೇಕು.",
+        "ಮನೆಯಲ್ಲಿ ವರ್ಷಗಳಿಂದ ಮಾನಸಿಕ ಹಿಂಸೆ ಅನುಭವಿಸಿದ್ದೇನೆ. ಆ ನೋವಿಗೆ ಪರಿಹಾರವಾಗಿ ಹಣ ಕೇಳಬಹುದೇ?"],
+    ro=["Nanna ganda mattu atte-mava pratidina ketta matugalinda nannannu himsisuttare. Ee manasika kirukula kagi [[dv_compensation:parihara]] beku.",
+        "Maneyalli varshagalinda manasika himse anubhavisiddene. Aa novige pariharavagi hana kelabahude?"],
+    issues={"violence": "requested", "dv_compensation": "requested"},
+    facts={"violence": "supported", "dv_injury_comp_asked": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("dv_comp_lost_wages", "hn_b",
+    en=["After my husband beat me, I could not go to work for a month and lost my wages. I want [[dv_compensation:compensation]] for the wages I lost.",
+        "My injuries stopped me from working, so I lost a month's pay. Can I ask my husband to pay for that loss?"],
+    kn=["ನನ್ನ ಗಂಡ ಹೊಡೆದ ನಂತರ ನಾನು ಒಂದು ತಿಂಗಳು ಕೆಲಸಕ್ಕೆ ಹೋಗಲಾಗಲಿಲ್ಲ, ನನ್ನ ವೇತನ ಕಳೆದುಕೊಂಡೆ. ನಾನು ಕಳೆದುಕೊಂಡ ವೇತನಕ್ಕಾಗಿ [[dv_compensation:ಪರಿಹಾರ]] ಬೇಕು.",
+        "ನನ್ನ ಗಾಯಗಳಿಂದ ಕೆಲಸ ಮಾಡಲಾಗಲಿಲ್ಲ, ಒಂದು ತಿಂಗಳ ಸಂಬಳ ಕಳೆದುಕೊಂಡೆ. ಆ ನಷ್ಟಕ್ಕೆ ನನ್ನ ಗಂಡ ಹಣ ಕೊಡಬೇಕೆಂದು ಕೇಳಬಹುದೇ?"],
+    ro=["Nanna ganda hodedanantara nanu ondu tingalu kelasakke hogalagalilla, nanna vetana kaledukonde. Nanu kaledukonda vetanakkagi [[dv_compensation:parihara]] beku.",
+        "Nanna gayagalinda kelasa madagalagilla, ondu tingala sambala kaledukonde. Aa nashtakke nanna ganda hana kodabekendu kelabahude?"],
+    issues={"violence": "requested", "dv_compensation": "requested"},
+    facts={"violence": "supported", "dv_injury_comp_asked": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("js_only_living_apart", "hn_c",
+    en=["I want a court order to live separately from my husband, but I do not want to end the marriage. I only want [[judicial_separation_only:judicial separation]].",
+        "We cannot live together anymore, but I am not ready for a divorce. I want to live apart with a court order."],
+    kn=["ನನ್ನ ಗಂಡನಿಂದ ಬೇರೆಯಾಗಿ ವಾಸಿಸಲು ಕೋರ್ಟ್ ಆದೇಶ ಬೇಕು, ಆದರೆ ಮದುವೆ ಕೊನೆಗೊಳಿಸಲು ಬಯಸುವುದಿಲ್ಲ. ನನಗೆ [[judicial_separation_only:ನ್ಯಾಯಾಂಗ ಬೇರ್ಪಡಿಕೆ]] ಮಾತ್ರ ಬೇಕು.",
+        "ನಾವು ಒಟ್ಟಿಗೆ ಬದುಕಲು ಸಾಧ್ಯವಿಲ್ಲ, ಆದರೆ ವಿಚ್ಛೇದನಕ್ಕೆ ನಾನು ಸಿದ್ಧವಿಲ್ಲ. ಕೋರ್ಟ್ ಆದೇಶದೊಂದಿಗೆ ಬೇರೆಯಾಗಿ ವಾಸಿಸಲು ಬಯಸುತ್ತೇನೆ."],
+    ro=["Nanna gandana inda bereyagi vaasisalu court adesha beku, adare maduve konegolisalu bayasuvudilla. Nanage [[judicial_separation_only:nyayanga berpadike]] matra beku.",
+        "Navu ottige badukalu sadhyavilla, adare divorce ge nanu siddhavilla. Court adeshadondige bereyagi vaasisalu bayasuttene."],
+    issues={"divorce": "denied"},
+    facts={"judicial_separation_only": "supported",
+           "divorce_asked": "denied", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("being_filed_custody", "hn_c",
+    en=["I am going to file a case for [[custody:custody]] of my {child_age}-year-old {child_word} next week. My husband has taken my {child_word} away from me.",
+        "Next month I will file a custody petition for my {child_word}. What is the first thing I should arrange?"],
+    kn=["ನಾನು ಮುಂದಿನ ವಾರ ನನ್ನ {child_age} ವರ್ಷದ {child_word}ನ [[custody:ಪಾಲನೆ]]ಗಾಗಿ ಕೇಸ್ ಹಾಕುತ್ತಿದ್ದೇನೆ. ನನ್ನ ಗಂಡ ನನ್ನ {child_word}ನನ್ನು ನನ್ನಿಂದ ಕರೆದುಕೊಂಡು ಹೋಗಿದ್ದಾನೆ.",
+        "ಮುಂದಿನ ತಿಂಗಳು ನನ್ನ {child_word}ಗಾಗಿ ಪಾಲನೆ ಅರ್ಜಿ ಹಾಕುತ್ತೇನೆ. ಮೊದಲು ಏನು ಸಿದ್ಧಪಡಿಸಬೇಕು?"],
+    ro=["Nanu mundina vara nanna {child_age} varshada {child_word}na [[custody:paalane]]gagi case hakuttiddene. Nanna ganda nanna {child_word}nannu nanninda karedukondu hogiddane.",
+        "Mundina tingalu nanna {child_word}gagi paalane arji hakuttene. Modalu enu siddhapadisabeku?"],
+    issues={"custody": "requested"},
+    facts={"being_filed": "supported", "custody_claim": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "in_scope": "supported"},
+    enums={"claimant_sex": F, "claimant_role": "spouse",
+           "modality_time": "future"}))
+_reg(B("being_filed_maintenance", "hn_c",
+    en=["I am going to file a case for [[maintenance:maintenance]] next week. My husband has given me nothing for {duration}.",
+        "I will file a maintenance petition next month. I have already spoken to a lawyer about it."],
+    kn=["ನಾನು ಮುಂದಿನ ವಾರ [[maintenance:ಜೀವನಾಂಶ]]ಕ್ಕಾಗಿ ಕೇಸ್ ಹಾಕುತ್ತಿದ್ದೇನೆ. ನನ್ನ ಗಂಡ {duration} ಏನೂ ಕೊಟ್ಟಿಲ್ಲ.",
+        "ಮುಂದಿನ ತಿಂಗಳು ಜೀವನಾಂಶ ಅರ್ಜಿ ಹಾಕುತ್ತೇನೆ. ಅದರ ಬಗ್ಗೆ ವಕೀಲರೊಂದಿಗೆ ಈಗಾಗಲೇ ಮಾತನಾಡಿದ್ದೇನೆ."],
+    ro=["Nanu mundina vara [[maintenance:jeevanamsha]]kkagi case hakuttiddene. Nanna ganda {duration} enu kottilla.",
+        "Mundina tingalu jeevanamsha arji hakuttene. Adara bagge vakilarondige egagale matanadiddene."],
+    issues={"maintenance": "requested"},
+    facts={"being_filed": "supported", "money_fact": "supported",
+           "in_scope": "supported"},
+    enums={"claimant_sex": F, "claimant_role": "spouse",
+           "modality_time": "future"}))
+_reg(B("mutual_refused", "hn_c",
+    en=["I asked my husband for a divorce by mutual consent, but he refuses to agree. I still want a [[divorce:divorce]], even if he does not agree.",
+        "My husband will not agree to a mutual divorce. Can I still get a divorce without his consent?"],
+    kn=["ನನ್ನ ಗಂಡನನ್ನು ಪರಸ್ಪರ ಒಪ್ಪಿಗೆಯ ವಿಚ್ಛೇದನಕ್ಕೆ ಕೇಳಿದೆ, ಆದರೆ ಅವನು ಒಪ್ಪಲು ನಿರಾಕರಿಸುತ್ತಾನೆ. ಅವನು ಒಪ್ಪದಿದ್ದರೂ ನನಗೆ [[divorce:ವಿಚ್ಛೇದನ]] ಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ಪರಸ್ಪರ ವಿಚ್ಛೇದನಕ್ಕೆ ಒಪ್ಪುವುದಿಲ್ಲ. ಅವನ ಒಪ್ಪಿಗೆ ಇಲ್ಲದೆ ವಿಚ್ಛೇದನ ಪಡೆಯಬಹುದೇ?"],
+    ro=["Nanna gandannu paraspara oppigeya divorce ge kelide, adare avanu oppalu nirakarisuttane. Avanu oppadiddaru nanage [[divorce:vichchhedana]] beku.",
+        "Nanna ganda paraspara divorce ge oppuvudilla. Avana oppige illade divorce padeyabahude?"],
+    issues={"divorce": "requested"},
+    facts={"divorce_asked": "supported", "mutual_consent": "denied",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("restitution_wife_left", "hn_c",
+    en=["My wife left our home and went to her parents' house. I want her to [[restitution:come back and live with me]] as my wife.",
+        "My wife has been living separately for a year. I do not want a divorce, I want my wife to return home.",
+        "My wife left home one day without telling anyone, and she has been away for a year. I want her to return home and live with me."],
+    kn=["ನನ್ನ ಹೆಂಡತಿ ನಮ್ಮ ಮನೆ ಬಿಟ್ಟು ತನ್ನ ಪೋಷಕರ ಮನೆಗೆ ಹೋದಳು. ಅವಳು [[restitution:ಮರಳಿ ಬಂದು ನನ್ನ ಜೊತೆ ಹೆಂಡತಿಯಾಗಿ ಬದುಕಬೇಕು]] ಎಂದು ಬಯಸುತ್ತೇನೆ.",
+        "ನನ್ನ ಹೆಂಡತಿ ಒಂದು ವರ್ಷದಿಂದ ಬೇರೆಯಾಗಿ ವಾಸಿಸುತ್ತಿದ್ದಾಳೆ. ನನಗೆ ವಿಚ್ಛೇದನ ಬೇಡ, ನನ್ನ ಹೆಂಡತಿ ಮನೆಗೆ ಮರಳಬೇಕು.",
+        "ನನ್ನ ಹೆಂಡತಿ ಒಂದು ದಿನ ಯಾರಿಗೂ ಹೇಳದೆ ಮನೆ ಬಿಟ್ಟು ಹೋದಳು, ಒಂದು ವರ್ಷದಿಂದ ದೂರವಿದ್ದಾಳೆ. ಅವಳು ಮನೆಗೆ ಮರಳಿ ನನ್ನ ಜೊತೆ ವಾಸಿಸಬೇಕು."],
+    ro=["Nanna hendati namma mane bittu tanna poshakara manege hodalu. Avalu [[restitution:marali bandu nanna jothe hendatiyagi badukabeku]] anta bayasuttene.",
+        "Nanna hendati ondu varshada inda bereyagi vaasisuttiddale. Nanage divorce beda, nanna hendati manege maralabeku.",
+        "Nanna hendati ondu dina yarigu helade mane bittu hodalu, ondu varshada inda dooraviddale. Avalu manege marali nanna jothe vaasisabeku."],
+    issues={"restitution": "requested", "divorce": "denied"},
+    facts={"restitution_asked": "supported", "divorce_asked": "denied",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE_M)))
+_reg(B("restitution_desertion", "hn_c",
+    en=["My husband left me two years ago and lives separately. I do not want a [[divorce:divorce]], I want him to return home and live with me.",
+        "My husband deserted me and our {child_word}. I want the court to ask him to come back home."],
+    kn=["ನನ್ನ ಗಂಡ ಎರಡು ವರ್ಷಗಳ ಹಿಂದೆ ನನ್ನನ್ನು ಬಿಟ್ಟು ಬೇರೆಯಾಗಿ ವಾಸಿಸುತ್ತಿದ್ದಾನೆ. ನನಗೆ [[divorce:ವಿಚ್ಛೇದನ]] ಬೇಡ, ಅವನು ಮನೆಗೆ ಮರಳಿ ನನ್ನ ಜೊತೆ ವಾಸಿಸಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ನನ್ನನ್ನು ಮತ್ತು ನಮ್ಮ {child_word}ನನ್ನು ಬಿಟ್ಟು ಹೋದನು. ಅವನು ಮನೆಗೆ ಮರಳಬೇಕು ಎಂದು ಕೋರ್ಟ್ ಕೇಳಬೇಕು."],
+    ro=["Nanna ganda eradu varshagala hinde nannannu bittu bereyagi vaasisuttiddane. Nanage [[divorce:vichchhedana]] beda, avanu manege marali nanna jothe vaasisabeku.",
+        "Nanna ganda nannannu mattu namma {child_word}nannu bittu hodanu. Avanu manege maralabeku anta court kelabeku."],
+    issues={"restitution": "requested", "divorce": "denied"},
+    facts={"restitution_asked": "supported", "divorce_asked": "denied",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("stridhan_after_decree", "hn_d",
+    en=["I already took a divorce from my husband, but my [[stridhan_claim:gold]] is still in his house. How can I recover my stridhan even after the divorce?",
+        "Our divorce is already decided, yet my wedding jewellery is still with my ex-husband's family. I want my [[stridhan_claim:stridhan]] back."],
+    kn=["ನನ್ನ ಗಂಡನಿಂದ ನಾನು ಈಗಾಗಲೇ ವಿಚ್ಛೇದನ ಪಡೆದಿದ್ದೇನೆ, ಆದರೆ ನನ್ನ [[stridhan_claim:ಚಿನ್ನ]] ಇನ್ನೂ ಅವನ ಮನೆಯಲ್ಲಿದೆ. ವಿಚ್ಛೇದನದ ನಂತರವೂ ನನ್ನ ಚಿನ್ನವನ್ನು ಹೇಗೆ ವಾಪಸ್ ಪಡೆಯುವುದು?",
+        "ನಮ್ಮ ವಿಚ್ಛೇದನ ಈಗಾಗಲೇ ತೀರ್ಮಾನವಾಗಿದೆ, ಆದರೂ ನನ್ನ ಮದುವೆಯ ಆಭರಣಗಳು ನನ್ನ ಮಾಜಿ ಗಂಡನ ಮನೆಯಲ್ಲೇ ಇವೆ. ನನ್ನ [[stridhan_claim:ಚಿನ್ನ]] ವಾಪಸ್ ಬೇಕು."],
+    ro=["Nanna gandana inda nanu egagale divorce padediddene, adare nanna [[stridhan_claim:chinna]] innu avana maneyallide. Divorce danantaravu nanna chinnavannu hege vapas padeyuvudu?",
+        "Namma divorce egagale teermanavagide, adaru nanna maduveya abharanagalu nanna maji gandana maneyalle ive. Nanna [[stridhan_claim:chinna]] vapas beku."],
+    issues={"stridhan": "requested", "divorce": "incidental"},
+    facts={"stridhan_claim": "supported", "decree": "supported",
+           "divorce_asked": "unknown", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("conflict_custody", "conflict",
+    en=["I want [[custody:custody]] of my {child_word}. Actually, no, let my husband keep our {child_word} with him. I cannot decide what is best.",
+        "One moment I feel my {child_word} belongs with me, then I wonder whether my {child_word} should stay with the father. I am confused about custody."],
+    kn=["ನನ್ನ {child_word}ನ [[custody:ಪಾಲನೆ]] ಬೇಕು. ಇಲ್ಲ, ನನ್ನ ಗಂಡನೇ ನಮ್ಮ {child_word}ನನ್ನು ತನ್ನ ಜೊತೆ ಇಟ್ಟುಕೊಳ್ಳಲಿ. ಯಾವುದು ಒಳ್ಳೆಯದು ಎಂದು ನಿರ್ಧರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+        "ಒಂದು ಕ್ಷಣ ನನ್ನ {child_word} ನನ್ನ ಜೊತೆಯೇ ಇರಬೇಕು ಎಂದು ಅನಿಸುತ್ತದೆ, ಮರುಕ್ಷಣ ನನ್ನ {child_word} ತಂದೆಯ ಜೊತೆ ಇರುವುದು ಒಳ್ಳೆಯದೇ ಎಂದು ಗೊಂದಲವಾಗುತ್ತದೆ."],
+    ro=["Nanna {child_word}na [[custody:paalane]] beku. Illa, nanna gandane namma {child_word}nannu tanna jothe ittukollali. Yavudu olleyadu anta nirdharisalu sadhyavilla.",
+        "Ondu kshana nanna {child_word} nanna joteye irabeku anta anisuttade, marukshana nanna {child_word} tandeya jothe iruvudu olleyade anta gondalavaguttade."],
+    issues={"custody": "uncertain"},
+    facts={"custody_claim": "conflicting", "child_fact": "supported",
+           "minor_child": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("conflict_maintenance", "conflict",
+    en=["I want [[maintenance:maintenance]] from my husband. Actually, no, I do not need his money. I can manage on my own.",
+        "One moment I want monthly support, the next moment I feel I should not take any money from him. I am confused about what to ask for."],
+    kn=["ನನ್ನ ಗಂಡನಿಂದ [[maintenance:ಜೀವನಾಂಶ]] ಬೇಕು. ಇಲ್ಲ, ಅವನ ಹಣ ನನಗೆ ಬೇಡ. ನಾನೊಬ್ಬಳೇ ನಿಭಾಯಿಸಬಲ್ಲೆ.",
+        "ಒಂದು ಕ್ಷಣ ತಿಂಗಳ ಬೆಂಬಲ ಬೇಕು ಎಂದು ಬಯಸುತ್ತೇನೆ, ಮರುಕ್ಷಣ ಅವನಿಂದ ಹಣ ತೆಗೆದುಕೊಳ್ಳಬಾರದು ಎಂದು ಅನಿಸುತ್ತದೆ. ಏನು ಕೇಳಬೇಕೆಂದು ಗೊಂದಲವಿದೆ."],
+    ro=["Nanna gandana inda [[maintenance:jeevanamsha]] beku. Illa, avana hana nanage beda. Nanobbale nibhayisaballe.",
+        "Ondu kshana tingala bembala beku anta bayasuttene, marukshana avaninda hana tegedukollabaradu anta anisuttade. Enu kelabekendu gondalavide."],
+    issues={"maintenance": "uncertain"},
+    facts={"money_fact": "conflicting", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("conflict_residence", "conflict",
+    en=["I want to keep living in our house. Actually, no, I want to leave this house and live elsewhere. I cannot decide where to live.",
+        "One moment I want to stay in my home, the next moment I want to move out. I am confused about the house."],
+    kn=["ನಮ್ಮ ಮನೆಯಲ್ಲೇ ವಾಸ ಮುಂದುವರಿಸಲು ಬಯಸುತ್ತೇನೆ. ಇಲ್ಲ, ಈ ಮನೆ ಬಿಟ್ಟು ಬೇರೆಡೆ ವಾಸಿಸಲು ಬಯಸುತ್ತೇನೆ. ಎಲ್ಲಿ ವಾಸಿಸಬೇಕೆಂದು ನಿರ್ಧರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+        "ಒಂದು ಕ್ಷಣ ನನ್ನ ಮನೆಯಲ್ಲೇ ಇರಬೇಕು ಎಂದು ಬಯಸುತ್ತೇನೆ, ಮರುಕ್ಷಣ ಮನೆ ಬಿಟ್ಟು ಹೋಗಬೇಕು ಎಂದು ಅನಿಸುತ್ತದೆ. ಮನೆಯ ಬಗ್ಗೆ ಗೊಂದಲವಿದೆ."],
+    ro=["Namma maneyalle vaasa munduvarisalu bayasuttene. Illa, ee mane bittu berede vaasisalu bayasuttene. Elli vaasisabekendu nirdharisalu sadhyavilla.",
+        "Ondu kshana nanna maneyalle irabeku anta bayasuttene, marukshana mane bittu hogabeku anta anisuttade. Maneya bagge gondalavide."],
+    issues={"residence": "uncertain"},
+    facts={"residence_claim": "conflicting", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("conflict_stridhan", "conflict",
+    en=["I want my [[stridhan_claim:gold]] back from my in-laws. Actually, no, let them keep it. I cannot decide whether to ask for it.",
+        "One moment I want my wedding jewellery back, the next moment I feel I should leave it with them. I am confused about my gold."],
+    kn=["ನನ್ನ [[stridhan_claim:ಚಿನ್ನ]]ವನ್ನು ಅತ್ತೆ-ಮಾವನಿಂದ ವಾಪಸ್ ಬೇಕು. ಇಲ್ಲ, ಅವರು ಅದನ್ನು ಇಟ್ಟುಕೊಳ್ಳಲಿ. ಅದನ್ನು ಕೇಳಬೇಕೇ ಎಂದು ನಿರ್ಧರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+        "ಒಂದು ಕ್ಷಣ ನನ್ನ ಮದುವೆಯ ಆಭರಣಗಳು ವಾಪಸ್ ಬೇಕು ಎಂದು ಬಯಸುತ್ತೇನೆ, ಮರುಕ್ಷಣ ಅವುಗಳನ್ನು ಅವರ ಬಳಿಯೇ ಬಿಡಬೇಕು ಎಂದು ಅನಿಸುತ್ತದೆ. ನನ್ನ ಚಿನ್ನದ ಬಗ್ಗೆ ಗೊಂದಲವಿದೆ."],
+    ro=["Nanna [[stridhan_claim:chinna]]vannu atte-mavaninda vapas beku. Illa, avaru adannu ittukollali. Adannu kelabeke anta nirdharisalu sadhyavilla.",
+        "Ondu kshana nanna maduveya abharanagalu vapas beku anta bayasuttene, marukshana avugalannu avara baliye bidabeku anta anisuttade. Nanna chinnada bagge gondalavide."],
+    issues={"stridhan": "uncertain"},
+    facts={"stridhan_claim": "conflicting", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("neg_residence", "neg",
+    en=["I do not want to live in that house anymore. I only want [[maintenance:maintenance]] from my husband.",
+        "I have already left the house and I do not want to go back there. My question is only about monthly support."],
+    kn=["ಆ ಮನೆಯಲ್ಲಿ ಇನ್ನು ವಾಸಿಸಲು ಬಯಸುವುದಿಲ್ಲ. ನನ್ನ ಗಂಡನಿಂದ [[maintenance:ಜೀವನಾಂಶ]] ಮಾತ್ರ ಬೇಕು.",
+        "ನಾನು ಈಗಾಗಲೇ ಮನೆ ಬಿಟ್ಟಿದ್ದೇನೆ, ಅಲ್ಲಿಗೆ ಮರಳಲು ಬಯಸುವುದಿಲ್ಲ. ನನ್ನ ಪ್ರಶ್ನೆ ತಿಂಗಳ ಬೆಂಬಲದ ಬಗ್ಗೆ ಮಾತ್ರ."],
+    ro=["Aa maneyalli innu vaasisalu bayasuvudilla. Nanna gandana inda [[maintenance:jeevanamsha]] matra beku.",
+        "Nanu egagale mane bittiddene, allige maralalu bayasuvudilla. Nanna prashne tingala bembalada bagge matra."],
+    issues={"residence": "denied", "maintenance": "requested"},
+    facts={"residence_claim": "denied", "money_fact": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("neg_stridhan", "neg",
+    en=["I do not want my [[stridhan_claim:gold]] back. Let my in-laws keep it. I only want a [[divorce:divorce]] from my husband.",
+        "My jewellery can stay with them, I am not asking for it. I only want to end the marriage."],
+    kn=["ನನ್ನ [[stridhan_claim:ಚಿನ್ನ]] ವಾಪಸ್ ಬೇಡ. ಅತ್ತೆ-ಮಾವ ಅದನ್ನು ಇಟ್ಟುಕೊಳ್ಳಲಿ. ನನ್ನ ಗಂಡನಿಂದ [[divorce:ವಿಚ್ಛೇದನ]] ಮಾತ್ರ ಬೇಕು.",
+        "ನನ್ನ ಆಭರಣಗಳು ಅವರ ಬಳಿಯೇ ಇರಲಿ, ನಾನು ಅವುಗಳನ್ನು ಕೇಳುತ್ತಿಲ್ಲ. ಮದುವೆ ಕೊನೆಗೊಳಿಸಲು ಮಾತ್ರ ಬಯಸುತ್ತೇನೆ."],
+    ro=["Nanna [[stridhan_claim:chinna]] vapas beda. Atte-mava adannu ittukollali. Nanna gandana inda [[divorce:vichchhedana]] matra beku.",
+        "Nanna abharanagalu avara baliye irali, nanu avugalannu keluttilla. Maduve konegolisalu matra bayasuttene."],
+    issues={"stridhan": "denied", "divorce": "requested"},
+    facts={"stridhan_claim": "denied", "divorce_asked": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("neg_joint", "neg",
+    en=["I do not want any share in the house we bought together. I only want [[custody:custody]] of my {child_word}.",
+        "My husband can keep the flat, I want nothing from it. I only want my {child_word} to live with me."],
+    kn=["ನಾವು ಒಟ್ಟಿಗೆ ಖರೀದಿಸಿದ ಮನೆಯಲ್ಲಿ ಯಾವುದೇ ಪಾಲು ಬೇಡ. ನನ್ನ {child_word}ನ [[custody:ಪಾಲನೆ]] ಮಾತ್ರ ಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ಫ್ಲ್ಯಾಟ್ ಇಟ್ಟುಕೊಳ್ಳಬಹುದು, ಅದರಿಂದ ನನಗೆ ಏನೂ ಬೇಡ. ನನ್ನ {child_word} ನನ್ನ ಜೊತೆ ಇರಬೇಕು ಅಷ್ಟೇ."],
+    ro=["Navu ottige khareedisa maneyalli yavude palu beda. Nanna {child_word}na [[custody:paalane]] matra beku.",
+        "Nanna ganda flat ittukollabahudu, adarinda nanage enu beda. Nanna {child_word} nanna jothe irabeku ashte."],
+    issues={"joint_property": "denied", "custody": "requested"},
+    facts={"joint_property_claim": "denied", "custody_claim": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("neg_dvcomp", "neg",
+    en=["I do not want any money for my injuries. I only want protection from my husband's beatings.",
+        "I am not asking for compensation. I only want the [[violence:violence]] at home to stop."],
+    kn=["ನನ್ನ ಗಾಯಗಳಿಗೆ ಯಾವುದೇ ಹಣ ಬೇಡ. ನನ್ನ ಗಂಡನ ಹೊಡೆತದಿಂದ ರಕ್ಷಣೆ ಮಾತ್ರ ಬೇಕು.",
+        "ನಾನು ಪರಿಹಾರ ಕೇಳುತ್ತಿಲ್ಲ. ಮನೆಯಲ್ಲಿ [[violence:ಹಿಂಸೆ]] ನಿಲ್ಲಬೇಕು ಅಷ್ಟೇ."],
+    ro=["Nanna gayagalige yavude hana beda. Nanna gandana hodetinda rakshane matra beku.",
+        "Nanu parihara keluttilla. Maneyalli [[violence:himse]] nillabeku ashte."],
+    issues={"dv_compensation": "denied", "violence": "requested"},
+    facts={"dv_injury_comp_asked": "denied", "violence": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("neg_restitution", "neg",
+    en=["I do not want my husband back at all. I want a [[divorce:divorce]], not a reunion.",
+        "He can stay away, I never want him to return. I only want to end the marriage legally."],
+    kn=["ನನ್ನ ಗಂಡ ವಾಪಸ್ ಬರುವುದು ಖಂಡಿತ ಬೇಡ. ನನಗೆ [[divorce:ವಿಚ್ಛೇದನ]] ಬೇಕು, ಮರುಸೇರ್ಪಡೆ ಬೇಡ.",
+        "ಅವನು ದೂರವೇ ಇರಬಹುದು, ಅವನು ಮರಳಿ ಬರುವುದು ನನಗೆ ಎಂದೂ ಬೇಡ. ಮದುವೆಯನ್ನು ಕಾನೂನುಬದ್ಧವಾಗಿ ಕೊನೆಗೊಳಿಸಲು ಮಾತ್ರ ಬಯಸುತ್ತೇನೆ."],
+    ro=["Nanna ganda vapas baruvudu khandita beda. Nanage [[divorce:vichchhedana]] beku, maruserpade beda.",
+        "Avanu doorave irabahudu, avanu marali baruvudu nanage endu beda. Maduveyannu kanunubaddhavagi konegolisalu matra bayasuttene."],
+    issues={"restitution": "denied", "divorce": "requested"},
+    facts={"restitution_asked": "denied", "divorce_asked": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+
+# --- hard negative G: incidental mentions (background, NOT requested) -------
+_reg(B("bg_violence_past", "hn_g",
+    en=["My husband hit me once two years ago, but that is in the past. My question now is only about [[maintenance:maintenance]] for my {child_word}.",
+        "He beat me a long time ago, but I am not asking about that now. I only want money for my {child_word}'s school fees."],
+    kn=["ನನ್ನ ಗಂಡ ಎರಡು ವರ್ಷಗಳ ಹಿಂದೆ ಒಮ್ಮೆ ನನ್ನನ್ನು ಹೊಡೆದನು, ಆದರೆ ಅದು ಹಿಂದಿನ ಮಾತು. ನನ್ನ ಪ್ರಶ್ನೆ ಈಗ ನನ್ನ {child_word}ಗಾಗಿ [[maintenance:ಜೀವನಾಂಶ]] ಬಗ್ಗೆ ಮಾತ್ರ.",
+        "ಅವನು ಬಹಳ ಹಿಂದೆಯೇ ನನ್ನನ್ನು ಹೊಡೆದನು, ಆದರೆ ಅದರ ಬಗ್ಗೆ ಈಗ ಕೇಳುತ್ತಿಲ್ಲ. ನನ್ನ {child_word}ನ ಶಾಲಾ ಶುಲ್ಕಕ್ಕಾಗಿ ಮಾತ್ರ ಹಣ ಬೇಕು."],
+    ro=["Nanna ganda eradu varshagala hinde omme nannannu hodedanu, adare adu hindina matu. Nanna prashne ega nanna {child_word}gagi [[maintenance:jeevanamsha]] bagge matra.",
+        "Avanu bahala hindeye nannannu hodedanu, adare adara bagge ega keluttilla. Nanna {child_word}na shala shulka kagi matra hana beku."],
+    issues={"violence": "incidental", "maintenance": "requested"},
+    facts={"violence": "supported", "money_fact": "supported",
+           "child_maintenance_only": "supported", "child_fact": "supported",
+           "minor_child": "supported", "school_fees_fact": "supported",
+           "in_scope": "supported"},
+    enums={"claimant_sex": F, "claimant_role": "spouse",
+           "modality_time": "past"}))
+_reg(B("bg_stridhan_mention", "hn_g",
+    en=["My gold is still with my in-laws, but I am not asking for it now. I only want [[custody:custody]] of my {child_word}.",
+        "My wedding jewellery is kept by my husband's family. That is not my question today — I only want my {child_word} to live with me."],
+    kn=["ನನ್ನ ಚಿನ್ನ ಇನ್ನೂ ನನ್ನ ಅತ್ತೆ-ಮಾವನ ಬಳಿಯೇ ಇದೆ, ಆದರೆ ಅದನ್ನು ಈಗ ಕೇಳುತ್ತಿಲ್ಲ. ನನ್ನ {child_word}ನ [[custody:ಪಾಲನೆ]] ಮಾತ್ರ ಬೇಕು.",
+        "ನನ್ನ ಮದುವೆಯ ಆಭರಣಗಳನ್ನು ನನ್ನ ಗಂಡನ ಮನೆಯವರು ಇಟ್ಟುಕೊಂಡಿದ್ದಾರೆ. ಅದು ಇಂದಿನ ನನ್ನ ಪ್ರಶ್ನೆಯಲ್ಲ — ನನ್ನ {child_word} ನನ್ನ ಜೊತೆ ಇರಬೇಕು ಅಷ್ಟೇ."],
+    ro=["Nanna chinna innu nanna atte-mavana baliye ide, adare adannu ega keluttilla. Nanna {child_word}na [[custody:paalane]] matra beku.",
+        "Nanna maduveya abharanagalannu nanna gandana maneyavaru ittukondiddare. Adu indina nanna prashneyalla — nanna {child_word} nanna jothe irabeku ashte."],
+    issues={"stridhan": "incidental", "custody": "requested"},
+    facts={"stridhan_claim": "supported", "custody_claim": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("bg_residence_mention", "hn_g",
+    en=["We live in our own house, and there is no problem about the house. My question is only about getting a [[divorce:divorce]].",
+        "The house is not an issue between us. I only want to know how to end my marriage."],
+    kn=["ನಾವು ನಮ್ಮ ಸ್ವಂತ ಮನೆಯಲ್ಲಿ ವಾಸಿಸುತ್ತೇವೆ, ಮನೆಯ ಬಗ್ಗೆ ಯಾವುದೇ ಸಮಸ್ಯೆ ಇಲ್ಲ. ನನ್ನ ಪ್ರಶ್ನೆ [[divorce:ವಿಚ್ಛೇದನ]] ಪಡೆಯುವ ಬಗ್ಗೆ ಮಾತ್ರ.",
+        "ಮನೆ ನಮ್ಮ ನಡುವೆ ಸಮಸ್ಯೆಯಲ್ಲ. ನನ್ನ ಮದುವೆಯನ್ನು ಹೇಗೆ ಕೊನೆಗೊಳಿಸುವುದು ಎಂದು ಮಾತ್ರ ತಿಳಿಯಬೇಕು."],
+    ro=["Navu namma swanta maneyalli vaasistevu, maneya bagge yavude samasye illa. Nanna prashne [[divorce:vichchhedana]] padeyuva bagge matra.",
+        "Mane namma naduve samasyealla. Nanna maduveyannu hege konegolisuvudu anta matra tiliyabeku."],
+    issues={"residence": "incidental", "divorce": "requested"},
+    facts={"divorce_asked": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("bg_joint_property", "hn_g",
+    en=["We also own a flat together, but my question today is only about [[maintenance:maintenance]] from my husband.",
+        "There is a joint house in both our names, but I am not asking about it now. I only need monthly support."],
+    kn=["ನಾವು ಜಂಟಿಯಾಗಿ ಫ್ಲ್ಯಾಟ್ ಸಹ ಹೊಂದಿದ್ದೇವೆ, ಆದರೆ ಇಂದಿನ ನನ್ನ ಪ್ರಶ್ನೆ ನನ್ನ ಗಂಡನಿಂದ [[maintenance:ಜೀವನಾಂಶ]] ಬಗ್ಗೆ ಮಾತ್ರ.",
+        "ಇಬ್ಬರ ಹೆಸರಿನಲ್ಲಿ ಜಂಟಿ ಮನೆ ಇದೆ, ಆದರೆ ಅದರ ಬಗ್ಗೆ ಈಗ ಕೇಳುತ್ತಿಲ್ಲ. ನನಗೆ ತಿಂಗಳ ಬೆಂಬಲ ಮಾತ್ರ ಬೇಕು."],
+    ro=["Navu jantiyagi flat saha hondiddeve, adare indina nanna prashne nanna gandana inda [[maintenance:jeevanamsha]] bagge matra.",
+        "Ibbara hesarinalli janti mane ide, adare adara bagge ega keluttilla. Nanage tingala bembala matra beku."],
+    issues={"joint_property": "incidental", "maintenance": "requested"},
+    facts={"joint_property_claim": "supported", "money_fact": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("bg_birth_cert", "hn_g",
+    en=["My {child_word} has no birth certificate yet, but that is not my question today. I only want to ask about [[maintenance:maintenance]] for my {child_word}.",
+        "We have not made a birth certificate for my {child_word} so far. Today I only want help with school fees support."],
+    kn=["ನನ್ನ {child_word}ಗೆ ಇನ್ನೂ ಜನನ ಪ್ರಮಾಣಪತ್ರವಿಲ್ಲ, ಆದರೆ ಅದು ಇಂದಿನ ನನ್ನ ಪ್ರಶ್ನೆಯಲ್ಲ. ನನ್ನ {child_word}ಗಾಗಿ [[maintenance:ಜೀವನಾಂಶ]] ಬಗ್ಗೆ ಮಾತ್ರ ಕೇಳಲು ಬಯಸುತ್ತೇನೆ.",
+        "ನನ್ನ {child_word}ಗಾಗಿ ಇಲ್ಲಿಯವರೆಗೆ ಜನನ ಪ್ರಮಾಣಪತ್ರ ಮಾಡಿಸಿಲ್ಲ. ಇಂದು ಶಾಲಾ ಶುಲ್ಕ ಬೆಂಬಲದ ಬಗ್ಗೆ ಮಾತ್ರ ಸಹಾಯ ಬೇಕು."],
+    ro=["Nanna {child_word}ge innu janana pramanapatravilla, adare adu indina nanna prashneyalla. Nanna {child_word}gagi [[maintenance:jeevanamsha]] bagge matra kelalu bayasuttene.",
+        "Nanna {child_word}gagi illiyavarage janana pramanapatra madisilla. Indu shala shulka bembalada bagge matra sahaya beku."],
+    issues={"birth_certificate": "incidental", "maintenance": "requested"},
+    facts={"money_fact": "supported", "child_maintenance_only": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "school_fees_fact": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+
+# --- hard negative H: modality traps (hypothetical / quoted / past) --------
+_reg(B("hypo_custody", "hn_h",
+    en=["Suppose a mother takes her child away and the father cannot see the child. Could the father ask the court for [[custody:custody]]?",
+        "If a wife leaves with the child, what could the husband do to get his child back?"],
+    kn=["ಒಂದು ವೇಳೆ ತಾಯಿ ಮಗುವನ್ನು ಕರೆದುಕೊಂಡು ಹೋಗಿ ತಂದೆಗೆ ಮಗುವನ್ನು ನೋಡಲು ಬಿಡದಿದ್ದರೆ, ತಂದೆ ಕೋರ್ಟ್‌ನಲ್ಲಿ [[custody:ಪಾಲನೆ]] ಕೇಳಬಹುದೇ?",
+        "ಹೆಂಡತಿ ಮಗುವಿನೊಂದಿಗೆ ಹೋದರೆ, ತನ್ನ ಮಗುವನ್ನು ವಾಪಸ್ ಪಡೆಯಲು ಗಂಡ ಏನು ಮಾಡಬಹುದು?"],
+    ro=["Ondu vele tayi maguvannu karedukondu hogi tandege maguvannu nodalu bidadiddare, tande court nalli [[custody:paalane]] kelabahude?",
+        "Hendati maguvinondige hodare, tanna maguvannu vapas padeyalu ganda enu madabahudu?"],
+    issues={},
+    facts={"in_scope": "supported"},
+    enums={"claimant_sex": "U", "claimant_role": "other",
+           "modality_time": "hypothetical"}))
+_reg(B("hypo_stridhan", "hn_h",
+    en=["If a woman's in-laws refuse to return her gold, can she ask the court for her [[stridhan_claim:gold]] back?",
+        "Suppose a husband sells his wife's jewellery without asking her. What could she do about it?"],
+    kn=["ಒಂದು ವೇಳೆ ಮಹಿಳೆಯ ಅತ್ತೆ-ಮಾವ ಅವಳ ಚಿನ್ನವನ್ನು ಹಿಂದಿರುಗಿಸಲು ನಿರಾಕರಿಸಿದರೆ, ಅವಳು ಕೋರ್ಟ್‌ನಲ್ಲಿ ತನ್ನ [[stridhan_claim:ಚಿನ್ನ]] ವಾಪಸ್ ಕೇಳಬಹುದೇ?",
+        "ಒಂದು ವೇಳೆ ಗಂಡ ಹೆಂಡತಿಯನ್ನು ಕೇಳದೆ ಅವಳ ಆಭರಣಗಳನ್ನು ಮಾರಿದರೆ, ಅವಳು ಅದರ ಬಗ್ಗೆ ಏನು ಮಾಡಬಹುದು?"],
+    ro=["Ondu vele mahileyaga atte-mava avala chinnavannu hindirugisalu nirakarisidare, avalu court nalli tanna [[stridhan_claim:chinna]] vapas kelabahude?",
+        "Ondu vele ganda hendatiyannu kelade avala abharanagalannu maridare, avalu adara bagge enu madabahudu?"],
+    issues={},
+    facts={"in_scope": "supported"},
+    enums={"claimant_sex": "U", "claimant_role": "other",
+           "modality_time": "hypothetical"}))
+_reg(B("quoted_maintenance", "hn_h",
+    en=["My neighbour told me, \"My husband gives me no money for the house.\" She wants to know if she can ask for [[maintenance:maintenance]].",
+        "A woman at my workplace said, \"My husband stopped paying me anything.\" She asked me what the law says."],
+    kn=["ನನ್ನ ನೆರೆಯವರು ನನಗೆ ಹೇಳಿದರು, \"ನನ್ನ ಗಂಡ ಮನೆಗೆ ಹಣ ಕೊಡುವುದಿಲ್ಲ.\" ಅವಳು [[maintenance:ಜೀವನಾಂಶ]] ಕೇಳಬಹುದೇ ಎಂದು ತಿಳಿಯಲು ಬಯಸುತ್ತಾಳೆ.",
+        "ನನ್ನ ಕೆಲಸದ ಸ್ಥಳದಲ್ಲಿ ಒಬ್ಬ ಮಹಿಳೆ ಹೇಳಿದಳು, \"ನನ್ನ ಗಂಡ ನನಗೆ ಏನೂ ಕೊಡುವುದನ್ನು ನಿಲ್ಲಿಸಿದನು.\" ಕಾನೂನು ಏನು ಹೇಳುತ್ತದೆ ಎಂದು ಅವಳು ಕೇಳಿದಳು."],
+    ro=["Nanna nereyavaru nanage helidaru, \"Nanna ganda manege hana koduvudilla.\" Avalu [[maintenance:jeevanamsha]] kelabahude anta tiliyalu bayasutale.",
+        "Nanna kelasa sthaladalli obba mahile helidalu, \"Nanna ganda nanage enu koduvudannu nillisidanu.\" Kanoonu enu heluttade anta avalu kelidalu."],
+    issues={},
+    facts={"in_scope": "supported"},
+    enums={"claimant_sex": "U", "claimant_role": "other",
+           "modality_time": "quoted"}))
+_reg(B("quoted_residence", "hn_h",
+    en=["My cousin told me, \"My in-laws threw me out of the house.\" She wants to know if she can go back to her home.",
+        "My friend said, \"My husband locked me out of the house.\" She asked me what she can do."],
+    kn=["ನನ್ನ ಸೋದರ ಸಂಬಂಧಿ ನನಗೆ ಹೇಳಿದಳು, \"ನನ್ನ ಅತ್ತೆ-ಮಾವ ನನ್ನನ್ನು ಮನೆಯಿಂದ ಹೊರಹಾಕಿದರು.\" ಅವಳು ತನ್ನ ಮನೆಗೆ ಮರಳಬಹುದೇ ಎಂದು ತಿಳಿಯಲು ಬಯಸುತ್ತಾಳೆ.",
+        "ನನ್ನ ಗೆಳತಿ ಹೇಳಿದಳು, \"ನನ್ನ ಗಂಡ ನನ್ನನ್ನು ಮನೆಯಿಂದ ಹೊರಗೆ ಬೀಗ ಹಾಕಿದನು.\" ಅವಳು ಏನು ಮಾಡಬಹುದು ಎಂದು ಕೇಳಿದಳು."],
+    ro=["Nanna sodara sambandhi nanage helidalu, \"Nanna atte-mava nannannu maneyinda horahakidaru.\" Avalu tanna manege maralabahude anta tiliyalu bayasutale.",
+        "Nanna gelati helidalu, \"Nanna ganda nannannu maneyinda horage beega hakidanu.\" Avalu enu madabahudu anta kelidalu."],
+    issues={},
+    facts={"in_scope": "supported"},
+    enums={"claimant_sex": "U", "claimant_role": "other",
+           "modality_time": "quoted"}))
+_reg(B("past_violence_stopped", "hn_h",
+    en=["My husband used to beat me, but he stopped two years ago. My question now is only about [[maintenance:maintenance]] from him.",
+        "He hit me in the past, but there has been no violence for a long time. I only want monthly support now."],
+    kn=["ನನ್ನ ಗಂಡ ಮೊದಲು ನನ್ನನ್ನು ಹೊಡೆಯುತ್ತಿದ್ದನು, ಆದರೆ ಎರಡು ವರ್ಷಗಳ ಹಿಂದೆ ನಿಲ್ಲಿಸಿದನು. ನನ್ನ ಪ್ರಶ್ನೆ ಈಗ ಅವನಿಂದ [[maintenance:ಜೀವನಾಂಶ]] ಬಗ್ಗೆ ಮಾತ್ರ.",
+        "ಅವನು ಹಿಂದೆ ನನ್ನನ್ನು ಹೊಡೆದಿದ್ದನು, ಆದರೆ ಬಹಳ ಸಮಯದಿಂದ ಯಾವುದೇ ಹಿಂಸೆ ಇಲ್ಲ. ನನಗೆ ಈಗ ತಿಂಗಳ ಬೆಂಬಲ ಮಾತ್ರ ಬೇಕು."],
+    ro=["Nanna ganda modalu nannannu hodeyuttiddanu, adare eradu varshagala hinde nillisidanu. Nanna prashne ega avaninda [[maintenance:jeevanamsha]] bagge matra.",
+        "Avanu hinde nannannu hodediddanu, adare bahala samayada inda yavude himse illa. Nanage ega tingala bembala matra beku."],
+    issues={"violence": "incidental", "maintenance": "requested"},
+    facts={"violence": "supported", "money_fact": "supported",
+           "in_scope": "supported"},
+    enums={"claimant_sex": F, "claimant_role": "spouse",
+           "modality_time": "past"}))
+_reg(B("past_threats", "hn_h",
+    en=["Two years ago my husband threatened to throw me out of the house, but nothing happened after that. I only want to know about getting a [[divorce:divorce]] now.",
+        "My husband once said he would lock me out, but he never did it. My question today is only about divorce."],
+    kn=["ಎರಡು ವರ್ಷಗಳ ಹಿಂದೆ ನನ್ನ ಗಂಡ ನನ್ನನ್ನು ಮನೆಯಿಂದ ಹೊರಹಾಕುವುದಾಗಿ ಬೆದರಿಸಿದನು, ಆದರೆ ಆ ನಂತರ ಏನೂ ಆಗಲಿಲ್ಲ. [[divorce:ವಿಚ್ಛೇದನ]] ಪಡೆಯುವ ಬಗ್ಗೆ ಮಾತ್ರ ಈಗ ತಿಳಿಯಬೇಕು.",
+        "ನನ್ನ ಗಂಡ ಒಮ್ಮೆ ನನ್ನನ್ನು ಹೊರಗೆ ಬೀಗ ಹಾಕುವುದಾಗಿ ಹೇಳಿದನು, ಆದರೆ ಅದನ್ನು ಎಂದೂ ಮಾಡಲಿಲ್ಲ. ಇಂದಿನ ನನ್ನ ಪ್ರಶ್ನೆ ವಿಚ್ಛೇದನದ ಬಗ್ಗೆ ಮಾತ್ರ."],
+    ro=["Eradu varshagala hinde nanna ganda nannannu maneyinda horahakuvudagi bedarisidanu, adare aa nantara enu agalilla. [[divorce:vichchhedana]] padeyuva bagge matra ega tiliyabeku.",
+        "Nanna ganda omme nannannu horage beega hakuvudagi helidanu, adare adannu endu madalilla. Indina nanna prashne divorce da bagge matra."],
+    issues={"residence": "incidental", "divorce": "requested"},
+    facts={"divorce_asked": "supported", "in_scope": "supported"},
+    enums={"claimant_sex": F, "claimant_role": "spouse",
+           "modality_time": "past"}))
+
+# --- recall-swarm expansion, Lane 11 reconciliation (2026-11-27) --------
+# Patterns from docs/kaanoon_phrasing_patterns.md (Lane 11 study sample
+# KAN-S01–S16 ONLY, contract R7 — never from the held-out eval set) that
+# were NOT yet covered by the blocks above. Each pattern below is our own
+# statutory-grammar wording informed by the pattern, never a copied
+# excerpt (the patterns file itself carries only 2–3 short fragments per
+# pattern). Patterns already covered and NOT re-added: numbered
+# multi-question asks (multi_ask_*), third-party askers (third_party,
+# quoted_*), fear of the other parent taking the child
+# (child_risk_abduction), settlement lump sum (maint_lump_sum), "asked to
+# leave" eviction story (now residence_asked_to_leave), soft-negation
+# (now neg_soft_*). Deliberately NOT added: unedited lay misspellings
+# (Lane 05 already covers spelling variants like "maintanance"; adding
+# more misspelt templates would teach wrong spellings), the
+# property-owner-side "let her out" eviction ask (no Laya section for an
+# owner evicting a daughter-in-law), "I have stopped going to court"
+# non-attendance (no schema fact), the mother's-gold-vs-father variant
+# (not spousal stridhan — would mislabel stridhan_claim).
+_reg(B("narr_maint_separated", "core",
+    en=["I have been living separately from my husband for two years. He gives me nothing for the house or for our {child_word}. Kindly advise how I should proceed.",
+        "My husband and I have lived apart for three years, and he sends no money at all. What am I supposed to do now?"],
+    kn=["ನಾನು ಎರಡು ವರ್ಷಗಳಿಂದ ನನ್ನ ಗಂಡನಿಂದ ಬೇರೆಯಾಗಿ ವಾಸಿಸುತ್ತಿದ್ದೇನೆ. ಮನೆಗಾಗಿ ಅಥವಾ ನಮ್ಮ {child_word}ಗಾಗಿ ಅವನು ಏನೂ ಕೊಡುವುದಿಲ್ಲ. ಮುಂದೆ ಹೇಗೆ ಹೋಗಬೇಕು ಎಂದು ದಯವಿಟ್ಟು ಸಲಹೆ ನೀಡಿ.",
+        "ನನ್ನ ಗಂಡ ಮತ್ತು ನಾನು ಮೂರು ವರ್ಷಗಳಿಂದ ಬೇರೆಯಾಗಿ ವಾಸಿಸುತ್ತಿದ್ದೇವೆ, ಅವನು ಯಾವುದೇ ಹಣ ಕಳುಹಿಸುವುದಿಲ್ಲ. ಈಗ ನಾನು ಏನು ಮಾಡಬೇಕು?"],
+    ro=["Nanu eradu varshagalinda nanna gandana inda bereyagi vaasistiddene. Manegagi athava namma {child_word}gagi avanu enu koduvudilla. Munde hege hogabeku anta dayavittu salahe needi.",
+        "Nanna ganda mattu nanu mooru varshagalinda bereyagi vaasistiddeve, avanu yavude hana kaluhisuvudilla. Eega nanu enu madabeku?"],
+    issues={"maintenance": "requested"},
+    facts={"money_fact": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("narr_custody_separate", "core",
+    en=["I want to live separately from my husband with my {child_age}-year-old {child_word}. My husband drinks and shouts at home. What are the legal steps to protect myself and my {child_word}?",
+        "I have been living apart from my husband with my {child_word} for a year. He keeps saying he will take my {child_word} away from me."],
+    kn=["ನನ್ನ {child_age} ವರ್ಷದ {child_word}ನೊಂದಿಗೆ ನನ್ನ ಗಂಡನಿಂದ ಬೇರೆಯಾಗಿ ವಾಸಿಸಲು ಬಯಸುತ್ತೇನೆ. ನನ್ನ ಗಂಡ ಮನೆಯಲ್ಲಿ ಕುಡಿದು ಕೂಗಾಡುತ್ತಾನೆ. ನನ್ನನ್ನು ಮತ್ತು ನನ್ನ {child_word}ನನ್ನು ರಕ್ಷಿಸಲು ಕಾನೂನುಬದ್ಧ ಹೆಜ್ಜೆಗಳು ಯಾವುವು?",
+        "ನಾನು ಒಂದು ವರ್ಷದಿಂದ ನನ್ನ {child_word}ನೊಂದಿಗೆ ನನ್ನ ಗಂಡನಿಂದ ಬೇರೆಯಾಗಿ ವಾಸಿಸುತ್ತಿದ್ದೇನೆ. ಅವನು ನನ್ನ {child_word}ನನ್ನು ನನ್ನಿಂದ ಕರೆದುಕೊಂಡು ಹೋಗುತ್ತೇನೆ ಎಂದು ಹೇಳುತ್ತಲೇ ಇದ್ದಾನೆ."],
+    ro=["Nanna {child_age} varshada {child_word}nodige nanna gandana inda bereyagi vaasisalu bayasuttene. Nanna ganda maneyalli kudidu koogaduttane. Nannannu mattu nanna {child_word}nannu rakshisalu kanunubaddha hejjegalu yavuvu?",
+        "Nanu ondu varshada inda nanna {child_word}nodige nanna gandana inda bereyagi vaasistiddene. Avanu nanna {child_word}nannu nanninda karedukondu hoguttene anta heluttalle iddane."],
+    issues={"custody": "requested"},
+    facts={"custody_claim": "supported", "child_fact": "supported",
+           "minor_child": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("stridhan_display", "hn_d",
+    en=["All my jewellery was displayed at the wedding, and we have photos and video of it. My in-laws are keeping it all. How do I get my [[stridhan_claim:gold]] back?",
+        "My wedding jewellery was shown to everyone at the wedding. My husband's family still refuses to return it, even though we have the video as proof."],
+    kn=["ನನ್ನ ಎಲ್ಲಾ ಆಭರಣಗಳನ್ನು ಮದುವೆಯಲ್ಲಿ ತೋರಿಸಲಾಗಿತ್ತು, ಅವುಗಳ ಫೋಟೋ ಮತ್ತು ವಿಡಿಯೋ ನಮ್ಮ ಬಳಿ ಇದೆ. ನನ್ನ ಅತ್ತೆ-ಮಾವ ಎಲ್ಲವನ್ನೂ ಇಟ್ಟುಕೊಂಡಿದ್ದಾರೆ. ನನ್ನ [[stridhan_claim:ಚಿನ್ನ]] ವಾಪಸ್ ಹೇಗೆ ಪಡೆಯುವುದು?",
+        "ನನ್ನ ಮದುವೆಯ ಆಭರಣಗಳನ್ನು ಮದುವೆಯಲ್ಲಿ ಎಲ್ಲರಿಗೂ ತೋರಿಸಲಾಗಿತ್ತು. ವಿಡಿಯೋ ಸಾಕ್ಷಿಯಾಗಿದ್ದರೂ ನನ್ನ ಗಂಡನ ಮನೆಯವರು ಅದನ್ನು ಹಿಂದಿರುಗಿಸಲು ನಿರಾಕರಿಸುತ್ತಿದ್ದಾರೆ."],
+    ro=["Nanna ella abharanagalannu maduveyalli torisalagittu, avugala photo mattu video namma bali ide. Nanna atte-mava ellavannu ittukondiddare. Nanna [[stridhan_claim:chinna]] vapas hege padeyuvudu?",
+        "Nanna maduveya abharanagalannu maduveyalli ellarigu torisalagittu. Video sakshiyagiddaru nanna gandana maneyavaru adannu hindirugisalu nirakarisuttiddare."],
+    issues={"stridhan": "requested"},
+    facts={"stridhan_claim": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("maint_partial_fees", "core",
+    en=["My husband pays only my {child_word}'s school fees, nothing for the bus, dress, books or food. I need [[maintenance:maintenance]] for all the other expenses of my {child_word}.",
+        "He pays the school fees and nothing else. The bus, the dress, the books and the food are all on me. I need support for the rest of my {child_word}'s expenses."],
+    kn=["ನನ್ನ ಗಂಡ ನನ್ನ {child_word}ನ ಶಾಲಾ ಶುಲ್ಕವನ್ನು ಮಾತ್ರ ಕೊಡುತ್ತಾನೆ, ಬಸ್, ಡ್ರೆಸ್, ಪುಸ್ತಕ ಅಥವಾ ಊಟಕ್ಕೆ ಏನೂ ಕೊಡುವುದಿಲ್ಲ. ನನ್ನ {child_word}ನ ಉಳಿದ ಎಲ್ಲಾ ಖರ್ಚುಗಳಿಗಾಗಿ [[maintenance:ಜೀವನಾಂಶ]] ಬೇಕು.",
+        "ಅವನು ಶಾಲಾ ಶುಲ್ಕವನ್ನು ಮಾತ್ರ ಕೊಡುತ್ತಾನೆ, ಬೇರೆ ಏನೂ ಇಲ್ಲ. ಬಸ್, ಡ್ರೆಸ್, ಪುಸ್ತಕ ಮತ್ತು ಊಟ ಎಲ್ಲವೂ ನನ್ನ ಮೇಲೆಯೇ ಇದೆ. ನನ್ನ {child_word}ನ ಉಳಿದ ಖರ್ಚುಗಳಿಗೆ ಬೆಂಬಲ ಬೇಕು."],
+    ro=["Nanna ganda nanna {child_word}na shala shulkavannu matra koduttane, bus, dress, pustaka athava utakke enu koduvudilla. Nanna {child_word}na ulida ella kharchugaligagi [[maintenance:jeevanamsha]] beku.",
+        "Avanu shala shulkavannu matra koduttane, bere enu illa. Bus, dress, pustaka mattu uta ellavu nanna meleye ide. Nanna {child_word}na ulida kharchugalige bembala beku."],
+    issues={"maintenance": "requested"},
+    facts={"money_fact": "supported", "child_maintenance_only": "supported",
+           "child_fact": "supported", "minor_child": "supported",
+           "school_fees_fact": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("maint_enforcement_fear", "hn_e",
+    en=["The court ordered me to pay [[maintenance:maintenance]], and I have not paid for six months. Can the court jail me for not paying?",
+        "I missed maintenance payments for a year. Can the court take my property to pay the amount I owe?"],
+    kn=["ಕೋರ್ಟ್ ನಾನು [[maintenance:ಜೀವನಾಂಶ]] ಕೊಡಬೇಕು ಎಂದು ಆದೇಶಿಸಿತು, ಆರು ತಿಂಗಳಿಂದ ನಾನು ಕೊಟ್ಟಿಲ್ಲ. ಕೊಡದಿದ್ದಕ್ಕಾಗಿ ಕೋರ್ಟ್ ನನ್ನನ್ನು ಜೈಲಿಗೆ ಹಾಕಬಹುದೇ?",
+        "ಒಂದು ವರ್ಷ ಜೀವನಾಂಶ ಪಾವತಿಗಳನ್ನು ತಪ್ಪಿಸಿದೆ. ನಾನು ಕೊಡಬೇಕಾದ ಹಣಕ್ಕಾಗಿ ಕೋರ್ಟ್ ನನ್ನ ಆಸ್ತಿಯನ್ನು ತೆಗೆದುಕೊಳ್ಳಬಹುದೇ?"],
+    ro=["Court nanu [[maintenance:jeevanamsha]] kodabeku anta adeshisitu, aaru tingalinda nanu kottilla. Kodadiddakkagi court nannannu jailige hakabahude?",
+        "Ondu varsha jeevanamsha pavaticgalannu tappiside. Nanu kodabekada hanakkagi court nanna astiyannu tegedukollabahude?"],
+    issues={"maintenance": "incidental"},
+    facts={"money_fact": "supported",
+           "existing_order_enforcement": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE_M)))
+_reg(B("divorce_settlement_terms", "core",
+    en=["I want to end all the cases between us. I am ready to pay a final settlement amount. Please suggest the terms I can put before the mediator.",
+        "I agreed to pay a final settlement so that all our litigations end. What terms should the settlement agreement have?"],
+    kn=["ನಮ್ಮ ನಡುವಿನ ಎಲ್ಲಾ ಕೇಸ್‌ಗಳನ್ನು ಕೊನೆಗೊಳಿಸಲು ಬಯಸುತ್ತೇನೆ. ಅಂತಿಮ ಒಪ್ಪಂದದ ಮೊತ್ತ ಕೊಡಲು ಸಿದ್ಧನಿದ್ದೇನೆ. ಮಧ್ಯಸ್ಥರ ಮುಂದೆ ಇಡಬಹುದಾದ ನಿಯಮಗಳನ್ನು ದಯವಿಟ್ಟು ಸೂಚಿಸಿ.",
+        "ನಮ್ಮ ಎಲ್ಲಾ ವ್ಯಾಜ್ಯಗಳು ಕೊನೆಗೊಳ್ಳಲು ಅಂತಿಮ ಒಪ್ಪಂದದ ಮೊತ್ತ ಕೊಡಲು ಒಪ್ಪಿದ್ದೇನೆ. ಒಪ್ಪಂದದಲ್ಲಿ ಯಾವ ನಿಯಮಗಳು ಇರಬೇಕು?"],
+    ro=["Namma naduvina ella case galannu konegolisalu bayasuttene. Antima oppandada motta kodalu siddhaniddene. Madhyastara munde idabahudada niyamagalanu dayavittu soochisi.",
+        "Namma ella vyajyagalu konegollalu antima oppandada motta kodalu oppiddene. Oppandadalli yava niyamagalu irabeku?"],
+    issues={"divorce": "requested"},
+    facts={"divorce_asked": "supported", "lump_sum_settlement": "supported",
+           "money_fact": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE_M)))
+_reg(B("residence_asked_to_leave", "hn_b",
+    en=["One day my husband asked me to leave the house, saying he needs some time alone. When I tried to return, he did not take me back.",
+        "My husband told me to leave our matrimonial house. I went away, and now he will not let me come back home."],
+    kn=["ಒಂದು ದಿನ ನನ್ನ ಗಂಡ ನನಗೆ ಸ್ವಲ್ಪ ಸಮಯ ಒಬ್ಬಂಟಿಯಾಗಿರಬೇಕು ಎಂದು ಮನೆ ಬಿಟ್ಟು ಹೋಗುವಂತೆ ಕೇಳಿದನು. ನಾನು ಹಿಂತಿರುಗಲು ಪ್ರಯತ್ನಿಸಿದಾಗ ಅವನು ನನ್ನನ್ನು ಮರಳಿ ತೆಗೆದುಕೊಳ್ಳಲಿಲ್ಲ.",
+        "ನನ್ನ ಗಂಡ ನಮ್ಮ ಮನೆ ಬಿಟ್ಟು ಹೋಗುವಂತೆ ಹೇಳಿದನು. ನಾನು ಹೋದೆ, ಈಗ ಅವನು ನನ್ನನ್ನು ಮನೆಗೆ ಮರಳಿ ಬರಲು ಬಿಡುತ್ತಿಲ್ಲ."],
+    ro=["Ondu dina nanna ganda nanage swalpa samaya obbantiyagirabeku anta mane bittu hoguvante kelidanu. Nanu hintirugalu prayatnisidaga avanu nannannu marali tegedukollalilla.",
+        "Nanna ganda namma mane bittu hoguvante helidanu. Nanu hode, ega avanu nannannu manege marali baralu biduttilla."],
+    issues={"residence": "requested"},
+    facts={"residence_claim": "supported",
+           "coercive_eviction_or_lockout": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("joint_property_rights", "core",
+    en=["Can a wife claim rights in the joint property of her husband? The agreement and share certificates are in both our names.",
+        "My husband and I bought a flat together. Can I claim my rights in this [[joint_property_claim:joint property]]?"],
+    kn=["ಹೆಂಡತಿ ತನ್ನ ಗಂಡನ ಜಂಟಿ ಆಸ್ತಿಯಲ್ಲಿ ಹಕ್ಕುಗಳನ್ನು ಕೇಳಬಹುದೇ? ಒಪ್ಪಂದ ಮತ್ತು ಷೇರು ಪ್ರಮಾಣಪತ್ರಗಳು ಇಬ್ಬರ ಹೆಸರಿನಲ್ಲಿವೆ.",
+        "ನನ್ನ ಗಂಡ ಮತ್ತು ನಾನು ಒಟ್ಟಿಗೆ ಫ್ಲ್ಯಾಟ್ ಖರೀದಿಸಿದೆವು. ಈ [[joint_property_claim:ಜಂಟಿ ಆಸ್ತಿ]]ಯಲ್ಲಿ ನನ್ನ ಹಕ್ಕುಗಳನ್ನು ಕೇಳಬಹುದೇ?"],
+    ro=["Hendati tanna gandana janti astiyalli hakkugalannu kelabahude? Oppanda mattu sheru pramanapatragalu ibbara hesarinallive.",
+        "Nanna ganda mattu nanu ottige flat khareedisidevu. Ee [[joint_property_claim:janti asti]]yalli nanna hakkugalannu kelabahude?"],
+    issues={"joint_property": "requested"},
+    facts={"joint_property_claim": "supported", "in_scope": "supported"},
+    enums=dict(SPOUSE)))
+_reg(B("third_party_son", "hn_f",
+    en=["I am asking for my mother. Her husband, my father, gives her no money and beats her. What can she do to get protection and support?",
+        "My mother-in-law is not treated well by her son and daughter-in-law. She gets no money for food or medicines. What help can she get?"],
+    kn=["ನಾನು ನನ್ನ ತಾಯಿಗಾಗಿ ಕೇಳುತ್ತಿದ್ದೇನೆ. ಅವಳ ಗಂಡ, ನನ್ನ ತಂದೆ, ಅವಳಿಗೆ ಹಣ ಕೊಡುವುದಿಲ್ಲ ಮತ್ತು ಅವಳನ್ನು ಹೊಡೆಯುತ್ತಾನೆ. ರಕ್ಷಣೆ ಮತ್ತು ಬೆಂಬಲ ಪಡೆಯಲು ಅವಳು ಏನು ಮಾಡಬಹುದು?",
+        "ನನ್ನ ಅತ್ತೆಗೆ ಅವರ ಮಗ ಮತ್ತು ಸೊಸೆ ಚೆನ್ನಾಗಿ ನಡೆಸಿಕೊಳ್ಳುವುದಿಲ್ಲ. ಊಟ ಅಥವಾ ಔಷಧಿಗೆ ಅವರಿಗೆ ಹಣ ಸಿಗುವುದಿಲ್ಲ. ಅವರಿಗೆ ಏನು ಸಹಾಯ ಸಿಗುತ್ತದೆ?"],
+    ro=["Nanu nanna tayigagi keluttiddene. Avala ganda, nanna tande, avalige hana koduvudilla mattu avalannu hodeyuttane. Rakshane mattu bembala padeyalu avalu enu madabahudu?",
+        "Nanna attege avara maga mattu sose chennagi nadesikolluvudilla. Uta athava aushadhige avarige hana siguvudilla. Avarige enu sahaya siguttade?"],
+    issues={},
+    facts={"in_scope": "supported"},
+    enums={"claimant_sex": "U", "claimant_role": "other"}))
+_reg(B("neg_soft_divorce", "neg",
+    en=["My wife is not agreeing for the divorce, and I do not want to force her. I only want [[maintenance:maintenance]] for our {child_word}.",
+        "She will not agree to end the marriage, so a divorce is not possible now. I only need money for my {child_word}'s school fees."],
+    kn=["ನನ್ನ ಹೆಂಡತಿ ವಿಚ್ಛೇದನಕ್ಕೆ ಒಪ್ಪುತ್ತಿಲ್ಲ, ಅವಳನ್ನು ಒತ್ತಾಯಿಸಲು ನನಗೆ ಇಷ್ಟವಿಲ್ಲ. ನಮ್ಮ {child_word}ಗಾಗಿ [[maintenance:ಜೀವನಾಂಶ]] ಮಾತ್ರ ಬೇಕು.",
+        "ಅವಳು ಮದುವೆ ಕೊನೆಗೊಳಿಸಲು ಒಪ್ಪುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ ಈಗ ವಿಚ್ಛೇದನ ಸಾಧ್ಯವಿಲ್ಲ. ನನ್ನ {child_word}ನ ಶಾಲಾ ಶುಲ್ಕಕ್ಕಾಗಿ ಮಾತ್ರ ಹಣ ಬೇಕು."],
+    ro=["Nanna hendati divorce ge opputtilla, avalannu ottayisalu nanage ishtavilla. Namma {child_word}gagi [[maintenance:jeevanamsha]] matra beku.",
+        "Avalu maduve konegolisalu oppuvudilla, adarinda ega divorce sadhyavilla. Nanna {child_word}na shala shulka kagi matra hana beku."],
+    issues={"divorce": "denied", "maintenance": "requested"},
+    facts={"divorce_asked": "denied", "money_fact": "supported",
+           "child_maintenance_only": "supported", "child_fact": "supported",
+           "minor_child": "supported", "school_fees_fact": "supported",
+           "in_scope": "supported"},
+    enums=dict(SPOUSE_M)))
+_reg(B("neg_soft_js", "neg",
+    en=["I never want to marry again, so a divorce is not essential for me. I only want to live separately from my husband with a court order.",
+        "Ending the marriage is not necessary for me. I only want [[judicial_separation_only:judicial separation]] and to live apart."],
+    kn=["ನಾನು ಮತ್ತೆ ಮದುವೆಯಾಗಲು ಎಂದೂ ಬಯಸುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ ವಿಚ್ಛೇದನ ನನಗೆ ಅಗತ್ಯವಿಲ್ಲ. ಕೋರ್ಟ್ ಆದೇಶದೊಂದಿಗೆ ನನ್ನ ಗಂಡನಿಂದ ಬೇರೆಯಾಗಿ ವಾಸಿಸಲು ಮಾತ್ರ ಬಯಸುತ್ತೇನೆ.",
+        "ಮದುವೆ ಕೊನೆಗೊಳಿಸುವುದು ನನಗೆ ಅಗತ್ಯವಿಲ್ಲ. ನನಗೆ [[judicial_separation_only:ನ್ಯಾಯಾಂಗ ಬೇರ್ಪಡಿಕೆ]] ಮಾತ್ರ ಬೇಕು, ಬೇರೆಯಾಗಿ ವಾಸಿಸಲು ಬಯಸುತ್ತೇನೆ."],
+    ro=["Nanu matte maduveyagalu endu bayasuvudilla, adarinda divorce nanage agatyavilla. Court adeshadondige nanna gandana inda bereyagi vaasisalu matra bayasuttene.",
+        "Maduve konegolisuvudu nanage agatyavilla. Nanage [[judicial_separation_only:nyayanga berpadike]] matra beku, bereyagi vaasisalu bayasuttene."],
+    issues={"divorce": "denied"},
+    facts={"judicial_separation_only": "supported",
+           "divorce_asked": "denied", "in_scope": "supported"},
     enums=dict(SPOUSE)))
 
 # --- hard negative A: custody vs residence co-location --------------------
@@ -855,6 +1521,34 @@ OOS_DOMAINS = [
       "ನನ್ನ ಮಗುವಿನ ಶಾಲೆ ಇದ್ದಕ್ಕಿದ್ದಂತೆ ಶುಲ್ಕ ಹೆಚ್ಚಿಸಿದೆ. ಶಾಲೆ ಎಷ್ಟು ವಿಧಿಸಬಹುದು ಎಂಬುದಕ್ಕೆ ಮಿತಿ ಇದೆಯೇ?"],
      ["Nanna maneya hattirada shale nanna maguvige pravesha needuttilla. Shala praveshada bagge elli duru needuvudu?",
       "Nanna maguvina shale iddakkidante shulka hechiside. Shale eshtu vidhisabahudu embudakke miti ideye?"]),
+    ("oos_workplace", "workplace harassment (non-domestic)",
+     ["My husband's boss shouts at him at work and has cut his pay. How can my husband complain about his boss?",
+      "My wife's manager harasses her at the office and gives her extra work every day. Where does she complain about workplace harassment?"],
+     ["ನನ್ನ ಗಂಡನ ಬಾಸ್ ಕೆಲಸದಲ್ಲಿ ಅವನ ಮೇಲೆ ಕೂಗಾಡುತ್ತಾನೆ ಮತ್ತು ಅವನ ಸಂಬಳ ಕಡಿತ ಮಾಡಿದ್ದಾನೆ. ನನ್ನ ಗಂಡ ತನ್ನ ಬಾಸ್ ಬಗ್ಗೆ ಹೇಗೆ ದೂರು ನೀಡಬಹುದು?",
+      "ನನ್ನ ಹೆಂಡತಿಯ ಮ್ಯಾನೇಜರ್ ಕಚೇರಿಯಲ್ಲಿ ಅವಳನ್ನು ಕಿರುಕುಳ ಮಾಡುತ್ತಾನೆ ಮತ್ತು ಪ್ರತಿದಿನ ಹೆಚ್ಚುವರಿ ಕೆಲಸ ಕೊಡುತ್ತಾನೆ. ಕೆಲಸದ ಸ್ಥಳದ ಕಿರುಕುಳದ ಬಗ್ಗೆ ಅವಳು ಎಲ್ಲಿ ದೂರು ನೀಡಬೇಕು?"],
+     ["Nanna gandana boss kelasadalli avana mele koogaduttane mattu avana sambala kadita madiddane. Nanna ganda tanna boss bagge hege duru needabahudu?",
+      "Nanna hendatiya manager kacheriyalli avalannu kirukula maduttane mattu pratidina hechuvari kelasa koduttane. Kelasa sthalada kirukula bagge avalu elli duru needabeku?"]),
+    ("oos_shop_sale", "business shop sale",
+     ["I want to sell my shop to another businessman. What papers do I need to sell a shop?",
+      "My business partner and I want to sell our shop together. How do we divide the sale money between us?"],
+     ["ನಾನು ನನ್ನ ಅಂಗಡಿಯನ್ನು ಬೇರೊಬ್ಬ ವ್ಯಾಪಾರಿಗೆ ಮಾರಲು ಬಯಸುತ್ತೇನೆ. ಅಂಗಡಿ ಮಾರಲು ಯಾವ ಕಾಗದಗಳು ಬೇಕು?",
+      "ನನ್ನ ವ್ಯಾಪಾರ ಪಾಲುದಾರ ಮತ್ತು ನಾನು ನಮ್ಮ ಅಂಗಡಿಯನ್ನು ಒಟ್ಟಿಗೆ ಮಾರಲು ಬಯಸುತ್ತೇವೆ. ಮಾರಾಟದ ಹಣವನ್ನು ನಮ್ಮ ನಡುವೆ ಹೇಗೆ ಹಂಚಿಕೊಳ್ಳುವುದು?"],
+     ["Nanu nanna angadiyannu berobba vyaparige maralu bayasuttene. Angadi maralu yava kagadagalu beku?",
+      "Nanna vyapara paludara mattu nanu namma angadiyannu ottige maralu bayasutteve. Maratada hanavannu namma naduve hege hanchikolluvudu?"]),
+    ("oos_hospital_bill", "hospital bill dispute",
+     ["The hospital charged me twice for the same treatment. How do I get the extra hospital bill amount back?",
+      "My husband was admitted to a private hospital and they gave a very high bill. Can I dispute a hospital bill?"],
+     ["ಆಸ್ಪತ್ರೆ ಅದೇ ಚಿಕಿತ್ಸೆಗೆ ಎರಡು ಬಾರಿ ಶುಲ್ಕ ವಿಧಿಸಿದೆ. ಹೆಚ್ಚುವರಿ ಆಸ್ಪತ್ರೆ ಬಿಲ್ ಮೊತ್ತವನ್ನು ಹೇಗೆ ವಾಪಸ್ ಪಡೆಯುವುದು?",
+      "ನನ್ನ ಗಂಡ ಖಾಸಗಿ ಆಸ್ಪತ್ರೆಗೆ ದಾಖಲಾಗಿದ್ದನು, ಅವರು ತುಂಬಾ ಹೆಚ್ಚಿನ ಬಿಲ್ ಕೊಟ್ಟರು. ಆಸ್ಪತ್ರೆ ಬಿಲ್ ಬಗ್ಗೆ ವಿವಾದ ಮಾಡಬಹುದೇ?"],
+     ["Aspatre ade chikitsege eradu bari shulka vidhiside. Hechuvari aspatre bill mottavannu hege vapas padeyuvudu?",
+      "Nanna ganda khasagi aspatrege dakhalagiddanu, avaru tumba hechchina bill kottaru. Aspatre bill bagge vivada madabahude?"]),
+    ("oos_dowry_punishment", "dowry punishment question (no Laya section)",
+     ["My neighbour says that asking for money at the wedding will be held as dowry. What is the punishment for dowry under the law?",
+      "Will giving gold at the wedding be treated as dowry? What happens if someone asks for dowry?"],
+     ["ಮದುವೆಯಲ್ಲಿ ಹಣ ಕೇಳುವುದು ವರದಕ್ಷಿಣೆ ಎಂದು ಹೇಳುತ್ತಾರೆ ಎಂದು ನನ್ನ ನೆರೆಯವರು ಹೇಳುತ್ತಾರೆ. ಕಾನೂನಿನಲ್ಲಿ ವರದಕ್ಷಿಣೆಗೆ ಶಿಕ್ಷೆ ಏನು?",
+      "ಮದುವೆಯಲ್ಲಿ ಚಿನ್ನ ಕೊಡುವುದು ವರದಕ್ಷಿಣೆ ಎಂದು ಪರಿಗಣಿಸಲಾಗುತ್ತದೆಯೇ? ಯಾರಾದರೂ ವರದಕ್ಷಿಣೆ ಕೇಳಿದರೆ ಏನಾಗುತ್ತದೆ?"],
+     ["Maduveyalli hana keluvudu varadakshine anta heluttare anta nanna nereyavaru heluttare. Kanoonina alli varadakshinege shikshe enu?",
+      "Maduveyalli chinna koduvudu varadakshine anta pariganisalaguttadeye? Yaradaru varadakshine kelidare enaguttade?"]),
     ("oos_business", "business partnership",
      ["My business partner took money from our company account without telling me. How do I settle a partnership dispute?",
       "I want to close my partnership firm. What is the process to dissolve a business partnership?"],
@@ -885,10 +1579,12 @@ FORUM_ADDON = {
 FRAMING = {
     "en": {
         "prefix": ["Please help me. ", "I need some advice. ",
-                   "I am writing to ask for help. "],
+                   "I am writing to ask for help. ",
+                   "Please suggest what I should do. "],
         "suffix": [" I am very worried about this.",
                    " I feel lost about all of this.",
-                   " This has been happening for a long time."],
+                   " This has been happening for a long time.",
+                   " Please guide me on what to do next."],
     },
     "kn": {
         "prefix": ["ದಯವಿಟ್ಟು ನನಗೆ ಸಹಾಯ ಮಾಡಿ. ", "ನನಗೆ ಸ್ವಲ್ಪ ಸಲಹೆ ಬೇಕು. ",
@@ -937,6 +1633,29 @@ COMBOS = [
     ["coloc_stay_with_child", "maint_wife"],
     ["coloc_custody_word", "maint_wife"],
     ["pre_bnss", "maint_arrears"],
+    ["birth_cert_late", "maint_child_only"],
+    ["dv_comp_medical", "maint_wife"],
+    ["restitution_wife_left", "neg_divorce"],
+    ["procedure_documents", "maint_wife"],
+    ["child_risk_abduction", "violence_beats"],
+    ["multi_ask_maint_stridhan", "custody_mother"],
+    ["conflict_custody", "maint_wife"],
+    ["mutual_agreed_terms", "maint_lump_sum"],
+    ["being_filed_maintenance", "custody_mother"],
+    ["stridhan_after_decree", "maint_post_decree"],
+    ["bg_stridhan_mention", "maint_wife"],
+    ["past_violence_stopped", "custody_mother"],
+    ["joint_property", "maint_wife"],
+    ["joint_property_no_hma", "custody_mother"],
+    ["divorce_pending", "custody_mother"],
+    ["maint_interim_pending", "stridhan_held"],
+    ["residence_explicit_only", "custody_mother"],
+    ["joint_property_hma_pending", "custody_mother"],
+    ["divorce_decree_done", "stridhan_after_decree"],
+    ["maint_child_self", "procedure_court"],
+    ["maint_elder_parent", "maint_child_only"],
+    ["joint_property", "divorce_pending"],
+    ["joint_property", "being_filed_maintenance"],
 ]
 
 CORE_SINGLE = ["maint_wife", "maint_child_only", "maint_lump_sum",
@@ -945,38 +1664,63 @@ CORE_SINGLE = ["maint_wife", "maint_child_only", "maint_lump_sum",
                "residence_live_in_house", "violence_beats", "violence_threats",
                "divorce_want", "divorce_mutual", "stridhan_held",
                "joint_property", "birth_cert", "procedure_court",
-               "procedure_how_file", "maint_child_self"]
+               "procedure_how_file", "maint_child_self",
+               "birth_cert_late", "birth_cert_correction", "birth_cert_lost",
+               "procedure_documents", "procedure_fees", "procedure_timeline",
+               "child_risk_alcoholic", "child_risk_abduction",
+               "child_risk_neglect", "mutual_agreed_terms",
+               "multi_ask_maint_stridhan", "multi_ask_custody_maint",
+               "narr_maint_separated", "narr_custody_separate",
+               "maint_partial_fees", "divorce_settlement_terms",
+               "joint_property_rights"]
 
-# Allocation: (kind, count). Sums to N_TOTAL = 5000.
+# Allocation: (kind, count). Sums to N_TOTAL = 8000.
 PLAN = [
-    ("single", 1400),
-    ("combo", 1300),
-    ("hn_a", 250),
-    ("hn_b", 300),
-    ("hn_c", 350),
-    ("hn_d", 300),
-    ("hn_e", 300),
-    ("hn_f", 600),
-    ("neg", 150),
-    ("conflict", 50),
+    ("single", 2000),
+    ("combo", 1900),
+    ("hn_a", 350),
+    ("hn_b", 450),
+    ("hn_c", 550),
+    ("hn_d", 450),
+    ("hn_e", 400),
+    ("hn_f", 900),
+    ("neg", 350),
+    ("conflict", 200),
+    ("hn_g", 250),
+    ("hn_h", 200),
 ]
 assert sum(c for _, c in PLAN) == N_TOTAL
 
 HN_BLOCKS = {
     "hn_a": ["coloc_stay_with_child", "coloc_custody_word"],
-    "hn_b": ["residence_explicit_only", "lockout", "violence_dv_comp"],
+    "hn_b": ["residence_explicit_only", "lockout", "violence_dv_comp",
+             "dv_comp_medical", "dv_comp_mental", "dv_comp_lost_wages",
+             "residence_asked_to_leave"],
     "hn_c": ["divorce_pending", "divorce_being_filed", "divorce_js_only",
-             "divorce_restitution", "divorce_decree_done"],
+             "divorce_restitution", "divorce_decree_done",
+             "js_only_living_apart", "being_filed_custody",
+             "being_filed_maintenance", "mutual_refused",
+             "restitution_wife_left", "restitution_desertion"],
     "hn_d": ["stridhan_sold", "stridhan_safe", "stridhan_never_asked",
-             "joint_property_hma_pending", "joint_property_no_hma"],
+             "joint_property_hma_pending", "joint_property_no_hma",
+             "stridhan_after_decree", "stridhan_display"],
     "hn_e": ["maint_arrears", "maint_vary", "maint_elder_parent",
-             "maint_male_self", "maint_father_child_only"],
+             "maint_male_self", "maint_father_child_only",
+             "maint_enforcement_fear"],
     "hn_f": ["hypothetical", "third_party", "quoted", "pre_bnss",
-             "past_event"],
+             "past_event", "third_party_son"],
     "hn_f_oos": [b for b, _, _, _, _ in OOS_DOMAINS],
     "neg": ["neg_maintenance", "neg_divorce", "neg_custody",
-            "neg_decree_mutual", "neg_no_order"],
-    "conflict": ["conflict_divorce"],
+            "neg_decree_mutual", "neg_no_order",
+            "neg_residence", "neg_stridhan", "neg_joint", "neg_dvcomp",
+            "neg_restitution", "neg_soft_divorce", "neg_soft_js"],
+    "conflict": ["conflict_divorce", "conflict_custody",
+                 "conflict_maintenance", "conflict_residence",
+                 "conflict_stridhan"],
+    "hn_g": ["bg_violence_past", "bg_stridhan_mention",
+             "bg_residence_mention", "bg_joint_property", "bg_birth_cert"],
+    "hn_h": ["hypo_custody", "hypo_stridhan", "quoted_maintenance",
+             "quoted_residence", "past_violence_stopped", "past_threats"],
 }
 
 # ---------------------------------------------------------------- generation
@@ -1104,7 +1848,7 @@ def build_record(block_ids, lang, rng):
     return rec, warnings
 
 
-def generate(seed=SEED):
+def generate(seed=SEED, exclude_keys=frozenset()):
     rng = random.Random(seed)
     records = []
     seen = set()
@@ -1140,7 +1884,7 @@ def generate(seed=SEED):
         for w in warns:
             warn_counts[w] += 1
         key = (lang, rec["text"])
-        if key in seen:
+        if key in seen or key in exclude_keys:
             continue
         seen.add(key)
         records.append(rec)
@@ -1194,7 +1938,7 @@ def validate(train, val):
         seen_texts.add(key)
 
 
-def manifest(train, val):
+def manifest(train, val, frozen_sha=None, frozen_at=None, frozen_note=None):
     allr = train + val
     return {
         "name": "synthetic_v7_1",
@@ -1202,8 +1946,19 @@ def manifest(train, val):
         "n_total": len(allr),
         "n_train": len(train),
         "n_validation": len(val),
+        "frozen_validation_sha256": frozen_sha,
+        "frozen_validation_at": frozen_at,
+        "frozen_validation_note": frozen_note,
         "method": "statutory-grammar paraphrase templates + hard-negative "
-                  "perturbations; never from test banks",
+                  "perturbations; never from test banks. v7.1 recall-swarm "
+                  "expansion (Lane 02, 2026-11-27): 5,000 -> 8,000 records; "
+                  "new thin-cluster blocks (conflict, birth_certificate, "
+                  "procedure, dv_compensation, restitution, child_safety, "
+                  "being_filed, judicial_separation), incidental-mention "
+                  "traps (hn_g), modality traps (hn_h), 3 new OOS domains, "
+                  "Kaanoon-informed lay phrasing patterns (own wording "
+                  "only, no Kaanoon text copied); Lane 05 kn_templates "
+                  "wired in when present",
         "languages": dict(Counter(r["lang"] for r in allr)),
         "clusters": dict(Counter(r["meta"]["cluster"] for r in allr)),
         "issues_requested": {
@@ -1239,18 +1994,100 @@ def main(argv=None):
     ap.add_argument("--out", default="data/synthetic_v7_1",
                     help="output directory")
     ap.add_argument("--seed", type=int, default=SEED)
+    ap.add_argument("--new-split", action="store_true",
+                    help="explicitly allow regenerating validation.jsonl "
+                         "(coordinator-ordered new split version only; "
+                         "without it, an existing validation.jsonl is "
+                         "FROZEN and never overwritten)")
     args = ap.parse_args(argv)
-    train, val, warns = generate(seed=args.seed)
-    validate(train, val)
+    # Recall-swarm R4: wire Lane 05 KN/Kanglish templates when present.
+    # kn_templates.py lives beside this file (scripts/); it only mutates
+    # this module's in-memory registries (BLOCKS / CORE_SINGLE /
+    # HN_BLOCKS / COMBOS) and never writes data files. If it is absent,
+    # the corpus builds without it (note printed, deterministic either way
+    # for a fixed builder + kn_templates pair).
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import kn_templates
+        kn_templates.validate()
+        kn_templates.wire_into_builder(sys.modules[__name__])
+        print("wired Lane 05 kn_templates:",
+              kn_templates.counts()["variants"])
+    except ImportError:
+        print("Lane 05 kn_templates not present; building without it")
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+    # FREEZE (coordinator, 2026-11-27): once validation.jsonl exists on
+    # disk it is FROZEN — a rebuild regenerates train.jsonl only and never
+    # rewrites validation.jsonl. Any further expansion goes to train only
+    # (or to a new versioned split file, e.g. validation-v2.jsonl, with
+    # its own manifest entry — use --new-split only when the coordinator
+    # explicitly orders a new split version).
+    frozen_val = None
+    frozen_sha = frozen_at = frozen_note = None
+    val_path = out / "validation.jsonl"
+    man_path = out / "manifest.json"
+    if val_path.exists() and not args.new_split:
+        frozen_val = [json.loads(line) for line in
+                      val_path.read_text(encoding="utf-8").splitlines()
+                      if line.strip()]
+        frozen_sha = hashlib.sha256(val_path.read_bytes()).hexdigest()
+        if man_path.exists():
+            old_man = json.loads(man_path.read_text(encoding="utf-8"))
+            old_sha = old_man.get("frozen_validation_sha256")
+            if old_sha is not None and old_sha != frozen_sha:
+                raise SystemExit(
+                    f"FROZEN validation.jsonl hash mismatch: manifest "
+                    f"records {old_sha} but file hashes {frozen_sha}; "
+                    f"refusing to build (the frozen file must not change)")
+            frozen_at = old_man.get("frozen_validation_at")
+            frozen_note = old_man.get("frozen_validation_note")
+        if frozen_at is None:
+            frozen_at = datetime.now(timezone.utc).isoformat()
+        if frozen_note is None:
+            frozen_note = (
+                "Frozen 2026-11-27 (recall swarm, coordinator freeze): "
+                "validation.jsonl is the frozen split; all "
+                "validation-split numbers are measured against this exact "
+                "file; further expansion goes to train.jsonl only.")
+        print(f"FROZEN validation.jsonl kept as-is "
+              f"(sha256 {frozen_sha[:12]}…, {len(frozen_val)} records); "
+              f"regenerating train.jsonl only")
+    if frozen_val is not None:
+        train, gen_val, warns = generate(seed=args.seed)
+        if [(r["id"], r["lang"], r["text"]) for r in gen_val] == \
+                [(r["id"], r["lang"], r["text"]) for r in frozen_val]:
+            # Builder unchanged since the freeze: generated split is
+            # identical, so train is byte-identical too. Keep both.
+            val = frozen_val
+        else:
+            # Builder changed since the freeze: regenerate train
+            # excluding every frozen validation (lang, text), so no
+            # train record can duplicate or 8-gram-collide with the
+            # frozen split through the shared template pool.
+            exclude = {(r["lang"], r["text"]) for r in frozen_val}
+            train, _gen_val2, warns = generate(
+                seed=args.seed, exclude_keys=exclude)
+            val = frozen_val
+            print("builder changed since freeze: train regenerated "
+                  "excluding frozen validation texts; validation "
+                  "untouched")
+    else:
+        if args.new_split and val_path.exists():
+            print("WARNING: --new-split: regenerating FROZEN "
+                  "validation.jsonl (coordinator-ordered only)")
+        train, val, warns = generate(seed=args.seed)
+    validate(train, val)
     with open(out / "train.jsonl", "w", encoding="utf-8") as fh:
         for r in train:
             fh.write(json.dumps(r, ensure_ascii=False) + "\n")
-    with open(out / "validation.jsonl", "w", encoding="utf-8") as fh:
-        for r in val:
-            fh.write(json.dumps(r, ensure_ascii=False) + "\n")
-    man = manifest(train, val)
+    if frozen_val is None:
+        with open(out / "validation.jsonl", "w", encoding="utf-8") as fh:
+            for r in val:
+                fh.write(json.dumps(r, ensure_ascii=False) + "\n")
+        frozen_sha = hashlib.sha256(val_path.read_bytes()).hexdigest()
+    man = manifest(train, val, frozen_sha=frozen_sha,
+                   frozen_at=frozen_at, frozen_note=frozen_note)
     man["merge_warnings"] = dict(warns)
     with open(out / "manifest.json", "w", encoding="utf-8") as fh:
         json.dump(man, fh, ensure_ascii=False, indent=1)

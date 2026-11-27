@@ -1,23 +1,26 @@
 """Train the LAYA v7.1 multi-head Stage 0/1 classifier (V71-P1-3).
 
-EXACT COMMAND — run on the user's RTX 5050 machine (CUDA), from the repo root
-after Lane 02 has produced the corpus (data/synthetic_v7_1/corpus.jsonl):
+EXACT COMMAND — run on the user's RTX 5050 machine (CUDA), from the repo root.
+The corpus ships as separate splits (Lane 02 layout), so use --train-file /
+--val-file (the --data + --val-frac form still works for a single file):
+
+    python scripts/train_v71_classifier.py \\
+        --train-file data/synthetic_v7_1/train.jsonl \\
+        --val-file data/synthetic_v7_1/validation.jsonl \\
+        --backbone answerdotai/ModernBERT-large \\
+        --epochs 5 --batch-size 4 --grad-accum 2 --lr 2e-5 \\
+        --class-weights --patience 2 \\
+        --max-seq-len 192 --max-clauses 8 \\
+        --output-dir models/v71-classifier --device cuda --fp16 \\
+        --grad-checkpoint --seed 42
+
+If Lane 02 later emits a single file instead, use --data + --val-frac:
 
     python scripts/train_v71_classifier.py \\
         --data data/synthetic_v7_1/corpus.jsonl \\
         --val-frac 0.10 --backbone answerdotai/ModernBERT-large \\
         --epochs 5 --batch-size 4 --grad-accum 2 --lr 2e-5 \\
-        --max-seq-len 192 --max-clauses 8 \\
-        --output-dir models/v71-classifier --device cuda --fp16 \\
-        --grad-checkpoint --seed 42
-
-If Lane 02 instead emits separate files, use --train-file / --val-file:
-
-    python scripts/train_v71_classifier.py \\
-        --train-file data/synthetic_v7_1/train.jsonl \\
-        --val-file data/synthetic_v7_1/val.jsonl \\
-        --backbone answerdotai/ModernBERT-large --epochs 5 \\
-        --batch-size 4 --grad-accum 2 --lr 2e-5 \\
+        --class-weights --patience 2 \\
         --output-dir models/v71-classifier --device cuda --fp16 \\
         --grad-checkpoint --seed 42
 
@@ -26,12 +29,16 @@ example encodes 1 full question + up to 8 clauses, so keep --batch-size 4
 with --grad-accum 2 (effective 8) and --grad-checkpoint on. If OOM persists,
 drop to --batch-size 2 --grad-accum 4, or --freeze-backbone, or
 --lora (needs `peft` installed; LoRA rank 8 on attention projections only).
+LoRA checkpoints must be merged before evaluation — see --merge-lora.
 
 EXPECTED OUTPUTS (stdout + files):
   - Per-epoch: train loss (total + per head), val macro/micro-F1 per head
     (issue, fact, claimant_sex, claimant_role, modality_time, gate),
     plus "requested"-class recall for the issue head (recall is the exit
     criterion driver: Sealed Fresh-20 micro-recall must reach >= 0.98).
+  - Early stopping (default --patience 2): training stops when mean val
+    macro-F1 (issue+fact) fails to improve by more than --min-delta
+    (0.001) for 2 consecutive epochs; the best checkpoint is kept.
   - models/v71-classifier/best/   (best checkpoint by mean val macro-F1
     over issue+fact heads): model.pt + config.json + label_maps.json
   - models/v71-classifier/last/   (final-epoch checkpoint, same layout)
@@ -42,12 +49,16 @@ EXPECTED OUTPUTS (stdout + files):
     ONE split; repeat with --seed 1..5 for the 5-fold CV claim (same command,
     different --seed and --val-frac folds are NOT k-fold — use --train-file /
     --val-file with Lane 02's fold files for true k-fold).
+  - Evaluate a checkpoint on the held-out split (no retraining):
+    python scripts/train_v71_classifier.py --eval-checkpoint
+        models/v71-classifier/best/model.pt
+        --val-file data/synthetic_v7_1/validation.jsonl --device cuda
 
 DO NOT RUN THIS ON THE COORDINATOR VM: it has no GPU and no torch. The
 --check-data-only mode is the only mode that works there — it loads and
 validates the corpus with pure python and prints the data report:
 
-    python scripts/train_v71_classifier.py --data data/synthetic_v7_1/corpus.jsonl --check-data-only
+    python scripts/train_v71_classifier.py --train-file data/synthetic_v7_1/train.jsonl --val-file data/synthetic_v7_1/validation.jsonl --check-data-only
 
 Loss: multi-head weighted cross-entropy. Per-head weights come from
 --loss-weights (issue,fact,enum,gate,span); span loss is a binary
@@ -61,6 +72,7 @@ per-class F1, micro-F1 = accuracy for these single-label heads.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import math
 import random
@@ -140,6 +152,20 @@ def parse_args(argv=None) -> argparse.Namespace:
                    help="Load + validate the corpus only (no torch needed).")
     p.add_argument("--smoke", action="store_true",
                    help="Train on 32 examples / 1 epoch to verify the pipeline.")
+    p.add_argument("--patience", type=int, default=2,
+                   help="Early-stopping patience in epochs on mean val "
+                        "macro-F1 (issue+fact); 0 disables early stopping.")
+    p.add_argument("--min-delta", type=float, default=0.001,
+                   help="Minimum mean val macro-F1 improvement that counts "
+                        "as progress for early stopping.")
+    p.add_argument("--eval-checkpoint", default=None,
+                   help="Score this checkpoint on --val-file (or --data) "
+                        "instead of training. Uses the model-side scoring "
+                        "hook in src/laya_v7_classifier.py.")
+    p.add_argument("--merge-lora", nargs=2, default=None, metavar=("CKPT", "OUT"),
+                   help="Merge a LoRA checkpoint CKPT into a plain model.pt "
+                        "at OUT (same format as full-FT checkpoints), so it "
+                        "can be scored with --eval-checkpoint. Needs peft.")
     return p.parse_args(argv)
 
 
@@ -235,6 +261,54 @@ def requested_recall(gold_issue, pred_issue) -> float:
     return round(tp / (tp + fn), 4) if tp + fn else 1.0
 
 
+def lora_config_for(backbone: str):
+    """Shared LoRA config (r=8) for train() and merge_lora_checkpoint().
+
+    Backbone-specific attention projection names: fused QKV in ModernBERT,
+    separate projections in DeBERTa-v3. Heads stay fully trainable via
+    modules_to_save (peft freezes the base model by default).
+    """
+    from peft import LoraConfig  # noqa: PLC0415 - only on --lora paths
+    target = (["Wqkv"] if "ModernBERT" in backbone
+              else ["query_proj", "key_proj", "value_proj"])
+    return LoraConfig(
+        r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
+        task_type="FEATURE_EXTRACTION", target_modules=target,
+        modules_to_save=["issue_head", "fact_head", "enum_heads",
+                         "clause_gate_head", "span_head", "span_attn"],
+    )
+
+
+def merge_lora_checkpoint(ckpt_path: str, out_path: str) -> int:
+    """Merge a LoRA checkpoint into a plain full-model checkpoint.
+
+    LoRA training saves peft-prefixed state dicts, which load_checkpoint()
+    cannot read. This rebuilds the base model, re-applies the adapter,
+    merges it, and writes a plain {"state_dict", "config"} file identical
+    in format to full fine-tuning checkpoints. RTX-only (needs torch+peft);
+    NOT verified on this VM (no torch here) — verify with
+    --eval-checkpoint on the merged file before trusting it.
+    """
+    try:
+        import torch
+        from peft import get_peft_model
+    except ImportError as exc:  # pragma: no cover - environment-dependent
+        print(f"ERROR: --merge-lora needs torch + peft ({exc}).", file=sys.stderr)
+        return 2
+    from laya_v7_classifier import ClassifierConfig, build_model  # noqa: E402
+    ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+    cfg = ClassifierConfig.from_dict(ckpt["config"])
+    model = build_model(cfg)
+    model = get_peft_model(model, lora_config_for(cfg.backbone))
+    model.load_state_dict(ckpt["state_dict"])
+    merged = model.merge_and_unload()
+    out = Path(out_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    torch.save({"state_dict": merged.state_dict(), "config": cfg.to_dict()}, out)
+    print(f"Merged LoRA checkpoint -> {out} (backbone={cfg.backbone})")
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # Torch training (only reachable with torch installed)
 # ---------------------------------------------------------------------------
@@ -273,26 +347,9 @@ def train(args) -> int:
         freeze_backbone=args.freeze_backbone, use_lora=args.lora,
         tau_neg=args.tau_neg, loss_weights=parse_loss_weights(args.loss_weights),
     )
-    if args.lora:
-        try:
-            from peft import LoraConfig, get_peft_model
-        except ImportError:
-            print("ERROR: --lora needs `peft` (`pip install peft`).", file=sys.stderr)
-            return 2
-        # Backbone-specific attention projection names (fused QKV in
-        # ModernBERT, separate projections in DeBERTa-v3).
-        target = (["Wqkv"] if "ModernBERT" in args.backbone
-                  else ["query_proj", "key_proj", "value_proj"])
-        lora_cfg = LoraConfig(
-            r=8, lora_alpha=16, lora_dropout=0.05, bias="none",
-            task_type="FEATURE_EXTRACTION", target_modules=target,
-            # Keep the multi-head classifiers trainable (peft freezes the
-            # base model by default; these modules stay fully trainable).
-            modules_to_save=["issue_head", "fact_head", "enum_heads",
-                             "clause_gate_head", "span_head", "span_attn"],
-        )
-        model = get_peft_model(model, lora_cfg)
-        model.print_trainable_parameters()
+    # NOTE (Lane 04 fix): the LoRA wrap used to sit here and referenced
+    # `model` before it existed (NameError on every --lora run). The model
+    # is built below first; the wrap happens right after the build.
 
     tokenizer = AutoTokenizer.from_pretrained(args.backbone)
     device = torch.device(args.device)
@@ -370,6 +427,14 @@ def train(args) -> int:
             model.encoder.gradient_checkpointing_enable()
         except Exception as exc:  # noqa: BLE001 - backbone-dependent
             print(f"WARNING: gradient checkpointing unavailable: {exc}")
+    if args.lora:
+        try:
+            from peft import get_peft_model
+        except ImportError:
+            print("ERROR: --lora needs `peft` (`pip install peft`).", file=sys.stderr)
+            return 2
+        model = get_peft_model(model, lora_config_for(args.backbone))
+        model.print_trainable_parameters()
     model.to(device)
 
     # Optional inverse-frequency class weights (clipped), issue/fact heads.
@@ -412,6 +477,7 @@ def train(args) -> int:
         json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     log_path = out_dir / "train_log.jsonl"
     best_macro = -1.0
+    epochs_no_improve = 0
     step = 0
 
     def evaluate():
@@ -549,7 +615,9 @@ def train(args) -> int:
                    last_dir / "model.pt")
         (last_dir / "config.json").write_text(
             json.dumps(cfg.to_dict(), indent=2), encoding="utf-8")
-        if metrics["mean_macro_f1_issue_fact"] > best_macro:
+        improved = (metrics["mean_macro_f1_issue_fact"]
+                    > best_macro + args.min_delta)
+        if improved:
             best_macro = metrics["mean_macro_f1_issue_fact"]
             best_dir = out_dir / "best"
             best_dir.mkdir(parents=True, exist_ok=True)
@@ -562,6 +630,18 @@ def train(args) -> int:
                 "issue_intents": ISSUE_INTENTS, "fact_states": FACT_STATES,
                 "enums": ENUMS}, indent=2), encoding="utf-8")
             print(f"  new best (mean_macro={best_macro}) -> {best_dir}/model.pt")
+        # Early stopping (Lane 04): stop when mean val macro-F1 (issue+fact)
+        # fails to improve by more than --min-delta for --patience epochs.
+        # The best checkpoint above is kept; --patience 0 disables this.
+        if improved:
+            epochs_no_improve = 0
+        else:
+            epochs_no_improve += 1
+        if args.patience > 0 and epochs_no_improve >= args.patience:
+            print(f"Early stopping at epoch {epoch}: no val improvement "
+                  f"for {epochs_no_improve} epochs "
+                  f"(best mean_macro={best_macro}).")
+            break
     print(f"DONE. Best mean val macro-F1 (issue+fact): {best_macro}. "
           f"Best checkpoint: {out_dir}/best/model.pt")
     print("Exit bar (plan §1.3): synthetic held-out macro/micro-F1 >= 0.95 "
@@ -571,6 +651,65 @@ def train(args) -> int:
 
 def main(argv=None) -> int:
     args = parse_args(argv)
+    if args.merge_lora:
+        return merge_lora_checkpoint(args.merge_lora[0], args.merge_lora[1])
+    if args.eval_checkpoint:
+        # Score an existing checkpoint on the held-out split (no training).
+        # --val-file wins; --data falls back to a --val-frac split.
+        from laya_v7_classifier import evaluate_checkpoint  # noqa: E402
+        if args.val_file:
+            val_path = args.val_file
+        elif args.data:
+            records, _ = load_corpus_jsonl(args.data)
+            _, val_recs = split_records(records, args.val_frac, args.seed)
+            tmp = Path("/tmp/laya_v71_eval_split.jsonl")
+            with tmp.open("w", encoding="utf-8") as fh:
+                for rec in val_recs:
+                    fh.write(json.dumps({
+                        "id": rec["id"], "lang": rec["lang"], "text": rec["text"],
+                        "issues": rec["issues"], "facts": rec["facts"],
+                        "enums": rec["enums"], "spans": rec["spans"],
+                    }, ensure_ascii=False) + "\n")
+            val_path = str(tmp)
+        else:
+            raise SystemExit("Provide --val-file (or --data) with --eval-checkpoint.")
+        try:
+            metrics, gold, preds = evaluate_checkpoint(
+                args.eval_checkpoint, val_path, device=args.device,
+                return_predictions=True)
+        except RuntimeError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 2
+        print("=== per-head label metrics (model-side, "
+              "src/laya_v7_classifier.score_label_predictions) ===")
+        print(json.dumps(metrics, indent=2, ensure_ascii=False))
+        # Section-exact R1 number via Lane 07's harness (tests/recall_eval.py):
+        # predict_text() -> predict_sections_from_stage1() -> score_predictions().
+        # Guarded: if the harness file is absent the label metrics above are
+        # still the result; the section number is simply skipped, not faked.
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "recall_eval", REPO_ROOT / "tests" / "recall_eval.py")
+            harness = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(harness)
+            sections = [harness.predict_sections_from_stage1(
+                p["issues"], p["facts"], p["enums"]) for p in preds]
+            sec = harness.score_predictions(gold, sections)
+            sec.pop("rows")
+            print("=== section-exact (Lane 07 harness, validation split) ===")
+            print(json.dumps(sec, indent=2, ensure_ascii=False))
+            print(f"section-exact: {sec['exact_count']}/{sec['n']} "
+                  f"({sec['exact_rate']:.1%})  Wilson 95% CI {sec['wilson_95']}  "
+                  f"silent={sec['silent']}")
+            print("Baseline to beat (evidence mode, CPU, "
+                  "results/recall_eval_summary_baseline.json): 173/500 "
+                  "(34.6%), micro-R 0.3389, silent 263.")
+        except Exception as exc:  # noqa: BLE001 - harness is Lane 07's file
+            print(f"NOTE: section-exact scoring skipped (harness unavailable "
+                  f"or failed: {exc}). Label metrics above still stand.")
+        print("Exit bar (plan §1.3): macro/micro-F1 >= 0.95 per head; "
+              "issue_requested_recall >= 0.98 before any sealed evaluation.")
+        return 0
     if args.check_data_only:
         train_recs, val_recs, report = load_splits(args)
         print(json.dumps(report, indent=2, ensure_ascii=False)[:6000])
