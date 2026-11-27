@@ -1,0 +1,84 @@
+{
+ "issues": [
+  "maintenance",
+  "custody",
+  "residence",
+  "divorce",
+  "stridhan",
+  "joint_property",
+  "violence",
+  "dv_compensation",
+  "restitution",
+  "birth_certificate",
+  "procedure"
+ ],
+ "facts": [
+  "divorce_asked",
+  "mutual_consent",
+  "judicial_separation_only",
+  "restitution_asked",
+  "proceeding_pending_hma",
+  "being_filed",
+  "decree",
+  "money_fact",
+  "lump_sum_settlement",
+  "existing_order_enforcement",
+  "interim_asked",
+  "custody_claim",
+  "child_fact",
+  "minor_child",
+  "child_maintenance_only",
+  "school_fees_fact",
+  "child_safety_risk",
+  "residence_claim",
+  "coercive_eviction_or_lockout",
+  "explicit_residence_order_only",
+  "violence",
+  "dv_injury_comp_asked",
+  "stridhan_claim",
+  "stridhan_sold_or_mortgaged",
+  "demand_made",
+  "joint_property_claim",
+  "birth_cert_asked",
+  "in_scope"
+ ],
+ "intents": [
+  "requested",
+  "incidental",
+  "denied",
+  "uncertain"
+ ],
+ "fact_states": [
+  "supported",
+  "denied",
+  "unknown",
+  "conflicting"
+ ],
+ "enums": {
+  "claimant_sex": [
+   "F",
+   "M",
+   "U"
+  ],
+  "claimant_role": [
+   "spouse",
+   "parent",
+   "child",
+   "other"
+  ],
+  "modality_time": [
+   "present",
+   "past",
+   "future",
+   "hypothetical",
+   "quoted"
+  ]
+ },
+ "span": {
+  "key": "fact-or-issue name",
+  "kind": "fact | issue",
+  "text": "surface phrase",
+  "start": "char offset",
+  "end": "char offset"
+ }
+}
