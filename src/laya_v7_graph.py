@@ -268,8 +268,12 @@ def _derive_escalations_v7(
     if ("pwdva-18" in kept) or custody_risk or urgent_safety:
         esc.append({"kind": "safety", "text": "Safety risk indicated — escalate urgently for protection and safety help."})
 
+    # Recovery fires ONLY once a demand exists (made / sold / refused):
+    # a bare bns-316 keep with no demand yet gets "demand" alone (H3/H10
+    # GT kinds are ['demand']; H15 with demand_made=True gets ['recovery']).
     if "bns-316" in kept:
-        esc.append({"kind": "recovery", "text": "Stridhan recovery requires formal valuation and legal assistance."})
+        if demand_made is True or stridhan_sold or stridhan_refused:
+            esc.append({"kind": "recovery", "text": "Stridhan recovery requires formal valuation and legal assistance."})
         if demand_made is False or first_demand_never:
             esc.append({"kind": "demand", "text": "Make a documented written demand for return of Stridhan before filing."})
     elif first_demand_never and (kept & {"bnss-144", "pwdva-20", "pwdva-17", "pwdva-19"}):
@@ -397,7 +401,17 @@ def evaluate_stage2_v7(
 
     if not in_scope:
         court_live, court_source = court_for_v7([], False)
-        escalations = _derive_escalations_v7(set(), facts, court_source, urgent_safety=urgent_safety)
+        # Explicit OOS handoff (H12 0/0 convention: no scored kind may fire
+        # on empty kept). Do NOT run the generic _derive_escalations_v7()
+        # here: its "(not kept and not no_dispute)" branch emits "procedure"
+        # for any empty kept set, which is the H12 mismatch. The ONLY
+        # exception is an independent safety signal (P4-3: safety fires
+        # regardless of scope). The handoff itself is signalled by
+        # in_scope=False + court_source="out-of-scope" + oos_handoff=True
+        # (rendered as OUT_OF_SCOPE_LINE prose, no scored kind).
+        escalations: list[dict[str, str]] = []
+        if urgent_safety or proved_true(facts, "child_safety_risk"):
+            escalations.append({"kind": "safety", "text": "Safety risk indicated — escalate urgently for protection and safety help."})
         return {
             "in_scope": False,
             "kept_ids": [],
@@ -406,6 +420,8 @@ def evaluate_stage2_v7(
             "custody_companions": [],
             "gated_out": ["all: out_of_scope"],
             "dispositions": {},
+            "candidates_before_gate": [],
+            "oos_handoff": True,
             "court_live": court_live,
             "court_source": court_source,
             "escalations_typed": escalations,
@@ -427,7 +443,11 @@ def evaluate_stage2_v7(
             _add_disp("hma-25", "eligible", "decree_or_lump_sum_settlement")
             if lump_sum or post_decree_lump:
                 handled_maint = True
-            elif decree and money_fact and sex != "male" and minor_child_verified:
+            elif decree and money_fact and sex != "male" and (minor_child_verified or not child_only):
+                # Post-decree ongoing maintenance for the wife herself: an
+                # adult child must NOT block it (L430 fix). The adult-child
+                # bar applies only when the money is for the child alone
+                # (child_only), matching the adult_able_child_ineligible rule.
                 _add_disp("bnss-144", "eligible", "post_decree_ongoing_maintenance")
                 handled_maint = True
             elif decree:
@@ -504,12 +524,19 @@ def evaluate_stage2_v7(
 
     # --- 4. Property & Stridhan slice (BNS 316 vs HMA 27) ---
     if (_wanted("stridhan") or stridhan_claim) and stridhan_claim and ("stridhan" not in negated) and not proved_true(facts, "stridhan_negated"):
-        if stridhan_held and dom_rel:
+        # BNS s.316 Stridhan is the wife's property: a husband claiming
+        # wedding gold is NOT routed to bns-316 (wife-specific prose).
+        if stridhan_held and dom_rel and sex != "male":
             _add_disp("bns-316", "eligible", "stridhan_withheld_or_disposed_criminal_trust")
+        elif sex == "male":
+            _add_disp("bns-316", "inapplicable", "male_claimant_no_stridhan_bns316")
+            gated_out.append("bns-316: gated (male claimant — Stridhan is the wife's property)")
         else:
             _add_disp("bns-316", "inapplicable", "stridhan_safe_or_no_domestic_entrustment")
 
-    if (_wanted("joint_property") or joint_prop_claim) and joint_prop_claim and ("stridhan" not in negated):
+    # Joint property is decoupled from the Stridhan negation: safe Stridhan
+    # (stridhan in negated_issues) must NOT block hma-27 (was L512).
+    if (_wanted("joint_property") or joint_prop_claim) and joint_prop_claim and ("joint_property" not in negated):
         if hma_active:
             _add_disp("hma-27", "eligible", "d2_joint_property_in_hma_proceeding")
         else:
@@ -566,6 +593,11 @@ def evaluate_stage2_v7(
         "applied_principles": sorted(set(applied_principles)),
         "custody_companions": custody_companions,
         "gated_out": gated_out,
+        # Genuine pre-gate candidates (contract C1): every section Stage 2
+        # considered — all disposition keys (eligible + conditional +
+        # inapplicable), deterministic sorted order. NOT a clone of kept_ids.
+        "candidates_before_gate": sorted(dispositions.keys()),
+        "oos_handoff": False,
         "dispositions": {k: v.to_dict() for k, v in dispositions.items()},
         "court_live": court_live,
         "court_source": court_source,

@@ -68,7 +68,9 @@ _FEMALE_SPEAKER_RE = re.compile(
     re.I,
 )
 _ELDER_PARENT_CLAIM_RE = re.compile(
-    r"\b(?:i\s*(?:am|'m)\s+(?:the\s+|his\s+|her\s+|an\s+)?(?:aged|elderly|old|retired|infirm|dependent)?\s*(?:mother|father|parent)\b|"
+    r"\b(?:\d{2}-year-old\s+(?:mother|father|parent)\b|"
+    r"(?:i\s+am\s+)?an?\s+\d{2}\s+years?\s+old\s+(?:mother|father|parent)\b|"
+    r"i\s*(?:am|'m)\s+(?:the\s+|his\s+|her\s+|an\s+)?(?:aged|elderly|old|retired|infirm|dependent)?\s*(?:mother|father|parent)\b|"
     r"i\s+am\s+(?:6\d|7\d|8\d|9\d)\s+years?\s+old\b.*\b(?:son|daughter)\b|"
     r"my\s+(?:father|mother)\s+is\s+(?:6\d|7\d|8\d|9\d|bedridden|old|elderly)\b.*\b(?:support|care\s+costs|maintenance)\b|"
     r"my\s+(?:son|daughter)\s+(?:earns\s+well\s+but\s+|refuses?|won['’]t)\b.*\bsupport\s+(?:me|him|her)\b|"
@@ -88,12 +90,12 @@ _CHILD_ONLY_CLAIM_RE = re.compile(
 )
 _CHILD_MENTION_RE = re.compile(
     r"\b(?:child|children|kids|son|daughter|baby|toddler|infant|newborn|twins|minor|"
-    r"\d{1,2}-?year-?old|(?:six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen)-year-old)\b",
+    r"(?:[1-9]|1[0-7])-?year-?old|(?:six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen)-year-old)\b",
     re.I,
 )
 _ADULT_CHILD_AGE_RE = re.compile(
     r"\b(?:turned\s+(?:eighteen|18|nineteen|twenty)|"
-    r"(?:1[89]|2\d|3\d)-?\s*years?\s*old|"
+    r"(?:1[89]|2\d|3\d)-?\s*years?\s*-?\s*old|"
     r"(?:daughter|son|child)\s+(?:is|aged)\s+(?:1[89]|2\d|3\d)\b|"
     r"\b(?:eighteen|nineteen|twenty|twenty-\w+)\s+year\s+old|"
     r"\badult\s+(?:son|daughter|child)\b)\b",
@@ -263,7 +265,7 @@ _RESIDENCE_ASK_RE = re.compile(
     r"\b(?:shared\s+(?:house|home|household)|right\s+to\s+(?:reside|stay)|residence\s+order|"
     r"throw(?:ing|s)?\s+me\s+out|threw\s+me\s+out|thrown\s+(?:me\s+)?out|kicked\s+(?:me\s+)?out|"
     r"changed\s+the\s+locks?|locked\s+(?:me\s+)?out|cannot\s+enter\s+(?:the|my|our)\s+(?:house|home)|stopped\s+paying\s+(?:the\s+|house\s+)?rent|"
-    r"barred\s+(?:me\s+)?from\s+(?:entering|the\s+(?:house|home))|refus(?:e|ing)\s+(?:me\s+)?entry|evict(?:ed|ion)?|"
+    r"barred\s+(?:me\s+)?from\s+(?:entering|the\s+(?:house|home))|refus(?:es|e|ing|ed)?\s+(?:me\s+)?entry|evict(?:ed|ion)?|"
     r"told\s+me\s+to\s+leave\s+(?:the\s+)?house|ordered\s+me\s+to\s+get\s+out|i\s+must\s+vacate|want(?:s)?\s+my\s+husband\s+to\s+leave|"
     r"afraid\s+to\s+stay\s+there.*nowhere\s+else\s+to\s+go|safe\s+place\s+to\s+stay|protect\s+my\s+stay|"
     r"keep\s+staying\s+in\s+the\s+house|stay\s+in\s+(?:the\s+)?same\s+house|permission\s+to\s+remain\s+in\s+the\s+house|"
@@ -281,8 +283,11 @@ _RESIDENCE_NEG_RE = re.compile(
     r"(?:housing|place\s+to\s+stay)\s+is\s+not\s+an\s+issue|own\s+(?:a\s+)?(?:flat|house)\s+of\s+my\s+own|my\s+own\s+house\s+to\s+live\s+in)\b",
     re.I,
 )
+# Lockout-vs-explicit split: entry refusal ("refuses me entry") is coercive
+# lockout and must NOT count as explicit-residence-only (it needs pwdva-18);
+# only a bare residence-order / separate-accommodation ask is explicit-only.
 _EXPLICIT_RES_ONLY_RE = re.compile(
-    r"\b(?:residence\s+order|returned\s+to\s+my\s+parents|separate\s+(?:place|accommodation)|refus(?:e|ing)\s+(?:me\s+)?entry)\b",
+    r"\b(?:residence\s+order|returned\s+to\s+my\s+parents|separate\s+(?:place|accommodation))\b",
     re.I,
 )
 _VIOLENCE_NEG_MASK_RE = re.compile(
@@ -301,7 +306,7 @@ _VIOLENCE_RE = re.compile(
 )
 _COERCIVE_LOCKOUT_RE = re.compile(
     r"\b(?:throw(?:ing|s)?\s+me\s+out|threw\s+me\s+out|kicked\s+(?:me\s+)?out|changed\s+the\s+locks?|locked\s+(?:me\s+)?out|"
-    r"forcing\s+me\s+out|told\s+me\s+to\s+leave|ordered\s+me\s+to\s+get\s+out|i\s+must\s+vacate|husband\s+to\s+leave|"
+    r"refus(?:es|e|ing|ed)?\s+(?:me\s+)?entry|forcing\s+me\s+out|told\s+me\s+to\s+leave|ordered\s+me\s+to\s+get\s+out|i\s+must\s+vacate|husband\s+to\s+leave|"
     r"keep\s+staying\s+in\s+the\s+house|threatening\s+to\s+(?:throw|evict|kick)\s+me\s+out|barred\s+me\s+from\s+the\s+house)\b",
     re.I,
 )
@@ -326,12 +331,43 @@ _STRIDHAN_HELD_RE = re.compile(
     r"(?:value|price)\s+of\s+the\s+\w+\s+back|gold\s+(?:returned|not\s+returning)|family\s+property\s+now|confused\s+about\s+the\s+gold|either\s+gold\s+or\s+money)\b",
     re.I,
 )
-_STRIDHAN_SAFE_OR_UNDISP_RE = re.compile(
+# Safe-Stridhan split (union == the old _STRIDHAN_SAFE_OR_UNDISP_RE, so
+# stridhan_safe behaviour is unchanged; the split wires the two dead graph
+# keys with honest semantics). Possession bucket = gold actually safe in the
+# claimant's own keeping (drives the graph's civil-handoff read). Abandoned
+# bucket = no live dispute / claim dropped / not disposed (incl. "did not
+# sell my gold" and "agreed to return": gold not yet in own possession).
+_STRIDHAN_SAFE_POSSESSION_RE = re.compile(
     r"\b(?:gold\s+(?:jewellery\s+)?is\s+(?:safe\s+)?(?:with\s+me|in\s+my\s+own)|in\s+my\s+(?:own\s+)?(?:locker|cupboard|possession|parents['’]\s+(?:house|custody))|"
-    r"has\s+never\s+touched\s+it|did\s+not\s+sell\s+my\s+gold|agreed\s+to\s+return|"
+    r"has\s+never\s+touched\s+it)\b",
+    re.I,
+)
+_STRIDHAN_ABANDONED_RE = re.compile(
+    r"\b(?:did\s+not\s+sell\s+my\s+gold|agreed\s+to\s+return|"
     r"no\s+dispute\s+about\s+(?:the\s+\w+|it|that)|whether\s+i\s+can\s+wear\s+it|"
     r"dropped\s+my\s+claim|want\s+maintenance\s+instead|gold\s+biscuit\s+as\s+an\s+investment|have\s+not\s+decided\s+whether\s+to\s+ask(?:\s+for\s+it)?|"
     r"undecided\s+whether\s+to\s+ask)\b",
+    re.I,
+)
+_STRIDHAN_INLAWS_REFUSED_RE = re.compile(
+    r"\b(?:in-?laws?|mother-in-law|father-in-law)\b[^.!?;]{0,60}\b(?:refus\w*|won['’]t\s+(?:give|return)|will\s+not\s+(?:give|return)|not\s+(?:giving|returning))\b|"
+    r"\b(?:refus\w*|won['’]t\s+(?:give|return))\b[^.!?;]{0,40}\b(?:in-?laws?|mother-in-law|father-in-law)\b",
+    re.I,
+)
+_INTERIM_ASKED_RE = re.compile(r"\binterim\s+(?:maintenance|support|costs|expenses|funds|relief)\b", re.I)
+_STAY_IN_HOUSE_RE = re.compile(
+    r"\b(?:stay|remain|continue\s+(?:living|staying)|keep\s+(?:living|staying))\b[^.!?;]{0,40}\b(?:house|home|household)\b",
+    re.I,
+)
+_EVICTION_PRESSURE_RE = re.compile(
+    r"\b(?:threaten\w*\s+to\s+(?:throw|evict|kick)\s+me\s+out|told\s+me\s+to\s+leave|ordered\s+me\s+to\s+get\s+out|i\s+must\s+vacate|"
+    r"throw(?:ing|s)?\s+me\s+out|threw\s+me\s+out|kicked\s+(?:me\s+)?out|evict(?:ed|ion)?|eviction\s+notice)\b",
+    re.I,
+)
+_URGENT_SAFETY_RE = re.compile(
+    r"\b(?:threaten\w*\s+to\s+(?:kill|harm)|kill\s+me|fear\s+for\s+my\s+life|afraid\s+(?:he|she|they)\s+(?:will\s+)?kill|"
+    r"immediate\s+danger|in\s+danger\s+(?:right\s+)?now|might\s+kill|will\s+kill\s+me|"
+    r"abduct|snatch\s+(?:the\s+)?(?:child|son|daughter)|take\s+(?:the\s+)?(?:child|son|daughter)\s+away)\b",
     re.I,
 )
 _STRIDHAN_SOLD_RE = re.compile(r"\b(?:sold|pawned|pledged|mortgaged|melted|disposed\s+of|gifted\s+away)\b", re.I)
@@ -479,9 +515,10 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
     else:
         role = "unknown"
 
-    # Minor child check
-    has_child_mention = bool(_CHILD_MENTION_RE.search(active_text))
+    # Minor child check (adult offspring computed first: an adult son/daughter
+    # is NOT a child mention and must not set child_fact).
     is_adult_child = bool(_ADULT_CHILD_AGE_RE.search(active_text)) and not bool(_MINOR_CHILD_AGE_RE.search(active_text))
+    has_child_mention = bool(_CHILD_MENTION_RE.search(active_text)) and not is_adult_child
     child_neg = bool(_CHILD_UNRELATED_NEG_RE.search(active_text))
     minor_child_st = "denied" if (is_adult_child or child_neg) else ("supported" if bool(_MINOR_CHILD_AGE_RE.search(active_text)) or (has_child_mention and not is_adult_child) else "unknown")
 
@@ -553,7 +590,9 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
     child_safety_risk = bool(_CHILD_SAFETY_RISK_RE.search(active_text)) and not res_neg
 
     stridhan_item = bool(_STRIDHAN_ITEM_RE.search(active_text))
-    stridhan_safe = bool(_STRIDHAN_SAFE_OR_UNDISP_RE.search(active_text))
+    stridhan_safe_possession = bool(_STRIDHAN_SAFE_POSSESSION_RE.search(active_text))
+    stridhan_abandoned = bool(_STRIDHAN_ABANDONED_RE.search(active_text))
+    stridhan_safe = bool(stridhan_safe_possession or stridhan_abandoned)
     stridhan_sold = bool(_STRIDHAN_SOLD_RE.search(active_text)) and stridhan_item
     kn_aunt_held = is_kannada_orig and stridhan_item and bool(re.search(r"\bmy\s+aunt\b", active_text, re.I))
     stridhan_claim = stridhan_item and (bool(_STRIDHAN_HELD_RE.search(active_text)) or stridhan_sold or kn_aunt_held) and not stridhan_safe
@@ -574,7 +613,28 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
     if bool(re.search(r"\bnever\s+asked\s+my\s+husband\s+for\s+money\b", active_text, re.I)):
         first_demand_never = True
 
-    no_dispute_empty = bool(stridhan_item and stridhan_safe and not money_fact and not violence and not residence_claim and not custody_claim and not divorce_asked)
+    # Dead-key wiring (Stage 2 reads these; Stage 0/1 never emitted them).
+    # interim_asked: any express interim maintenance/support ask (graph gates
+    # its use on pending_hma / being_filed, so no context guard here).
+    interim_asked = bool(_INTERIM_ASKED_RE.search(active_text))
+    # money_fact_child_or_parallel: the money is for the child only. The
+    # "parallel" half has no grounded Stage 0/1 source (no fact distinguishes
+    # a parallel proceeding) and stays False; see lane status note.
+    money_fact_child_or_parallel = bool(child_only)
+    stay_in_house_under_eviction_pressure = bool(
+        _STAY_IN_HOUSE_RE.search(active_text) and _EVICTION_PRESSURE_RE.search(active_text)
+    )
+    stridhan_held_by_inlaws_refused = bool(stridhan_item and _STRIDHAN_INLAWS_REFUSED_RE.search(active_text))
+    # Imminent-danger language, plus the existing child-safety signal (the
+    # graph already treats child_safety_risk as a safety trigger).
+    urgent_safety_risk = bool(_URGENT_SAFETY_RE.search(active_text)) or child_safety_risk
+    other_live = (
+        money_fact or custody_claim or residence_claim or violence
+        or stridhan_claim or divorce_asked or birth_cert or dv_injury_comp
+    )
+    hypothetical_or_joint_prop_fact_only = bool(all_hyp_or_3p or (joint_prop_claim and not other_live))
+
+    no_dispute_empty = bool(stridhan_item and stridhan_safe and not money_fact and not violence and not residence_claim and not custody_claim and not divorce_asked and not joint_prop_claim and not restitution_asked and not birth_cert)
 
     open_markers: set[str] = set()
     if re.search(r"\b(?:cash\s+income|hides?\s+(?:his\s+)?income|no\s+pay\s*slips|cannot?\s+prove\s+(?:his\s+)?salary|cant\s+prove\s+salary|"
@@ -629,6 +689,14 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
         "forum_question_asked": _fact("forum_question_asked", "supported" if forum_asked else "denied", forum_asked, _FORUM_Q_RE),
         "procedure_how_to_asked": _fact("procedure_how_to_asked", "supported" if proc_asked else "denied", proc_asked, _PROC_HOW_RE),
         "first_demand_never_made": _fact("first_demand_never_made", "supported" if first_demand_never else "denied", first_demand_never),
+        "interim_asked": _fact("interim_asked", "supported" if interim_asked else "denied", interim_asked, _INTERIM_ASKED_RE),
+        "money_fact_child_or_parallel": _fact("money_fact_child_or_parallel", "supported" if money_fact_child_or_parallel else "denied", money_fact_child_or_parallel),
+        "stay_in_house_under_eviction_pressure": _fact("stay_in_house_under_eviction_pressure", "supported" if stay_in_house_under_eviction_pressure else "denied", stay_in_house_under_eviction_pressure),
+        "stridhan_held_by_inlaws_refused": _fact("stridhan_held_by_inlaws_refused", "supported" if stridhan_held_by_inlaws_refused else "denied", stridhan_held_by_inlaws_refused),
+        "stridhan_safe_in_own_possession": _fact("stridhan_safe_in_own_possession", "supported" if stridhan_safe_possession else "denied", stridhan_safe_possession),
+        "stridhan_abandoned_or_undisputed": _fact("stridhan_abandoned_or_undisputed", "supported" if stridhan_abandoned else "denied", stridhan_abandoned),
+        "urgent_safety_risk": _fact("urgent_safety_risk", "supported" if urgent_safety_risk else "denied", urgent_safety_risk, _URGENT_SAFETY_RE),
+        "hypothetical_or_joint_prop_fact_only": _fact("hypothetical_or_joint_prop_fact_only", "supported" if hypothetical_or_joint_prop_fact_only else "denied", hypothetical_or_joint_prop_fact_only),
         "no_dispute_empty": _fact("no_dispute_empty", "supported" if no_dispute_empty else "denied", no_dispute_empty),
     }
 

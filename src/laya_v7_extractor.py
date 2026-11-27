@@ -74,12 +74,21 @@ def detect_script_locale(raw_text: str, explicit_locale: str | None = None) -> d
 
 
 def laya_available(min_free_gb: float = 2.0) -> bool:
+    """True when PIXMELT/laya is cached locally and runnable.
+
+    CPU is allowed when cached (previously this returned False whenever CUDA
+    was absent, silently degrading mode="auto" to regex-only "evidence" on
+    CPU even with the model cached). On CUDA the VRAM floor still applies;
+    on CPU there is no VRAM check — callers route device="cpu". CPU neural
+    runs are slow (G14 still needs the student model, Lane 08); this only
+    stops the silent degradation, it does not claim CPU is fast.
+    """
     try:
         from huggingface_hub import snapshot_download
         import torch
         snapshot_download(LAYA_MODEL_ID, revision=LAYA_REVISION, local_files_only=True)
         if not torch.cuda.is_available():
-            return False
+            return True
         free_bytes, _ = torch.cuda.mem_get_info()
         return free_bytes >= int(min_free_gb * (1024 ** 3))
     except Exception:
@@ -379,7 +388,14 @@ def _merge_laya_and_grounded(
     has_strid_anchor = bool(
         re.search(r"\b(?:stridhan|streedhan|gold|jewellery|jewelry|ornaments?|bangles?|necklace|earrings?|chain|ring|mangalsutra|wedding\s+gifts?|things\s+back)\b", raw_txt, re.I)
     )
-    strid_p = probs.get("full_strid_p", 0.0) if has_strid_anchor else 0.0
+    # Clause-max pooling (cmax) across strid/res/div/jp/bc, matching the
+    # existing cust_p / maint / vio precedent: score = max(full, cmax) so a
+    # single informative clause can lift recall on multi-issue questions.
+    # Conflict resolution stays grounded: the English anchor gates below, the
+    # negated_issues check and the proved_true guard inside _boost, and the
+    # unchanged calibrated thresholds. Thresholds were NOT recalibrated for
+    # cmax here (no ROC data on this VM) — RTX re-calibration is a follow-up.
+    strid_p = max(probs.get("full_strid_p", 0.0), probs.get("strid_p", 0.0)) if has_strid_anchor else 0.0
 
     has_res_anchor = bool(
         re.search(r"\b(?:house|home|flat|household|residence|evict|vacate|lock|enter|place\s+to\s+stay|accommodation)\b", raw_txt, re.I)
@@ -388,11 +404,11 @@ def _merge_laya_and_grounded(
         re.search(r"\blocks?\s+me\s+in\s+(?:the\s+|a\s+)?(?:house|home|room)\b", raw_txt, re.I)
         and not re.search(r"\b(?:out|entry|vacate|evict|separate\s+place|afraid\s+to\s+stay)\b", raw_txt, re.I)
     )
-    res_full = probs.get("full_res_a", 0.0) if (has_res_anchor and not confinement_only) else 0.0
+    res_full = max(probs.get("full_res_a", 0.0), probs.get("res_a", 0.0)) if (has_res_anchor and not confinement_only) else 0.0
     cust_p = probs.get("cust_p", 0.0)
-    div_full = probs.get("full_div_p", 0.0)
-    jp_full = probs.get("full_jp_p", 0.0)
-    bc_full = probs.get("full_bc_p", 0.0)
+    div_full = max(probs.get("full_div_p", 0.0), probs.get("div_p", 0.0))
+    jp_full = max(probs.get("full_jp_p", 0.0), probs.get("jp_p", 0.0))
+    bc_full = max(probs.get("full_bc_p", 0.0), probs.get("bc_p", 0.0))
 
     def _boost(fkey: str, ikey: str, score: float, thr: float) -> None:
         if ikey in negated or score < thr or proved_true(facts, fkey):
@@ -406,7 +422,10 @@ def _merge_laya_and_grounded(
         if proved_true(facts, "stridhan_claim"):
             facts["stridhan_held_or_disposed"] = FactEvidence(key="stridhan_held_or_disposed", status="supported", value=True, source="model", confidence=strid_p)
 
-    # Custody boost only when minor child exists (never elderly-parent role!), not adult, not house co-location, not maint-only
+    # Custody boost only when minor child exists (never elderly-parent role!), not adult, not house co-location, not maint-only.
+    # L417 fix: the old "not residence_claim" conjunct blocked the neural
+    # custody boost on every multi-issue custody+residence question; the
+    # res_coloc guard above already separates house co-location from custody.
     minor_denied = facts.get("minor_child") and getattr(facts["minor_child"], "status", "") == "denied"
     has_child = proved_true(facts, "child_fact")
     res_coloc = bool(re.search(r"\b(?:stay|live|remain)\s+in\s+(?:the|our|my)\s+(?:house|home)\s+(?:with|alongside)\b", raw_txt, re.I))
@@ -414,7 +433,7 @@ def _merge_laya_and_grounded(
         re.search(r"\b(?:maintenance|money|support|school\s+fees)\s+(?:only\s+)?for\s+(?:the\s+|my\s+|our\s+)?(?:\d+-?year-?old\s+)?(?:child|children|kids|son|daughter)\b", raw_txt, re.I)
         and not re.search(r"\b(?:custody|stay|live|keep|visitation|see\s+my|who\s+(?:will|gets))\b", raw_txt, re.I)
     )
-    if role_val != "parent" and has_child and not minor_denied and not res_coloc and not maint_only_for_child and not proved_true(facts, "child_maintenance_only") and not proved_true(facts, "residence_claim"):
+    if role_val != "parent" and has_child and not minor_denied and not res_coloc and not maint_only_for_child and not proved_true(facts, "child_maintenance_only"):
         _boost("custody_claim", "custody", cust_p, 0.55 if not is_kannada else 0.35)
 
     if "maintenance" not in negated and maint_p > 0.0:
@@ -441,6 +460,71 @@ def _merge_laya_and_grounded(
         _boost("divorce_asked", "divorce", div_full, 0.84)
 
 
+def _apply_structured_slots(
+    facts: dict[str, Any],
+    issues: dict[str, IssueEvidence],
+    negated: set[str],
+    slots: dict[str, str],
+) -> None:
+    """Apply Qwen constrained-slot outputs (structured mode) as model evidence.
+
+    Only ADDS: a "Y" slot may set a fact/issue the grounded extractor left
+    unproved, mirroring _merge_laya_and_grounded's _boost — never overrides
+    a grounded supported fact or an explicit negation (negated_issues).
+    Wired (16/18): sx, rl (S/P only), mn, ls, eo, dv, mc, ph, bf, dc, cs,
+    rs, vo, st, jp, bc. NOT read: sc (scope stays with the grounded OOS
+    rules — a slot must never flip in_scope), rl=C (no clean claimant_role
+    mapping: a parent claiming child support only is neither role "spouse"
+    nor role "parent"), of (the caller resets open_fact_markers from
+    grounded after this step, which would wipe it — needs Lane 05 work).
+    """
+    def _boost_slot(fkey: str, slot_val: str | None, *, neg_key: str | None = None, issue_key: str | None = None) -> bool:
+        if slot_val != "Y":
+            return False
+        if neg_key is not None and neg_key in negated:
+            return False
+        if proved_true(facts, fkey):
+            return False
+        facts[fkey] = FactEvidence(key=fkey, status="supported", value=True, source="model", confidence=0.7)
+        if issue_key is not None and issues.get(issue_key) and issues[issue_key].intent == "uncertain":
+            issues[issue_key] = IssueEvidence(issue=issue_key, intent="requested", source="model", confidence=0.7)
+        return True
+
+    # Claimant sex / role: fill ONLY when grounded left them unknown.
+    sex_ev = facts.get("claimant_sex")
+    if slots.get("sx") in ("F", "M") and isinstance(sex_ev, FactEvidence) and sex_ev.status == "unknown":
+        facts["claimant_sex"] = FactEvidence(
+            key="claimant_sex", status="supported",
+            value="female" if slots["sx"] == "F" else "male",
+            source="model", confidence=0.7,
+        )
+    role_ev = facts.get("claimant_role")
+    if isinstance(role_ev, FactEvidence) and role_ev.status == "unknown":
+        if slots.get("rl") == "S":
+            facts["claimant_role"] = FactEvidence(key="claimant_role", status="supported", value="spouse", source="model", confidence=0.7)
+        elif slots.get("rl") == "P":
+            facts["claimant_role"] = FactEvidence(key="claimant_role", status="supported", value="parent", source="model", confidence=0.7)
+
+    _boost_slot("money_fact", slots.get("mn"), neg_key="maintenance", issue_key="maintenance")
+    _boost_slot("lump_sum_settlement", slots.get("ls"), neg_key="maintenance", issue_key="maintenance")
+    _boost_slot("existing_order_enforcement", slots.get("eo"), neg_key="maintenance", issue_key="maintenance")
+    if not proved_true(facts, "judicial_separation_only"):
+        _boost_slot("divorce_asked", slots.get("dv"), neg_key="divorce", issue_key="divorce")
+    # mutual_consent: fact only — do NOT upgrade the divorce issue on mc alone.
+    _boost_slot("mutual_consent", slots.get("mc"))
+    _boost_slot("proceeding_pending_hma", slots.get("ph"))
+    _boost_slot("being_filed", slots.get("bf"))
+    _boost_slot("decree", slots.get("dc"))
+    # cs keeps its original semantics: fact only, still negation-checked.
+    _boost_slot("custody_claim", slots.get("cs"), neg_key="custody")
+    _boost_slot("residence_claim", slots.get("rs"), neg_key="residence", issue_key="residence")
+    _boost_slot("violence", slots.get("vo"), neg_key="violence", issue_key="violence")
+    if _boost_slot("stridhan_claim", slots.get("st"), neg_key="stridhan", issue_key="stridhan"):
+        facts["stridhan_held_or_disposed"] = FactEvidence(key="stridhan_held_or_disposed", status="supported", value=True, source="model", confidence=0.7)
+    _boost_slot("joint_property_claim", slots.get("jp"), neg_key="joint_property", issue_key="joint_property")
+    _boost_slot("birth_cert_asked", slots.get("bc"), neg_key="birth_certificate", issue_key="birth_certificate")
+
+
 def extract_v7_batch(
     raw_texts: list[str],
     *,
@@ -453,8 +537,17 @@ def extract_v7_batch(
     """Batched Stage 0/1 extraction preserving strict per-question isolation."""
     use_mode = mode
     if use_mode == "auto":
-        if device != "cpu" and laya_available(1.8):
+        if laya_available(1.8):
             use_mode = "laya"
+            if device != "cpu":
+                # laya_available() is True on CPU when cached; never request
+                # CUDA on a CPU-only machine (model load would crash).
+                try:
+                    import torch
+                    if not torch.cuda.is_available():
+                        device = "cpu"
+                except Exception:
+                    device = "cpu"
         elif device != "cpu" and available_on_cuda(3.8):
             use_mode = "structured"
         else:
@@ -498,11 +591,9 @@ def extract_v7_batch(
         if use_mode == "laya":
             _merge_laya_and_grounded(facts, issues, negated, laya_probs_list[idx], is_kannada=is_kn)
         elif use_mode == "structured":
-            # Retain structured Qwen fallback mode cleanly
-            from .laya_v7_schema import FactEvidence as _FE
-            slots = model_slots_list[idx]
-            if slots.get("cs") == "Y" and "custody" not in negated and not proved_true(facts, "custody_claim"):
-                facts["custody_claim"] = _FE(key="custody_claim", status="supported", value=True, source="model", confidence=0.7)
+            # Structured Qwen fallback mode: read 16/18 constrained slots
+            # (see _apply_structured_slots for the wired vs unread split).
+            _apply_structured_slots(facts, issues, negated, model_slots_list[idx])
         facts.pop("_raw_analysis", None)
         facts["negated_issues"] = negated
         facts["open_fact_markers"] = set(grounded.get("open_fact_markers", set()))
