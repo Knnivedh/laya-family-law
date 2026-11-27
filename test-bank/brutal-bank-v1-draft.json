@@ -1,0 +1,4052 @@
+{
+  "header": {
+    "bank": "Laya brutal-test bank v1 DRAFT (not frozen)",
+    "status": "DRAFT — no freeze note, no hash. Second rater to blind-check 25% next.",
+    "d1_branch_applied": "A — HMA s.27 removed from GT where no HMA proceeding is pending or being filed. HMA 27 applies only where a proceeding is pending or the user states they are filing/will file an HMA petition (incl. conditional 'if I file'). Divorce merely asked about, contemplated, or undecided is NOT a pending proceeding; a BNSS/PWDVA/GWA case is not an HMA proceeding. Jointly-owned property without a pending/being-filed HMA proceeding carries NO hma-27.",
+    "category_counts": {
+      "C1": 30,
+      "C10": 12,
+      "C11": 12,
+      "C12": 8,
+      "C13": 16,
+      "C14": 12,
+      "C2": 20,
+      "C3": 20,
+      "C4": 20,
+      "C5": 20,
+      "C6": 16,
+      "C7": 16,
+      "C8": 12,
+      "C9": 16
+    },
+    "total": 230,
+    "lead_forum_rule": "Lead forum = forum of the dominant relief, applied uniformly. Priority: (1) any HMA/GWA relief (divorce, HMA maintenance, HMA custody, HMA property) -> Family Court; (2) else any PWDVA/BNSS/BNS relief -> Magistrate; (3) birth/death registration -> Registrar; (4) no family-law relief -> none. Where both Family Court and Magistrate reliefs are claimed, Family Court leads. A pending HMA proceeding alone does not make the forum Family Court unless HMA/GWA relief is sought in the question.",
+    "section_vocabulary": [
+      "bnss-144",
+      "pwdva-17",
+      "pwdva-18",
+      "pwdva-19",
+      "pwdva-20",
+      "pwdva-21",
+      "pwdva-22",
+      "bns-316",
+      "gwa-1890",
+      "hma-9",
+      "hma-13",
+      "hma-13b",
+      "hma-24",
+      "hma-25",
+      "hma-26",
+      "hma-27",
+      "births-deaths-act-1969"
+    ],
+    "escalation_kinds": [
+      "quantum",
+      "court",
+      "demand",
+      "custody",
+      "residence",
+      "recovery",
+      "procedure",
+      "fact",
+      "safety"
+    ],
+    "out_of_scope_convention": "C10 empty-GT questions (and empty-GT items in C3/C6/C8/C9) carry gt_escalates=true with kind ['procedure'] as a handoff to a human lawyer / correct forum, following the BX-13 design example. The two C9 empty items with no dispute at all carry gt_escalates=false (no handoff needed).",
+    "rater_declaration": "Written by the independent BANK lane from brutal-test-200-plan.md §1-§7 and the rater's own legal knowledge only. The rater did NOT read any v6-deep-dive-report, v6-lane files, v5-precision-report, v5-lane files, empty5-fix-report, live result JSONs, notebooks, sealed-set question text, or current-16 question text. The 20 design examples in plan §5 were read only as format examples and were NOT reused; an 8-gram overlap check was run against them and the sealed/current sets (see eight_gram_check). No question was written to fit any threshold, prompt, or phrasebook (none were seen).",
+    "kannada_flag": "Rater is NOT a fluent Kannada writer. All 16 C13 items carry kannada_check_needed=true and MUST be checked by a Kannada-fluent rater before freeze; do not freeze C13 as-is.",
+    "length_mix": {
+      "one_liners": 47,
+      "long_narratives": 10
+    },
+    "eight_gram_check": {
+      "method": "8-word shingles, lowercased, punctuation stripped, whitespace tokenised (incl. Kannada script). Script /tmp/check_bank.py; reference texts were read only by the script, which prints counts/flags only, never matched text.",
+      "reference_sources": {
+        "plan_BX_design_examples": "20 questions, 343 distinct 8-grams",
+        "sealed_fresh_20": "20 questions, 483 distinct 8-grams",
+        "sealed_kannada_8": "8 questions, 254 distinct 8-grams",
+        "current_16_gt_v2_hma27_A": "16 questions, 292 distinct 8-grams (ground-truth-v2-hma27-A.json; live-laya-inference-test.json held no 'question' fields, 0 used)",
+        "v5_lane_paraphrase_tests": "lanes custody 8 / maintenance 11 / procedure 25 / residence 13 / stridhan 10 questions",
+        "gate_definition_question_lines": "1 line with '?', 4 distinct 8-grams"
+      },
+      "runs": [
+        "Run 1: 11 flagged of 230 (B-033, B-053, B-071, B-075, B-121, B-203, B-206, B-209, B-210, B-214, B-215) — all rewritten, GT unchanged.",
+        "Run 2 (added current-16 + v5-lane sources): 4 flagged (B-006, B-029, B-172, B-203 again) — all rewritten, GT unchanged.",
+        "Run 3 (final): 0 flagged of 230; 230 clean."
+      ],
+      "result": "PASS — 0 questions share any 8-gram with any reference source."
+    }
+  },
+  "questions": [
+    {
+      "id": "B-001",
+      "category": "C1",
+      "question": "My marriage has broken down completely and I want to end it legally. My husband earns well but gives me nothing for the house, and I want our 7-year-old twins to remain with me.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "bnss-144",
+        "pwdva-20",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "custody"
+      ],
+      "gt_notes": "Divorce + maintenance + custody of twins; Family Court leads (HMA/GWA relief present).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-002",
+      "category": "C1",
+      "question": "I have decided to seek a divorce because my husband hits me when he drinks and last month he changed the locks so I could not enter our flat.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "residence"
+      ],
+      "gt_notes": "Divorce + violence + barred from shared home; Family Court leads, residence/protection also fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-003",
+      "category": "C1",
+      "question": "I want to end my marriage, get back the gold my parents gave me which my husband's family is holding, and get monthly support for myself.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Divorce + Stridhan recovery + maintenance; Family Court leads.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-004",
+      "category": "C1",
+      "question": "I am planning to file for divorce and I need the court to let my 10-year-old son continue living with me and order his father to pay his school expenses.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "gwa-1890",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "quantum"
+      ],
+      "gt_notes": "Divorce being filed + custody + school expenses; Family Court leads.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-005",
+      "category": "C1",
+      "question": "My divorce petition has been pending in Family Court for eight months and my husband has stopped paying the interim support the court fixed. We also purchased a flat jointly in 2021 — can the same court divide it?",
+      "language": "en",
+      "gt_sections": [
+        "hma-27",
+        "hma-24",
+        "bnss-144"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "HMA proceeding pending: HMA 27 available for joint flat, HMA 24 interim support; Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-006",
+      "category": "C1",
+      "question": "A divorce petition between us is already being heard by the Family Court. These days my husband turns up at my mother's place and issues threats, and I need my girl to remain in my care until the proceedings finish.",
+      "language": "en",
+      "gt_sections": [
+        "hma-26",
+        "pwdva-18"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "safety"
+      ],
+      "gt_notes": "Custody inside pending HMA proceeding is HMA 26, plus protection order; Family Court. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-007",
+      "category": "C1",
+      "question": "My divorce matter is pending and my mother-in-law still has my wedding jewellery. I also need money for my two children while the case continues.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20",
+        "hma-24"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Pending HMA proceeding: Stridhan recovery + maintenance, incl. HMA 24 interim; Family Court leads.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-008",
+      "category": "C1",
+      "question": "My divorce case is pending. My husband is trying to throw me out of the flat we live in, which is in his father's name. Can the divorce court protect my stay there?",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Residence/protection relief is Magistrate forum; flat in father-in-law's name so no HMA 27.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-009",
+      "category": "C1",
+      "question": "My gold ornaments are lying in my in-laws' almirah and I have never asked them for it so far. I also need monthly money for my son. What should I do first?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "demand",
+        "quantum"
+      ],
+      "gt_notes": "Stridhan recovery where no demand yet made (demand kind) + maintenance; Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-010",
+      "category": "C1",
+      "question": "After my husband left me, I have been staying with my parents. I have never demanded anything from him, but now I want to return to our shared home and get support for my daughter.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-19",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence",
+        "quantum",
+        "demand"
+      ],
+      "gt_notes": "Return to shared household + maintenance, no demand made yet; Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-011",
+      "category": "C1",
+      "question": "I have not asked my husband or his family for anything since I left. Now I want my 4-year-old daughter to live with me and my jewellery returned.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890",
+        "bns-316"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "recovery",
+        "demand"
+      ],
+      "gt_notes": "Custody + Stridhan recovery, no demand made yet; custody makes Family Court lead.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-012",
+      "category": "C1",
+      "question": "I have never filed anything or asked for anything. I want a divorce, and my husband and I jointly own a plot we bought in 2020. Can I get a share of it?",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "fact",
+        "procedure"
+      ],
+      "gt_notes": "Divorce being filed, so HMA 27 available for jointly owned plot; valuation is the open fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-013",
+      "category": "C1",
+      "question": "My husband hit me with a belt last Sunday and then told me to leave the house with our daughter. She has exams next month and her fees are unpaid for two terms.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "residence",
+        "quantum"
+      ],
+      "gt_notes": "Violence + thrown out + unpaid school fees; Magistrate (no divorce/custody sought).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-014",
+      "category": "C1",
+      "question": "Whenever I ask for my son's tuition money, my husband abuses me and locks the bedroom door from outside. I am afraid to stay there but I have nowhere else to go.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "residence",
+        "quantum"
+      ],
+      "gt_notes": "Violence + confinement + school money; residence and maintenance both fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-015",
+      "category": "C1",
+      "question": "My husband pushed me down the stairs in front of our children and says the house is his, so I must vacate it. My daughter's school has sent three fee reminders.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "residence",
+        "quantum"
+      ],
+      "gt_notes": "Violence + eviction threat + school-fee arrears; Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-016",
+      "category": "C1",
+      "question": "My husband threatens to kill me if I complain, he has stopped paying the rent, and my son may be removed from school for unpaid fees.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "residence",
+        "quantum"
+      ],
+      "gt_notes": "Death threat + rent stopped (residence at risk) + school fees; Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-017",
+      "category": "C1",
+      "question": "My husband and I both agree the marriage is over and want to separate by mutual consent. We need to settle who our 9-year-old daughter lives with and what monthly amount he will pay.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13b",
+        "gwa-1890",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "quantum"
+      ],
+      "gt_notes": "Mutual-consent divorce + custody + maintenance; Family Court leads.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-018",
+      "category": "C1",
+      "question": "My husband left our home six months ago and refuses to return. I want him to come back, and until then I need money to run the house.",
+      "language": "en",
+      "gt_sections": [
+        "hma-9",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Restitution of conjugal rights (HMA 9) + maintenance; Family Court (HMA relief).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-019",
+      "category": "C1",
+      "question": "My husband broke my arm and I spent 60,000 rupees on hospital treatment. I want him to pay my medical costs and monthly support.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "pwdva-22",
+        "pwdva-20",
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "quantum"
+      ],
+      "gt_notes": "Injury compensation (PWDVA 22) + protection + monetary relief; Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-020",
+      "category": "C1",
+      "question": "I married in 2018 in Hubballi. For two years my husband treated me well, but after our son was born he began drinking, lost his job, and started demanding money from my parents. Last Diwali he sold my mangalsutra, and last week he told me to leave with the child. I have no income and my parents are old. I want my jewellery back, money for my son, and a safe place to stay.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum",
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Long narrative: Stridhan sold + maintenance + residence + violence; Magistrate (no divorce/custody sought).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-021",
+      "category": "C1",
+      "question": "My 6-year-old son lives with me, his father pays nothing, and the school is asking for his birth certificate which the hospital never issued.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20",
+        "births-deaths-act-1969"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "procedure"
+      ],
+      "gt_notes": "Maintenance + unregistered birth; Magistrate leads (PWDVA/BNSS relief dominant over Registrar).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-022",
+      "category": "C1",
+      "question": "I want a divorce and a one-time settlement instead of monthly payments. We also own a car and a shop jointly.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "hma-25",
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Divorce being filed + permanent alimony lump sum + joint property (HMA 27 available); Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-023",
+      "category": "C1",
+      "question": "My husband has not given me a rupee in a year, he has barred me from entering our house, and he sold my gold earrings to pay his debts.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-19",
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "residence",
+        "recovery"
+      ],
+      "gt_notes": "Maintenance + barred from home + Stridhan sold; Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-024",
+      "category": "C1",
+      "question": "My husband beats our 12-year-old son when he is drunk. I want my son to stay only with me and I need money for his food and schooling.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "gwa-1890",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "custody",
+        "quantum"
+      ],
+      "gt_notes": "Violence against child + custody + maintenance; custody makes Family Court lead.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-025",
+      "category": "C1",
+      "question": "My husband's family harasses me for dowry every day and my husband supports them. I want a divorce, money to live on, and to keep staying in the house till the case ends.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-18"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Divorce + maintenance + residence during case + harassment; Family Court leads.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-026",
+      "category": "C1",
+      "question": "We both want a mutual divorce. We have a jointly owned flat and a 5-year-old daughter. How do we divide the flat and decide where she lives?",
+      "language": "en",
+      "gt_sections": [
+        "hma-13b",
+        "hma-27",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "fact"
+      ],
+      "gt_notes": "Mutual divorce being filed + joint flat (HMA 27) + custody; Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-027",
+      "category": "C1",
+      "question": "My daughter needs an operation costing 2 lakh rupees and my husband refuses to pay anything, not even her monthly school fees. I earn only 8,000 rupees a month as a cook.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Medical + school costs as monetary relief; quantum/fact (income and costs stated).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-028",
+      "category": "C1",
+      "question": "My husband drinks, hits me, and gives no money — I want divorce and my children with me.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "pwdva-18",
+        "bnss-144",
+        "pwdva-20",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "quantum",
+        "custody"
+      ],
+      "gt_notes": "One-liner multi-issue: divorce + violence + maintenance + custody; Family Court leads.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-029",
+      "category": "C1",
+      "question": "My wedding took place in 2021 in Dharwad, after which I shifted into my husband's joint family home. His mother keeps hold of every rupee, and my husband passes his whole pay packet to her. The gold I received at the wedding sits in her cupboard. A month ago my husband struck me when I asked for cash for my daughter's textbooks, and his sister ordered me to get out. I hold a degree but have no employment. I seek the return of my gold, a monthly allowance, and permission to remain in the house alongside my daughter.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum",
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Long narrative: Stridhan held + maintenance + residence + slap; Magistrate (no divorce/custody sought). [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-030",
+      "category": "C1",
+      "question": "My husband has stopped talking to me and gives me no money, and his brother says I must vacate the house. I am thinking about divorce but I have not decided.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Maintenance + residence + intimidation; divorce merely contemplated, so no HMA 13.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-031",
+      "category": "C2",
+      "question": "How much maintenance can I claim if my husband earns 1 lakh rupees a month?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Quantum asked, income stated; maintenance-only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-032",
+      "category": "C2",
+      "question": "My husband works in Dubai and sends no money. I do not know his salary. Can I still get maintenance?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Maintenance where husband's income is unknown; fact kind.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-033",
+      "category": "C2",
+      "question": "I have never had a job outside the house, so there are no pay slips in my name. My husband claims the court will first demand proof of my earnings.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "No salary slips (never demand slips the user lacks); income proof is the open fact. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-034",
+      "category": "C2",
+      "question": "My husband gives 5,000 rupees a month but our rent alone is 12,000. Can I ask for more?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Inadequate maintenance, enhancement sought; quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-035",
+      "category": "C2",
+      "question": "I need interim money while my maintenance case is pending before the Magistrate. My husband has not paid anything for four months.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Interim money with no HMA proceeding, so no HMA 24; BNSS/PWDVA interim.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-036",
+      "category": "C2",
+      "question": "My husband is a daily-wage worker earning about 600 rupees a day. Can I get maintenance from him?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Low-income husband; maintenance still claimable, quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-037",
+      "category": "C2",
+      "question": "I am 62 years old and my son earns well but refuses to support me. Can I claim maintenance from him?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Parent claiming maintenance from adult son; BNSS 144 only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-038",
+      "category": "C2",
+      "question": "My husband left me with two small children and no money. I want maintenance only for my children.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Maintenance for children only; quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-039",
+      "category": "C2",
+      "question": "I was married in 2016 and I have never earned an income. My husband runs a transport business and says it is running at a loss, so he gives me 3,000 rupees a month, which does not cover food, let alone my son's school bus fee. I do not have his bank statements or salary slips. How can I prove his income and get a fair monthly amount?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Long: business-income husband, inadequate amount, proof of income is the open fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-040",
+      "category": "C2",
+      "question": "My husband stopped my monthly money after I visited my parents. What can I do?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "One-liner: maintenance stopped; quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-041",
+      "category": "C2",
+      "question": "Can a wife who earns 20,000 rupees a month still claim maintenance from a husband earning 2 lakh?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Earning wife claiming from higher-earning husband; quantum/fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-042",
+      "category": "C2",
+      "question": "My husband says maintenance is only for wives who do not work. Is that true?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Entitlement question; maintenance sections still the GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-043",
+      "category": "C2",
+      "question": "My husband has two wives and gives money only to the first. Can I, the second wife, claim maintenance?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Second-wife maintenance claim; quantum/fact (status is the open fact).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-044",
+      "category": "C2",
+      "question": "My husband retired last year and his pension is 35,000 rupees. Can maintenance come from his pension?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Maintenance from pension income; quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-045",
+      "category": "C2",
+      "question": "I want maintenance for myself and my disabled adult son who cannot work.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Maintenance for wife plus disabled adult child; quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-046",
+      "category": "C2",
+      "question": "My husband pays maintenance irregularly — some months 10,000 rupees, some months nothing. Can the court fix a fixed monthly date?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "procedure"
+      ],
+      "gt_notes": "Irregular payment; fixed payment date sought (quantum/procedure).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-047",
+      "category": "C2",
+      "question": "My father is 70 and bedridden, and my brother refuses to share his care costs. Can my father claim support from him?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Parent claiming from adult child; BNSS 144 only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-048",
+      "category": "C2",
+      "question": "No money from husband for six months — how do I start a maintenance case?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "procedure"
+      ],
+      "gt_notes": "One-liner: how to start a maintenance case; quantum/procedure.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-049",
+      "category": "C2",
+      "question": "My husband earns in cash and hides his income. I need maintenance but I cannot show his salary.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Cash income hidden; proof of income is the open fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-050",
+      "category": "C2",
+      "question": "Can I get maintenance even though we were married only eight months ago?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Short marriage; entitlement/quantum question.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-051",
+      "category": "C3",
+      "question": "My in-laws are holding my wedding gold and I have asked them three times to return it. They refuse. Can I also claim monthly maintenance from my husband?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Stridhan held, demand refused + maintenance; both fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-052",
+      "category": "C3",
+      "question": "My husband sold my gold necklace to repay his business loan. I want the value of the necklace back, not maintenance.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "fact"
+      ],
+      "gt_notes": "Stridhan sold; value recovery only — maintenance must NOT fire (expressly not wanted).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-053",
+      "category": "C3",
+      "question": "The gold from my wedding is locked in a locker my husband controls. So far I have stayed silent about it. Must I ask for it back before I can take any legal step?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "demand"
+      ],
+      "gt_notes": "Stridhan held, no demand yet made; demand is the next step. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-054",
+      "category": "C3",
+      "question": "The house we live in is jointly owned by my husband and me, but there is no case filed yet. Can I claim a share of it along with maintenance?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Joint house, no proceeding: no HMA 27 under D1-A; maintenance only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-055",
+      "category": "C3",
+      "question": "My husband and I jointly own a shop, and he has kept all its income. I want my share of the shop income and my gold back.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Joint shop income (maintenance) + gold recovery; no HMA 27, no proceeding.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-056",
+      "category": "C3",
+      "question": "My mother-in-law sold my gold bangles without telling me. She says they were family property, not mine.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "fact"
+      ],
+      "gt_notes": "Stridhan sold by mother-in-law; ownership is the disputed fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-057",
+      "category": "C3",
+      "question": "My gold is with my in-laws and I get no maintenance — what are my rights?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "One-liner: Stridhan held + no maintenance; both fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-058",
+      "category": "C3",
+      "question": "I want only my stridhan back. I do not want any monthly money from my husband.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery"
+      ],
+      "gt_notes": "Recovery only; maintenance must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-059",
+      "category": "C3",
+      "question": "My husband says the gold my parents gave is his because it was given during the marriage. I want maintenance but I am confused about the gold.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Ownership of wedding gold disputed + maintenance; both fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-060",
+      "category": "C3",
+      "question": "My sister-in-law is wearing my gold chain, which my husband gave her. I asked her to return it and she refused.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "demand"
+      ],
+      "gt_notes": "Stridhan with third person, demand refused; recovery.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-061",
+      "category": "C3",
+      "question": "We own a flat together but I only want maintenance for my children right now. Can the flat be divided later?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Maintenance now; flat division deferred, no proceeding so no HMA 27.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-062",
+      "category": "C3",
+      "question": "At my wedding in 2019 my parents gave me 80 grams of gold, a car, and cash. The car is in my husband's name, the gold is in my mother-in-law's cupboard, and the cash was spent on the wedding itself. My husband now gives me no money for the house. I want my gold returned and monthly support, and I want to know whether the car counts as my property.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Long: wedding gifts (gold/car/cash) + maintenance; car ownership is the open fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-063",
+      "category": "C3",
+      "question": "My husband mortgaged my gold ornaments to a bank for his loan without my consent. The bank is now asking for repayment.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "fact"
+      ],
+      "gt_notes": "Stridhan mortgaged without consent; recovery/valuation fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-064",
+      "category": "C3",
+      "question": "I earn my own salary and I do not need maintenance. I only want the gold my parents gave me, which my husband keeps in his office drawer.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "demand"
+      ],
+      "gt_notes": "Earning wife, recovery only; demand not yet made.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-065",
+      "category": "C3",
+      "question": "My husband gave me a gold set at our wedding and now he has taken it away and refuses to return it. Is it my stridhan and can I get it back?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "fact"
+      ],
+      "gt_notes": "Wedding gift from husband is stridhan; taken and withheld — recovery.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-066",
+      "category": "C3",
+      "question": "My in-laws say my gold was spent on household expenses, so there is nothing to return. I want maintenance instead.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Gold said to be spent; user abandons recovery and seeks maintenance only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-067",
+      "category": "C3",
+      "question": "My husband and I bought a plot in both our names. I want my half of the plot and monthly maintenance, but I do not want a divorce.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Joint plot, no divorce and no proceeding: no HMA 27 under D1-A; maintenance only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-068",
+      "category": "C3",
+      "question": "Husband sold my jewellery — can I get its price back?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "fact"
+      ],
+      "gt_notes": "One-liner: Stridhan sold, price recovery; valuation fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-069",
+      "category": "C3",
+      "question": "My mother gave me gold before my marriage and it is still at my parents' house. My husband has never touched it. Can he claim it?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": false,
+      "gt_escalation_kinds": [],
+      "gt_notes": "No issue: gold is solely hers, untouched, no claim by anyone — nothing fires.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-070",
+      "category": "C3",
+      "question": "I want maintenance for my daughter and the return of my gold, but my husband says I must choose one — either gold or money. Is that true?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Both reliefs available together; husband's either/or claim is wrong.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-071",
+      "category": "C4",
+      "question": "Once we live apart, our 8-year-old girl should remain under my roof. I own a flat of my own, so housing is not an issue.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody-only; user has her own flat, residence must NOT fire. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-072",
+      "category": "C4",
+      "question": "My husband slapped me yesterday. I want an order stopping him from hitting me again.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety"
+      ],
+      "gt_notes": "Violence-only protection order; no residence claim.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-073",
+      "category": "C4",
+      "question": "How much maintenance can I get for my two children? My husband earns 60,000 rupees a month.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Money-only; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-074",
+      "category": "C4",
+      "question": "I want a divorce from my husband because he has been cheating on me. I have my own house to live in.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Divorce-only; own house, residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-075",
+      "category": "C4",
+      "question": "Our little boy, aged six, was moved by my husband into his parents' home, and I am barred from meeting him. I am asking for him to come back and live with me.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody-only; residence must NOT fire. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-076",
+      "category": "C4",
+      "question": "My husband abuses me verbally every day and threatens to harm me. I need protection but I live at my parents' house and do not want to return to his.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety"
+      ],
+      "gt_notes": "Violence-only; she lives elsewhere and does not seek residence.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-077",
+      "category": "C4",
+      "question": "My husband has not paid maintenance for a year. Can I get the unpaid amount from him?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Money-only arrears; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-078",
+      "category": "C4",
+      "question": "We both agree to end our marriage by mutual consent. There are no children and no property dispute.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13b"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Mutual divorce only; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-079",
+      "category": "C4",
+      "question": "My wife has taken our children to her parents' house and will not let me meet them. I am the father and I want to see my children.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Father seeking custody/visitation; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-080",
+      "category": "C4",
+      "question": "My husband's family insults me daily but I stay at my own parents' home. I want monthly money for my daughter.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Money-only; stays at parents' home, no residence claim.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-081",
+      "category": "C4",
+      "question": "I want custody of my twin daughters — nothing else.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "One-liner custody-only; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-082",
+      "category": "C4",
+      "question": "I want a protection order against my husband because he hit me in front of our neighbours.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety"
+      ],
+      "gt_notes": "Protection-only; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-083",
+      "category": "C4",
+      "question": "My husband earns 90,000 rupees and gives me 2,000. I want the court to fix a proper monthly amount.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Money-only quantum; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-084",
+      "category": "C4",
+      "question": "My husband and I want a divorce but we disagree about who keeps our 4-year-old son.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Divorce + custody; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-085",
+      "category": "C4",
+      "question": "I am a mother and my husband has kept our baby with his mother. I want my baby back.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody-only (baby); residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-086",
+      "category": "C4",
+      "question": "My husband stopped paying my daughter's school fees. I only want the fees, nothing else.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "School fees only; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-087",
+      "category": "C4",
+      "question": "My husband threatens me on the phone every night. I live separately and I am safe at home, but I want the threats to stop.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety"
+      ],
+      "gt_notes": "Threats-only protection; lives separately, residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-088",
+      "category": "C4",
+      "question": "I want to divorce my wife because she left me two years ago and never returned. I live alone in my own flat.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Husband divorce-only; own flat, residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-089",
+      "category": "C4",
+      "question": "I live with my parents in Bengaluru and my husband lives in Chennai. He has never hit me and I have a place to stay, so I do not need any house from him. What I need is money for our 3-year-old daughter, who lives with me, and a decision that she stays with me. My husband says he will take her to Chennai.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "custody"
+      ],
+      "gt_notes": "Long: maintenance + custody, residence expressly not wanted; Family Court (custody leads).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-090",
+      "category": "C4",
+      "question": "My husband sold my gold chain. I want the money for it and nothing else.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "fact"
+      ],
+      "gt_notes": "Gold recovery only; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-091",
+      "category": "C5",
+      "question": "I want my daughter to stay in the house with me after our separation.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "'Stay in the house with me' is custody, not residence; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-092",
+      "category": "C5",
+      "question": "Who gets the kids after divorce?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "One-liner: custody question (plural 'kids'); residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-093",
+      "category": "C5",
+      "question": "Can I keep my children with me? My husband says the children belong to his family.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody paraphrase with plural 'children'; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-094",
+      "category": "C5",
+      "question": "I want my son to live with me. He is 11 and says he wants to stay with me too.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody with child's stated wish; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-095",
+      "category": "C5",
+      "question": "My husband wants our kids to live with his mother. I want them to live with me.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody dispute over where kids live; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-096",
+      "category": "C5",
+      "question": "After our divorce, will my 5-year-old daughter live with me or with her father?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Post-divorce living arrangement = custody; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-097",
+      "category": "C5",
+      "question": "I want to keep my baby with me. My mother-in-law says a baby must stay with the father's family.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody of baby; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-098",
+      "category": "C5",
+      "question": "My 14-year-old son wants to live with his father. Can I stop him?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "fact"
+      ],
+      "gt_notes": "Teenager's wishes are the open fact; custody only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-099",
+      "category": "C5",
+      "question": "Can the court let my children stay with me while my divorce case is going on?",
+      "language": "en",
+      "gt_sections": [
+        "hma-26"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody during pending HMA proceeding is HMA 26; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-100",
+      "category": "C5",
+      "question": "My husband has taken my daughter to his village and enrolled her in a school there. I want her back with me in the city.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody: child moved away and enrolled elsewhere; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-101",
+      "category": "C5",
+      "question": "I want my kids to stay with me, not with their father.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "One-liner custody (plural 'kids'); residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-102",
+      "category": "C5",
+      "question": "My wife left with our two children and I do not know where they are. I want them to live with me.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Father claiming custody; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-103",
+      "category": "C5",
+      "question": "My daughter is 16 and wants to live with me after I separate from my husband. Does her wish matter?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "fact"
+      ],
+      "gt_notes": "Older child's wishes are the open fact; custody only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-104",
+      "category": "C5",
+      "question": "I want my son to live with me during the week and visit his father on weekends. Is that possible?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Shared living arrangement = custody; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-105",
+      "category": "C5",
+      "question": "My husband says that because I do not earn, the children will be given to him. Is that true?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "fact"
+      ],
+      "gt_notes": "Income vs custody; mother's earnings are not decisive — fact kind.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-106",
+      "category": "C5",
+      "question": "My husband and I have been living separately for a year. Our 7-year-old son lives with me and goes to school near my house, and our 4-year-old daughter lives with my husband's mother in another town. I want both children to live with me under one roof. My husband says the court will split them. What will the court look at?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "fact"
+      ],
+      "gt_notes": "Long: siblings split across homes; custody factors are the open fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-107",
+      "category": "C5",
+      "question": "Can I get custody of my children if I live in a rented house?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "fact"
+      ],
+      "gt_notes": "Rented house is context, not a residence claim; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-108",
+      "category": "C5",
+      "question": "My husband is an alcoholic. I want my children to live with me and not be left alone with him.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "safety"
+      ],
+      "gt_notes": "Custody on safety grounds; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-109",
+      "category": "C5",
+      "question": "I want my child to live with me after we separate, and I want his father to pay for his schooling.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "quantum"
+      ],
+      "gt_notes": "Custody + school money; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-110",
+      "category": "C5",
+      "question": "My wife has kept our son away from me for eight months. I want the court to give me my son.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Father claiming custody after denial of access; residence must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-111",
+      "category": "C6",
+      "question": "Our divorce petition has been running in the Family Court for a year. During the marriage we purchased a flat in both names. Can that court split the flat between us?",
+      "language": "en",
+      "gt_sections": [
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "fact"
+      ],
+      "gt_notes": "HMA proceeding pending: HMA 27 available for joint flat; valuation is the open fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-112",
+      "category": "C6",
+      "question": "I want a divorce and my husband and I own a house together. Can I get half the house?",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "fact"
+      ],
+      "gt_notes": "Divorce being filed, so HMA 27 available for the joint house; valuation fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-113",
+      "category": "C6",
+      "question": "My husband and I jointly own a flat, but neither of us has filed any case. Can I claim a share of the flat now?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "No HMA proceeding pending or being filed: no HMA 27 under D1-A; partition needs a civil suit (handoff).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-114",
+      "category": "C6",
+      "question": "I am going to file for divorce next month. We own a plot together. Can the divorce court divide the plot?",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "fact"
+      ],
+      "gt_notes": "'Going to file' = being filed: HMA 27 available for the joint plot.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-115",
+      "category": "C6",
+      "question": "My divorce case is pending and I want my 6-year-old son to stay with me until the case ends.",
+      "language": "en",
+      "gt_sections": [
+        "hma-26"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Custody inside pending HMA proceeding is HMA 26, not standalone GWA.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-116",
+      "category": "C6",
+      "question": "I am thinking of asking for a divorce and I want my daughter to live with me. Can I get custody?",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Divorce only contemplated, no proceeding: custody is standalone GWA, not HMA 26.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-117",
+      "category": "C6",
+      "question": "My divorce case has been going on for a year and I have no income. Can I get monthly money while the case is pending?",
+      "language": "en",
+      "gt_sections": [
+        "hma-24"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Interim maintenance inside pending HMA proceeding is HMA 24.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-118",
+      "category": "C6",
+      "question": "I need money every month while I decide whether to file for divorce. There is no case yet.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "No proceeding: no HMA 24; interim money is BNSS/PWDVA, Magistrate forum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-119",
+      "category": "C6",
+      "question": "Our divorce matter is pending in Family Court. I want a one-time settlement and a share of our jointly owned shop.",
+      "language": "en",
+      "gt_sections": [
+        "hma-25",
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Pending proceeding: permanent alimony (HMA 25) + joint shop (HMA 27).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-120",
+      "category": "C6",
+      "question": "I want to separate from my husband. We bought a car together. If I file for divorce, can the court give me the car?",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "fact"
+      ],
+      "gt_notes": "Conditional filing = being filed: HMA 27 available for the joint car.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-121",
+      "category": "C6",
+      "question": "No case exists between us so far, and the only house we have stands solely in my husband's name. Do I have any claim to a portion of it as property?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Solely owned house, no proceeding: no HMA 27 under D1-A; ownership share needs advice (handoff). [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-122",
+      "category": "C6",
+      "question": "My divorce case has been pending in Family Court for over a year. Last month I learned that my husband sold our jointly owned flat without telling me or asking my consent. The buyer has now asked me to vacate the portion I still occupy. I want to know whether the divorce court can undo the sale or give me my share from the sale money.",
+      "language": "en",
+      "gt_sections": [
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "fact"
+      ],
+      "gt_notes": "Long: joint flat sold during pending HMA proceeding; HMA 27 is the remedy.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-123",
+      "category": "C6",
+      "question": "I will be filing for divorce next week. We have a jointly owned house and a 9-year-old son. I want the house divided and my son to stay with me.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "hma-27",
+        "hma-26"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "fact"
+      ],
+      "gt_notes": "Filing next week = being filed: HMA 27 for house, HMA 26 for custody inside it.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-124",
+      "category": "C6",
+      "question": "I want a divorce from my husband and I need monthly money. We own no property together.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Divorce + maintenance; no joint property, so no HMA 27.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-125",
+      "category": "C6",
+      "question": "My divorce case is pending. My gold is with my in-laws and we also own a house together. Can the divorce court deal with both?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "fact"
+      ],
+      "gt_notes": "Pending proceeding: gold recovery (BNS 316) + joint house (HMA 27).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-126",
+      "category": "C6",
+      "question": "Divorce case pending — can the court divide our joint flat?",
+      "language": "en",
+      "gt_sections": [
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "fact"
+      ],
+      "gt_notes": "One-liner: pending proceeding, joint flat; HMA 27.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-127",
+      "category": "C7",
+      "question": "Divorce is not what I want. I only need monthly support for my children's education.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Negation: no divorce — HMA 13 must NOT fire; maintenance only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-128",
+      "category": "C7",
+      "question": "I don't want any monthly money. I only want my gold ornaments returned from my in-laws.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery"
+      ],
+      "gt_notes": "Negation: no maintenance — BNSS 144/PWDVA 20 must NOT fire; recovery only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-129",
+      "category": "C7",
+      "question": "No violence happened in my marriage. I just want a divorce because we cannot live together.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Negation: no violence — no PWDVA sections; divorce only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-130",
+      "category": "C7",
+      "question": "There has been no physical harm in my marriage. I am not looking for a criminal complaint; I only want my wedding jewellery returned.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery"
+      ],
+      "gt_notes": "Negation: no violence, no criminal case; Stridhan recovery only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-131",
+      "category": "C7",
+      "question": "I do not want custody of the children. I only want maintenance for them while they live with their father.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Negation: custody expressly not wanted — GWA must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-132",
+      "category": "C7",
+      "question": "I don't want to stay in that house. I only want monthly money and my gold.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Negation: residence expressly not wanted — PWDVA 17/19 must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-133",
+      "category": "C7",
+      "question": "I am not asking for a divorce and I do not want to live with my husband. I want a separate place to stay and money to run it.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-19",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence",
+        "quantum"
+      ],
+      "gt_notes": "Negation: no divorce, but residence + maintenance sought; no HMA 13.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-134",
+      "category": "C7",
+      "question": "My husband did not sell my gold. It is still in the locker. I only want maintenance.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Negation: gold not sold — BNS 316 must NOT fire; maintenance only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-135",
+      "category": "C7",
+      "question": "I never asked my husband for money before, and I do not want to fight. But now I need support for my son.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "demand"
+      ],
+      "gt_notes": "No demand made before; maintenance now sought (demand kind).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-136",
+      "category": "C7",
+      "question": "I do not want my husband to be punished. I only want an order that he stays away from me.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety"
+      ],
+      "gt_notes": "Negation: no punishment/criminal case; protection order only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-137",
+      "category": "C7",
+      "question": "No, I don't want a mutual divorce. I want the court to decide my maintenance and my daughter's custody.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "custody"
+      ],
+      "gt_notes": "Negation: no mutual divorce — HMA 13B must NOT fire; maintenance + custody.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-138",
+      "category": "C7",
+      "question": "I don't want my in-laws' property. I only want my own gold and monthly support for myself.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Negation: no claim on in-laws' property — HMA 27 must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-139",
+      "category": "C7",
+      "question": "Not divorce — just my gold and my children's school money.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "One-liner negation: no divorce; recovery + maintenance.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-140",
+      "category": "C7",
+      "question": "My husband has never stopped me from meeting my parents. My problem is only that he gives me no money.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Negation: no isolation/protection issue; maintenance only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-141",
+      "category": "C7",
+      "question": "I do not want to leave my house. I want my husband to leave instead.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-17"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Negation: she stays, husband vacates — residence + protection.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-142",
+      "category": "C7",
+      "question": "Let me be clear about what I do not want. I do not want a divorce, I do not want my husband punished, and I do not want to move out of my home. What I do want is simple: my gold jewellery returned, a fixed monthly amount for my two children, and an order that my husband stops threatening me when he drinks.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum",
+        "safety"
+      ],
+      "gt_notes": "Long negation: no divorce, no punishment, no move — recovery + maintenance + protection; no HMA 13, no residence order needed.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-143",
+      "category": "C8",
+      "question": "As the father, I am asking for my son to live with me after my wife moved him to her parents' home.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Father as claimant seeking custody; system must not assume the claimant is the wife.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-144",
+      "category": "C8",
+      "question": "My wife earns 1.5 lakh rupees a month and I earn nothing since my accident. Our divorce case is pending and I need monthly support from her.",
+      "language": "en",
+      "gt_sections": [
+        "hma-24"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Husband claiming interim maintenance from earning wife inside pending HMA proceeding.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-145",
+      "category": "C8",
+      "question": "I am the husband and I want a divorce because my wife left me three years ago.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Husband as divorce claimant; desertion ground.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-146",
+      "category": "C8",
+      "question": "My wife earns more than me and refuses to pay anything for our daughter. Can I claim maintenance for my daughter from her?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Father as guardian claiming child's maintenance from earning mother; BNSS 144 only (no PWDVA for a male claimant).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-147",
+      "category": "C8",
+      "question": "My wife has kept our daughter away from me for a year. I want to meet my daughter regularly.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Father seeking access/visitation; custody label.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-148",
+      "category": "C8",
+      "question": "I am a husband and my wife hits me when she drinks. I want protection from her.",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Husband as violence victim: no PWDVA order is available to a male claimant; handoff to criminal complaint/lawyer, nothing in the label set fires.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-149",
+      "category": "C8",
+      "question": "My wife left our home with our son and married someone else. I want custody of my son and a divorce.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Father claiming divorce + custody.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-150",
+      "category": "C8",
+      "question": "I earn 15,000 rupees a month and my wife earns 80,000. Our divorce is pending. Can I get interim maintenance from her?",
+      "language": "en",
+      "gt_sections": [
+        "hma-24"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Lower-earning husband seeking HMA 24 interim maintenance from wife.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-151",
+      "category": "C8",
+      "question": "My wife's family is holding my son and will not let me see him. I am his father — what can I do?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Father denied access by maternal family; custody.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-152",
+      "category": "C8",
+      "question": "Father here — my wife took the kids and I want them back.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "One-liner role reversal: father claiming custody of kids.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-153",
+      "category": "C8",
+      "question": "My wife has a good job and I look after our children at home. I want monthly money for the children from her.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Stay-at-home father claiming children's maintenance from earning mother.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-154",
+      "category": "C8",
+      "question": "My wife and I both want a mutual divorce, but she earns more and I want a fair settlement from her.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13b",
+        "hma-25"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Mutual divorce with husband seeking alimony from higher-earning wife (HMA 25 open to either spouse).",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-155",
+      "category": "C9",
+      "question": "My husband sends money home regularly, but he has forbidden me from visiting my mother. Is there anything I can do about that?",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "fact"
+      ],
+      "gt_notes": "Money adequate and not claimed — maintenance must NOT fire; isolation/protection issue.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-156",
+      "category": "C9",
+      "question": "There is a gold chain my husband bought me lying in our joint locker. I have not asked for it and there is no dispute about it. I only want to know whether I can wear it to a wedding.",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": false,
+      "gt_escalation_kinds": [],
+      "gt_notes": "Gold as an object, no claim and no dispute — Stridhan must NOT fire; empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-157",
+      "category": "C9",
+      "question": "My daughter needs books and uniforms for the new school year and my husband will not pay for them.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Money need phrased without money words (books/uniforms) — maintenance MUST fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-158",
+      "category": "C9",
+      "question": "My son's school bus fee and lunch costs are pending, and his father says he has no money for them.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "School costs phrased indirectly — maintenance MUST fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-159",
+      "category": "C9",
+      "question": "My husband counts every rupee I spend but he gives me enough for the house. My real problem is that he locks me in the house.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety"
+      ],
+      "gt_notes": "Money mentioned but adequate; the claim is confinement — maintenance must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-160",
+      "category": "C9",
+      "question": "My mother-in-law wears my gold bangles to functions and refuses to give them back when I ask.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "demand"
+      ],
+      "gt_notes": "Gold as an object worn by another + demand refused — recovery MUST fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-161",
+      "category": "C9",
+      "question": "My husband's salary comes into a joint account, but he has changed the PIN so I cannot withdraw anything for groceries.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Money need via blocked access/groceries — maintenance MUST fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-162",
+      "category": "C9",
+      "question": "My husband bought a gold biscuit as an investment and keeps it in a locker. We have no dispute about it. I want a divorce for other reasons.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Gold as an investment object, no Stridhan claim — BNS 316 must NOT fire; divorce only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-163",
+      "category": "C9",
+      "question": "My children have no notebooks, no shoes, and no tiffin money. Their father earns well.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Children's needs without money words — maintenance MUST fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-164",
+      "category": "C9",
+      "question": "My husband gave my gold necklace to his sister as a gift. I want it back.",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery"
+      ],
+      "gt_notes": "Gold given away by husband — recovery MUST fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-165",
+      "category": "C9",
+      "question": "We talk about money all the time at home, but my question is only about my daughter's custody.",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Money mentioned, not claimed — maintenance must NOT fire; custody only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-166",
+      "category": "C9",
+      "question": "My husband keeps saying there is no money, yet he bought a new car last month. I need support for myself and my son.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Claimed need + hidden income; maintenance fires, income is the open fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-167",
+      "category": "C9",
+      "question": "My gold jewellery is safe in my own cupboard at my parents' house. My question is about maintenance only.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Gold mentioned, safe and unclaimed — BNS 316 must NOT fire; maintenance only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-168",
+      "category": "C9",
+      "question": "Husband pays for everything but hits me — I need protection.",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety"
+      ],
+      "gt_notes": "One-liner: money adequate, protection claimed — maintenance must NOT fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-169",
+      "category": "C9",
+      "question": "My daughter's college admission fee is due next week and her father refuses to contribute a rupee.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Admission fee as indirect money claim — maintenance MUST fire.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-170",
+      "category": "C9",
+      "question": "My husband's mother has my gold, but I have not decided whether to ask for it. Right now I only want to know about divorce.",
+      "language": "en",
+      "gt_sections": [
+        "hma-13"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Gold undecided, no claim yet — BNS 316 must NOT fire; divorce only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-171",
+      "category": "C10",
+      "question": "The owner of the flat I rent has changed the locks and wants three months' rent before letting me in. What are my options?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: landlord-tenant lockout; handoff to civil tenancy advice, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-172",
+      "category": "C10",
+      "question": "There is a quarrel between my sibling and me concerning agricultural land left by our late father. He insists the entire holding belongs to him alone.",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: sibling property dispute; handoff, empty GT. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-173",
+      "category": "C10",
+      "question": "Someone stole my scooter from outside my office. How do I get it back?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: unrelated theft; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-174",
+      "category": "C10",
+      "question": "My employer has not paid my salary for two months. Can I file a case?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: employment/salary dispute; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-175",
+      "category": "C10",
+      "question": "My neighbour's tree fell on my compound wall and he refuses to pay for the damage.",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: neighbour property damage; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-176",
+      "category": "C10",
+      "question": "I bought a phone online and the seller sent a broken one. How do I get a refund?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: consumer refund; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-177",
+      "category": "C10",
+      "question": "My tenant has not paid rent for six months — what can I do?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "One-liner out of scope: landlord vs tenant rent; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-178",
+      "category": "C10",
+      "question": "My brother-in-law borrowed 2 lakh rupees from me and now refuses to return it.",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: private loan between relatives (not Stridhan); handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-179",
+      "category": "C10",
+      "question": "The builder has delayed my flat by two years and will not refund my booking amount.",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: builder delay/refund; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-180",
+      "category": "C10",
+      "question": "I was fined for jumping a traffic signal, but I did not jump it. How do I challenge the fine?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: traffic fine challenge; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-181",
+      "category": "C10",
+      "question": "My colleague has been spreading rumours about me at work. Can I take action against her?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: workplace rumours/defamation; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-182",
+      "category": "C10",
+      "question": "A bank is calling me daily for a loan I never took. What should I do?",
+      "language": "en",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Out of scope: bank harassment over an unknown loan; handoff, empty GT.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-183",
+      "category": "C11",
+      "question": "My baby was born at home and no birth certificate was made. Where do I apply to register the birth?",
+      "language": "en",
+      "gt_sections": [
+        "births-deaths-act-1969"
+      ],
+      "gt_court": "Registrar",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Forum trap: birth registration goes to the Registrar, not Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-184",
+      "category": "C11",
+      "question": "My daughter was born two years ago and her birth was never registered. I need the certificate for school admission.",
+      "language": "en",
+      "gt_sections": [
+        "births-deaths-act-1969"
+      ],
+      "gt_court": "Registrar",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Late birth registration; Registrar forum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-185",
+      "category": "C11",
+      "question": "My husband has barred me from the house we lived in, which stands in his name. Can I get an order to return and live there?",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Residence right beats ownership in husband's name; Magistrate forum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-186",
+      "category": "C11",
+      "question": "I want a divorce from my husband. Which court do I approach?",
+      "language": "en",
+      "gt_sections": [
+        "hma-13"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "court"
+      ],
+      "gt_notes": "Forum question: divorce goes to Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-187",
+      "category": "C11",
+      "question": "My husband is not paying the maintenance the court ordered. Where do I go to enforce it?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "procedure"
+      ],
+      "gt_notes": "Enforcement of a maintenance order stays with the Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-188",
+      "category": "C11",
+      "question": "My son's birth certificate has his name spelt wrong. How do I get it corrected?",
+      "language": "en",
+      "gt_sections": [
+        "births-deaths-act-1969"
+      ],
+      "gt_court": "Registrar",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Correction of birth record; Registrar forum, not Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-189",
+      "category": "C11",
+      "question": "My husband threw me out of our shared house. I want a residence order. Which court gives it?",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-19"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence",
+        "court"
+      ],
+      "gt_notes": "Forum question: residence order comes from the Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-190",
+      "category": "C11",
+      "question": "I want custody of my daughter. Should I go to the Magistrate or the Family Court?",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody",
+        "court"
+      ],
+      "gt_notes": "Forum question: custody goes to Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-191",
+      "category": "C11",
+      "question": "My husband and I want a mutual divorce. Which court handles it?",
+      "language": "en",
+      "gt_sections": [
+        "hma-13b"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "court",
+        "procedure"
+      ],
+      "gt_notes": "Forum question: mutual divorce in Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-192",
+      "category": "C11",
+      "question": "My in-laws are keeping my gold. Which court do I approach to get it back?",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "court"
+      ],
+      "gt_notes": "Forum question: Stridhan recovery goes to the Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-193",
+      "category": "C11",
+      "question": "I need a protection order because my husband beats me. Which court do I go to?",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "court"
+      ],
+      "gt_notes": "Forum question: protection order from the Magistrate.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-194",
+      "category": "C11",
+      "question": "My child's birth was registered, but the hospital wrote the wrong date of birth. Where is this corrected?",
+      "language": "en",
+      "gt_sections": [
+        "births-deaths-act-1969"
+      ],
+      "gt_court": "Registrar",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Wrong date of birth on record; Registrar forum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-195",
+      "category": "C12",
+      "question": "The Magistrate fixed my maintenance at 12,000 rupees a month, but my husband sends only 5,000. What can I do about the shortfall?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Ordered amount partly unpaid; enforcement/quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-196",
+      "category": "C12",
+      "question": "My husband was ordered to pay 8,000 rupees interim maintenance and he has paid nothing for five months. The arrears are now 40,000.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Interim order unpaid; arrears quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-197",
+      "category": "C12",
+      "question": "The court gave me 15,000 rupees a month but prices have gone up and it is not enough. Can I ask for an increase?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Enhancement of maintenance; quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-198",
+      "category": "C12",
+      "question": "My husband says the 20,000 rupee maintenance order is too high because his salary fell. He wants it reduced.",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Reduction sought by payer; quantum dispute.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-199",
+      "category": "C12",
+      "question": "I was granted 7,000 rupees a month two years ago. My husband now earns double. Can the amount be revised?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Revision on changed income; quantum.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-200",
+      "category": "C12",
+      "question": "My husband pays the ordered amount but always 20 days late. Can the court make him pay on time?",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "procedure"
+      ],
+      "gt_notes": "Late payment of ordered amount; quantum/procedure.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-201",
+      "category": "C12",
+      "question": "The court ordered a lump sum of 5 lakh rupees as permanent alimony but my husband has paid only 1 lakh.",
+      "language": "en",
+      "gt_sections": [
+        "hma-25"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Lump-sum alimony partly unpaid; HMA 25, Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-202",
+      "category": "C12",
+      "question": "My interim maintenance was fixed at 6,000 rupees, but my husband says he will pay 6,000 only till the divorce ends. Is that right?",
+      "language": "en",
+      "gt_sections": [
+        "hma-24"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Duration of interim maintenance disputed; HMA 24, Family Court.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-203",
+      "category": "C13",
+      "question": "ತಿಂಗಳುಗಳು ಕಳೆದರೂ ನನ್ನ ಪತಿ ನನಗೆ ಯಾವುದೇ ಹಣ ನೀಡಿಲ್ಲ. ನನ್ನ ಮಗನ ವಿದ್ಯಾಭ್ಯಾಸದ ವೆಚ್ಚವನ್ನು ಭರಿಸಲು ನನಗೆ ಸಹಾಯ ಬೇಕು. ನಾನು ಯಾವ ಮಾರ್ಗ ಅನುಸರಿಸಬೇಕು?",
+      "language": "kn",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Kannada: maintenance + school fees; needs Kannada-fluent rater check before freeze. [Reworded after 8-gram check flag; GT unchanged.] [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-204",
+      "category": "C13",
+      "question": "ನನ್ನ ಗಂಡ ತಿಂಗಳಿಗೆ ಎಂಭತ್ತು ಸಾವಿರ ಸಂಪಾದಿಸುತ್ತಾರೆ, ಆದರೆ ನನಗೆ ಏನೂ ಕೊಡುವುದಿಲ್ಲ. ನನಗೆ ಎಷ್ಟು ಜೀವನಾಂಶ ಸಿಗಬಹುದು?",
+      "language": "kn",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Kannada: quantum asked, income stated; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-205",
+      "category": "C13",
+      "question": "ನನ್ನ ಗಂಡ ಆರು ತಿಂಗಳಿನಿಂದ ನನಗೆ ಹಣ ಕೊಟ್ಟಿಲ್ಲ. ನಾನು ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ. ಜೀವನಾಂಶಕ್ಕಾಗಿ ನಾನು ಎಲ್ಲಿ ಅರ್ಜಿ ಕೊಡಬೇಕು?",
+      "language": "kn",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "procedure"
+      ],
+      "gt_notes": "Kannada: maintenance stopped, where to apply; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-206",
+      "category": "C13",
+      "question": "ನನ್ನ ಮಗಳ ಓದಿಗೆ ಪುಸ್ತಕ ಮತ್ತು ಇತರ ಖರ್ಚುಗಳಿವೆ. ಅವಳ ತಂದೆ ಅದಕ್ಕೆ ಏನೂ ನೀಡುತ್ತಿಲ್ಲ.",
+      "language": "kn",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Kannada: school costs as maintenance; needs Kannada-fluent rater check before freeze. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-207",
+      "category": "C13",
+      "question": "ನನ್ನ ಮಗಳು ನನ್ನ ಜೊತೆ ಇರಬೇಕು. ಅವಳ ತಂದೆ ಅವಳನ್ನು ತಮ್ಮ ಮನೆಯಲ್ಲಿ ಇಟ್ಟುಕೊಳ್ಳಲು ಬಯಸುತ್ತಾರೆ.",
+      "language": "kn",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Kannada: custody, daughter to live with mother; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-208",
+      "category": "C13",
+      "question": "ವಿಚ್ಛೇದನದ ನಂತರ ನನ್ನ ಮಗ ಯಾರ ಜೊತೆ ಇರುತ್ತಾನೆ? ನಾನು ಅವನನ್ನು ನನ್ನ ಜೊತೆ ಇಟ್ಟುಕೊಳ್ಳಲು ಬಯಸುತ್ತೇನೆ.",
+      "language": "kn",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Kannada: custody after divorce; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-209",
+      "category": "C13",
+      "question": "ನನ್ನ ಮಗನನ್ನು ನನ್ನ ಗಂಡ ಅವರ ತವರು ಊರಿಗೆ ಕರೆದೊಯ್ದಿದ್ದಾರೆ. ಮಗು ನನ್ನ ಬಳಿ ಮರಳಿ ಬರಬೇಕು ಎಂದು ನಾನು ಬಯಸುತ್ತೇನೆ.",
+      "language": "kn",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Kannada: child taken away, mother wants him back; needs Kannada-fluent rater check before freeze. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-210",
+      "category": "C13",
+      "question": "ಮದುವೆಯ ಸಂದರ್ಭದಲ್ಲಿ ನನ್ನ ಹೆತ್ತವರು ನೀಡಿದ ಚಿನ್ನದ ಬಳೆಗಳು ನನ್ನ ಅತ್ತೆಯ ಬಳಿ ಇವೆ. ಅವರು ಅವುಗಳನ್ನು ಹಿಂದಿರುಗಿಸಲು ನಿರಾಕರಿಸುತ್ತಿದ್ದಾರೆ.",
+      "language": "kn",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery"
+      ],
+      "gt_notes": "Kannada: Stridhan held by mother-in-law; needs Kannada-fluent rater check before freeze. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-211",
+      "category": "C13",
+      "question": "ನನ್ನ ಗಂಡ ನನ್ನ ಚಿನ್ನದ ಸರವನ್ನು ಮಾರಿ ಹಣ ಖರ್ಚು ಮಾಡಿದ್ದಾರೆ. ನನಗೆ ಆ ಹಣ ವಾಪಸ್ ಬೇಕು.",
+      "language": "kn",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "fact"
+      ],
+      "gt_notes": "Kannada: Stridhan sold, value recovery; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-212",
+      "category": "C13",
+      "question": "ನನ್ನ ಚಿನ್ನ ನನ್ನ ಅತ್ತೆಯ ಮನೆಯಲ್ಲಿದೆ. ನಾನು ಅದನ್ನು ಕೇಳಿಲ್ಲ. ನಾನು ಅದನ್ನು ಹೇಗೆ ವಾಪಸ್ ಪಡೆಯಬಹುದು?",
+      "language": "kn",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "demand"
+      ],
+      "gt_notes": "Kannada: Stridhan held, no demand yet made; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-213",
+      "category": "C13",
+      "question": "ನನ್ನ ಗಂಡ ನನ್ನನ್ನು ಮನೆಯಿಂದ ಹೊರಗೆ ಹಾಕಿದ್ದಾರೆ. ನಾನು ಅದೇ ಮನೆಯಲ್ಲಿ ಇರಲು ಬಯಸುತ್ತೇನೆ.",
+      "language": "kn",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Kannada: thrown out, wants to return and stay; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-214",
+      "category": "C13",
+      "question": "ನಾನು ವಾಸವಿದ್ದ ಮನೆ ನನ್ನ ಪತಿಯ ಹೆಸರಿನಲ್ಲಿ ನೋಂದಾಯಿತವಾಗಿದೆ. ಈಗ ಅವರು ನನಗೆ ಪ್ರವೇಶ ನಿರಾಕರಿಸುತ್ತಿದ್ದಾರೆ. ಇದಕ್ಕೆ ಪರಿಹಾರ ಏನು?",
+      "language": "kn",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-19"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence"
+      ],
+      "gt_notes": "Kannada: residence in husband-named house; needs Kannada-fluent rater check before freeze. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-215",
+      "category": "C13",
+      "question": "ನನ್ನ ಗಂಡ ನನ್ನ ಮೇಲೆ ಹಲ್ಲೆ ಮಾಡುತ್ತಾರೆ ಮತ್ತು ಮನೆಯ ಖರ್ಚಿಗೆ ಹಣ ನೀಡುವುದಿಲ್ಲ. ನನ್ನ ಮಗಳು ನನ್ನೊಂದಿಗೇ ಇರಬೇಕೆಂದು ನಾನು ಬಯಸುತ್ತೇನೆ. ಇದರಲ್ಲಿ ನಾನು ಯಾವ ಕ್ರಮ ಕೈಗೊಳ್ಳಬೇಕು?",
+      "language": "kn",
+      "gt_sections": [
+        "pwdva-18",
+        "bnss-144",
+        "pwdva-20",
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "quantum",
+        "custody"
+      ],
+      "gt_notes": "Kannada multi-issue: violence + maintenance + custody; needs Kannada-fluent rater check before freeze. [Reworded after 8-gram check flag; GT unchanged.]",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-216",
+      "category": "C13",
+      "question": "ನನಗೆ ವಿಚ್ಛೇದನ ಬೇಕು. ನನ್ನ ಗಂಡ ನನ್ನ ಚಿನ್ನವನ್ನು ವಾಪಸ್ ಕೊಡುತ್ತಿಲ್ಲ ಮತ್ತು ನನಗೆ ಹಣವೂ ಕೊಡುತ್ತಿಲ್ಲ.",
+      "language": "kn",
+      "gt_sections": [
+        "hma-13",
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Kannada multi-issue: divorce + Stridhan + maintenance; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-217",
+      "category": "C13",
+      "question": "ನನ್ನ ಮಗುವಿನ ಜನ್ಮ ಪ್ರಮಾಣಪತ್ರ ಸಿಕ್ಕಿಲ್ಲ. ಅದನ್ನು ಹೇಗೆ ಪಡೆಯುವುದು?",
+      "language": "kn",
+      "gt_sections": [
+        "births-deaths-act-1969"
+      ],
+      "gt_court": "Registrar",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Kannada: birth certificate not received; Registrar; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-218",
+      "category": "C13",
+      "question": "ನನ್ನ ಮನೆ ಮಾಲೀಕರು ಬಾಡಿಗೆ ಕೊಡಲಿಲ್ಲ ಎಂದು ನನ್ನ ಅಂಗಡಿಗೆ ಬೀಗ ಹಾಕಿದ್ದಾರೆ. ನಾನು ಏನು ಮಾಡಬೇಕು?",
+      "language": "kn",
+      "gt_sections": [],
+      "gt_court": "none",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Kannada out-of-scope: landlord lockout; handoff, empty GT; needs Kannada-fluent rater check before freeze.",
+      "kannada_check_needed": true
+    },
+    {
+      "id": "B-219",
+      "category": "C14",
+      "question": "hubby beats me n throws me out, need money 4 kids pls",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "residence",
+        "quantum"
+      ],
+      "gt_notes": "Adversarial one-liner: slang/typos, violence + residence + maintenance.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-220",
+      "category": "C14",
+      "question": "my husbnd sold my gold chain without askin, want it bak",
+      "language": "en",
+      "gt_sections": [
+        "bns-316"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery"
+      ],
+      "gt_notes": "Adversarial one-liner: Stridhan sold, slang/typos.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-221",
+      "category": "C14",
+      "question": "can i get money from husband he earns 90000 n gives zero??",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "gt_notes": "Adversarial one-liner: maintenance quantum, slang.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-222",
+      "category": "C14",
+      "question": "want my kidz to stay wit me after divorce, hubby says no",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Adversarial one-liner: custody, slang; divorce is context only.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-223",
+      "category": "C14",
+      "question": "no divorce pls just gold back n monthly money",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Adversarial one-liner: negation + recovery + maintenance, slang.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-224",
+      "category": "C14",
+      "question": "husband hit me, kicked me out, kids fees pending, help",
+      "language": "en",
+      "gt_sections": [
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "safety",
+        "residence",
+        "quantum"
+      ],
+      "gt_notes": "Adversarial one-liner: violence + residence + school fees, fragments.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-225",
+      "category": "C14",
+      "question": "so like i got married 2021 ok and everything was fine till my mother in law started taunting me for dowry and my husband he just listens to her and last week he took my jewellery box and said its family property now and i have no job and two small kids and i dont know what to do i just want my things back and some money every month please tell me",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum"
+      ],
+      "gt_notes": "Long rambly narrative: Stridhan taken + maintenance, no punctuation.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-226",
+      "category": "C14",
+      "question": "father here wife left wit my son want him back with me",
+      "language": "en",
+      "gt_sections": [
+        "gwa-1890"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "gt_notes": "Adversarial one-liner: father claiming custody, slang.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-227",
+      "category": "C14",
+      "question": "my husband earns cash hides income need maintenance cant prove salary",
+      "language": "en",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "fact"
+      ],
+      "gt_notes": "Adversarial one-liner: hidden cash income, proof is the open fact.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-228",
+      "category": "C14",
+      "question": "divorce case goin on in court n we got joint house can court split it",
+      "language": "en",
+      "gt_sections": [
+        "hma-27"
+      ],
+      "gt_court": "Family Court",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "fact"
+      ],
+      "gt_notes": "Adversarial one-liner: pending proceeding + joint house; HMA 27.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-229",
+      "category": "C14",
+      "question": "ok so my story is i married in 2019 in bangalore, my husband is a nice man sometimes but when he drinks he becomes a different person, he broke my phone last month, he doesnt give money for vegetables, my daughter is 8 and her school is asking fees, my gold is with my mother in law, i live with my parents now, i want to know can i get my gold back and money for my daughter and also can i go back to my house",
+      "language": "en",
+      "gt_sections": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-18"
+      ],
+      "gt_court": "Magistrate",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery",
+        "quantum",
+        "residence",
+        "safety"
+      ],
+      "gt_notes": "Long rambly narrative: Stridhan + maintenance + residence + violence, slang.",
+      "kannada_check_needed": false
+    },
+    {
+      "id": "B-230",
+      "category": "C14",
+      "question": "birth certificate not given hospital baby 2 months how to get",
+      "language": "en",
+      "gt_sections": [
+        "births-deaths-act-1969"
+      ],
+      "gt_court": "Registrar",
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "gt_notes": "Adversarial one-liner: birth certificate, fragments; Registrar.",
+      "kannada_check_needed": false
+    }
+  ]
+}

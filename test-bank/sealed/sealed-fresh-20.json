@@ -1,0 +1,739 @@
+{
+  "set": "sealed-fresh-20",
+  "frozen_date": "2026-11-27",
+  "language": "en",
+  "blind_writer": true,
+  "questions": [
+    {
+      "id": "F1",
+      "question": "My husband stopped sending money for the house last month. I have no income of my own and no case filed anywhere.",
+      "primary_issue": "maintenance",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_labels": [
+        "maintenance"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income unknown; needed to fix the monthly amount."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "no-case-filed"
+      ]
+    },
+    {
+      "id": "F2",
+      "question": "How much monthly money should I get from my husband? I do not know his salary or what he earns.",
+      "primary_issue": "maintenance",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_labels": [
+        "maintenance"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "quantum",
+          "reason": "Amount cannot be stated without the husband's income; escalate quantum, never invent a figure."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "missing-facts",
+        "quantum-only"
+      ]
+    },
+    {
+      "id": "F3",
+      "question": "I have already filed for divorce in the Family Court and the matter is still going on. I need money every month till it finishes.",
+      "primary_issue": "maintenance",
+      "gt_sections": [
+        "hma-13",
+        "hma-24",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_labels": [
+        "maintenance"
+      ],
+      "facts": {
+        "divorce_asked": true,
+        "proceeding_pending": true,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income unknown; needed to fix the interim amount."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "case-pending",
+        "interim-money"
+      ]
+    },
+    {
+      "id": "F4",
+      "question": "My divorce was finalised a year ago. My husband was ordered to pay monthly money, but he has disappeared and nobody knows where he is, and my son's school fees are due.",
+      "primary_issue": "maintenance",
+      "gt_sections": [
+        "hma-25",
+        "bnss-144"
+      ],
+      "gt_labels": [
+        "maintenance"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": true,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "enforcement",
+          "reason": "A decree/order exists but the husband has disappeared; last known address or employer is needed for enforcement."
+        },
+        {
+          "type": "ask_missing_fact",
+          "reason": "School-fee amount unknown."
+        }
+      ],
+      "difficulty_tags": [
+        "missing-facts",
+        "decree-passed",
+        "school-fees",
+        "whereabouts-unknown"
+      ]
+    },
+    {
+      "id": "F5",
+      "question": "My husband took our seven year old daughter to his parents' house and will not let me see her. No case has been filed. I do not know where he has taken her.",
+      "primary_issue": "custody",
+      "gt_sections": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "gt_labels": [
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Daughter's present whereabouts unknown; needed before any custody step."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "no-case-filed",
+        "missing-facts",
+        "whereabouts-unknown"
+      ]
+    },
+    {
+      "id": "F6",
+      "question": "My son is three years old and my husband says he will keep the boy with him because he earns more. Who should the child stay with? I am not sure whether I want a divorce or not, I am confused.",
+      "primary_issue": "custody",
+      "gt_sections": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "gt_labels": [
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask-decision",
+          "reason": "User is undecided about divorce; do not fire HMA 13/13B until she decides — escalate the decision to her and a lawyer."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "child-under-5",
+        "divorce-undecided",
+        "divorce-not-asked"
+      ]
+    },
+    {
+      "id": "F7",
+      "question": "I do not want custody of my children, they live with their father. I only want to meet them on weekends. Can I get visiting rights? No case has been filed anywhere.",
+      "primary_issue": "custody",
+      "gt_sections": [
+        "gwa-1890",
+        "welfare-principle"
+      ],
+      "gt_labels": [
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Children's ages and the father's terms for visits are unknown; needed before any step."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "no-case-filed",
+        "negation",
+        "visitation-only"
+      ]
+    },
+    {
+      "id": "F8",
+      "question": "I asked my husband's family in writing to return my wedding gold and cash, and they refused in writing. How do I get it back?",
+      "primary_issue": "stridhan",
+      "gt_sections": [
+        "hma-27",
+        "bns-316"
+      ],
+      "gt_labels": [
+        "stridhan"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": true,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court",
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "human-lawyer",
+          "reason": "Demand made and refused in writing; recovery and any criminal complaint need a lawyer."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "demand-made"
+      ]
+    },
+    {
+      "id": "F9",
+      "question": "My mother-in-law sold the gold bangles my parents gave me at my wedding without telling me and spent the money.",
+      "primary_issue": "stridhan",
+      "gt_sections": [
+        "bns-316",
+        "hma-27"
+      ],
+      "gt_labels": [
+        "stridhan"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court",
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "human-lawyer",
+          "reason": "Sale/misappropriation of Stridhan may need a criminal complaint under BNS 316; needs a lawyer."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue"
+      ]
+    },
+    {
+      "id": "F10",
+      "question": "My parents gave me gold at my wedding but I have no bills or photos to prove it. My husband gives no money and his family will not let me stay in the house.",
+      "primary_issue": "stridhan",
+      "gt_sections": [
+        "hma-27",
+        "bns-316",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "gt_labels": [
+        "stridhan",
+        "maintenance",
+        "residence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court",
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "proof",
+          "reason": "No bills, photos or list for the gold; gather witnesses, relatives' photos and bank records — escalate proof to a lawyer."
+        },
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income unknown."
+        }
+      ],
+      "difficulty_tags": [
+        "multi-issue",
+        "missing-facts",
+        "no-proof",
+        "demand-not-made"
+      ]
+    },
+    {
+      "id": "F11",
+      "question": "When I came back from my mother's place, the locks on our home had been changed and my husband's family would not open the door.",
+      "primary_issue": "residence",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "gt_labels": [
+        "residence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Ask whether she wants to return to the house or alternate accommodation."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue"
+      ]
+    },
+    {
+      "id": "F12",
+      "question": "I do not want a divorce. My husband threw me out and I am living with a friend. I need rent money for a separate place and monthly money to live on.",
+      "primary_issue": "residence",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20",
+        "bnss-144"
+      ],
+      "gt_labels": [
+        "residence",
+        "maintenance"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Judicial Magistrate First Class",
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Rent amount and monthly expenses unknown; needed to fix the PWDVA 20 relief."
+        }
+      ],
+      "difficulty_tags": [
+        "divorce-not-asked",
+        "negation"
+      ]
+    },
+    {
+      "id": "F13",
+      "question": "My husband hits me when he drinks. I do not want a divorce and I am not asking for money or the house. I only want the beating to stop. I have not filed any case.",
+      "primary_issue": "violence",
+      "gt_sections": [
+        "pwdva-18"
+      ],
+      "gt_labels": [
+        "violence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": true
+      },
+      "expected_court": [
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "safety",
+          "reason": "Ongoing violence — immediate safety steps and a protection order; do not wait."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "no-case-filed",
+        "divorce-not-asked",
+        "negation"
+      ]
+    },
+    {
+      "id": "F14",
+      "question": "We have been living separately for a year. My husband keeps calling and threatening to harm me if I do not come back, he sends no money, and he will not let me return to our house.",
+      "primary_issue": "violence",
+      "gt_sections": [
+        "pwdva-18",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-19"
+      ],
+      "gt_labels": [
+        "violence",
+        "maintenance",
+        "residence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": true
+      },
+      "expected_court": [
+        "Judicial Magistrate First Class",
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "safety",
+          "reason": "Threats after separation — immediate safety steps and a protection order; do not wait."
+        },
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income and residence preference unknown."
+        }
+      ],
+      "difficulty_tags": [
+        "multi-issue"
+      ]
+    },
+    {
+      "id": "F15",
+      "question": "We already have a divorce matter before the Family Court and my husband is contesting it, he refuses to agree. He beats me, gives no money, threw me out of the house, and says he will take our daughter away.",
+      "primary_issue": "divorce",
+      "gt_sections": [
+        "hma-13",
+        "hma-24",
+        "hma-26",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19"
+      ],
+      "gt_labels": [
+        "divorce",
+        "violence",
+        "maintenance",
+        "residence",
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": true,
+        "proceeding_pending": true,
+        "decree": false,
+        "demand_made": false,
+        "violence": true
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "safety",
+          "reason": "Ongoing violence — protection order and safety steps."
+        },
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income and daughter's school-fee amount unknown."
+        }
+      ],
+      "difficulty_tags": [
+        "multi-issue",
+        "five-issue",
+        "case-pending",
+        "divorce-asked"
+      ]
+    },
+    {
+      "id": "F16",
+      "question": "My husband and I both agree to end our marriage peacefully. We have a five year old son, we need to decide who he stays with, and I want my wedding gold back from his family.",
+      "primary_issue": "divorce",
+      "gt_sections": [
+        "hma-13b",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316"
+      ],
+      "gt_labels": [
+        "divorce",
+        "custody",
+        "stridhan"
+      ],
+      "facts": {
+        "divorce_asked": true,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "written-demand-first",
+          "reason": "No demand for the gold has been made yet; make a written demand before any complaint."
+        }
+      ],
+      "difficulty_tags": [
+        "multi-issue",
+        "divorce-asked",
+        "demand-not-made"
+      ]
+    },
+    {
+      "id": "F17",
+      "question": "My daughter was born at home with a midwife and we never registered her birth. The local office says there is no record. How do I get her birth certificate now? I have not gone to any court about this.",
+      "primary_issue": "birth-certificate",
+      "gt_sections": [
+        "births-deaths-act-1969"
+      ],
+      "gt_labels": [
+        "birth-certificate"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Registrar of Births and Deaths"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "registrar-procedure",
+          "reason": "Late/unregistered home birth needs the Registrar's late-registration procedure; exact documents to be confirmed with the Registrar."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "no-case-filed",
+        "missing-facts"
+      ]
+    },
+    {
+      "id": "F18",
+      "question": "We live apart under a judicial separation order from the court. I am not asking for a divorce. My husband gives no money, my four year old son should stay with me, and how do I get his birth certificate?",
+      "primary_issue": "birth-certificate",
+      "gt_sections": [
+        "births-deaths-act-1969",
+        "bnss-144",
+        "pwdva-20",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "gt_labels": [
+        "birth-certificate",
+        "maintenance",
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court",
+        "Registrar of Births and Deaths"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income unknown."
+        },
+        {
+          "type": "registrar-procedure",
+          "reason": "Birth-certificate procedure to be confirmed with the Registrar."
+        }
+      ],
+      "difficulty_tags": [
+        "multi-issue",
+        "judicial-separation",
+        "divorce-not-asked",
+        "child-under-5"
+      ]
+    },
+    {
+      "id": "F19",
+      "question": "My employer fired me from my job without notice and has not paid my last two months' salary. What can I do?",
+      "primary_issue": "out-of-scope",
+      "gt_sections": [],
+      "gt_labels": [
+        "out-of-scope"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [],
+      "escalates": false,
+      "expected_escalations": [],
+      "difficulty_tags": [
+        "out-of-scope",
+        "single-issue"
+      ]
+    },
+    {
+      "id": "F20",
+      "question": "My husband is demanding more dowry from my parents and says he will marry another woman if they do not pay. What should I do?",
+      "primary_issue": "out-of-scope",
+      "gt_sections": [],
+      "gt_labels": [
+        "out-of-scope"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "human-lawyer",
+          "reason": "Dowry demand and threatened second marriage are on the unmapped list; no section may be invented — hand to a human lawyer."
+        }
+      ],
+      "difficulty_tags": [
+        "out-of-scope",
+        "single-issue"
+      ]
+    }
+  ]
+}

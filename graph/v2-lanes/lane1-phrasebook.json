@@ -1,0 +1,1974 @@
+{
+  "design_understanding": "Stage 1 (layman to article/section): the user speaks in layman words — e.g. 'my husband is not giving me money', 'he took my gold', 'they are throwing me out' — and Laya must first convert each such phrase into legal terms (maintenance / neglect to maintain, Stridhan / return of property, right to reside in the shared household, custody, domestic violence, divorce) and then, via a Laya choice question per phrase, map those legal terms to candidate sections from the verified list only. Stage 2 (recheck inside the article section): after Stage 1 picks sections, each picked section is rechecked against ALL of its relations inside that section — its prerequisites, its exclusions/not_for list, its related/co-firing sections, its guardrails and its court — and only sections that survive that recheck stay in the final answer. A section that fails recheck (for example HMA 24 with no HMA proceeding pending, HMA 13/13B when divorce was not asked for, Rajnesh v. Neha cited for Stridhan, Satish Chander Ahuja cited for custody, or residence labelled 'tenancy rights') must be DROPPED with a reason, not kept. Example rechecks built into this phrasebook: maintenance phrases recheck BNSS 144 against HMA 24 vs 25 and PWDVA 20 without double-counting; Stridhan phrases recheck HMA 27 together with BNS 316; custody phrases recheck the welfare-of-the-child principle overriding the HMGA s.6 natural-guardian default; residence phrases recheck PWDVA 17+18+19+20 as a set.",
+  "test_case": "35yo Hindu woman, Bengaluru, Hindu marriage 2012, husband separated 2 years, Rs 40,000/month, paying no maintenance, 8yo daughter, Stridhan Rs 5 lakh gold + Rs 2 lakh cash held by husband's family, eviction threats from house in husband's name.",
+  "issues": {
+    "maintenance": {
+      "phrases": [
+        {
+          "phrase_en": "my husband is not giving me money",
+          "phrase_kn": "ನನ್ನ ಗಂಡ ನನಗೆ ಹಣ ಕೊಡುತ್ತಿಲ್ಲ",
+          "phrase_kn_transliteration": "Nanna ganda nanage hana koduttilla",
+          "gloss": "My husband is not giving me money",
+          "legal_terms": [
+            "maintenance",
+            "neglect to maintain",
+            "refusal to maintain"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is the husband neglecting or refusing to maintain his wife although he has sufficient means?"
+        },
+        {
+          "phrase_en": "I need money for my child",
+          "phrase_kn": "ನನ್ನ ಮಗುವಿಗೆ ಹಣ ಬೇಕು",
+          "phrase_kn_transliteration": "Nanna maguvige hana beku",
+          "gloss": "I need money for my child",
+          "legal_terms": [
+            "child maintenance",
+            "maintenance for minor child"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Does the 8-year-old daughter need maintenance from her father who is not paying?"
+        },
+        {
+          "phrase_en": "he doesn't take care of us",
+          "phrase_kn": "ಅವನು ನಮ್ಮನ್ನು ನೋಡಿಕೊಳ್ಳುತ್ತಿಲ್ಲ",
+          "phrase_kn_transliteration": "Avanu nammannu nodikolluttilla",
+          "gloss": "He does not look after us",
+          "legal_terms": [
+            "neglect to maintain",
+            "failure to maintain wife and child"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is the husband failing to maintain his wife and minor child?"
+        },
+        {
+          "phrase_en": "he has not paid anything for two years",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "neglect to maintain",
+            "arrears of maintenance"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Has the husband paid no maintenance at all during the two-year separation?"
+        },
+        {
+          "phrase_en": "I have nothing",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "unable to maintain herself",
+            "insufficient income"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20",
+            "HMA 24"
+          ],
+          "laya_question": "Is the wife unable to maintain herself on her own income?"
+        },
+        {
+          "phrase_en": "my salary is not enough for me and my daughter",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "unable to maintain herself",
+            "insufficient means"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is Rs 40,000 a month insufficient for the wife and her 8-year-old daughter?"
+        },
+        {
+          "phrase_en": "he earns well but gives us nothing",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "sufficient means",
+            "neglect to maintain"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Does the husband have sufficient means but still refuse to maintain his wife and child?"
+        },
+        {
+          "phrase_en": "maintanance for me and my kid",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "maintenance",
+            "child maintenance"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is maintenance being sought for the wife and for the minor child?"
+        },
+        {
+          "phrase_en": "how much money can I get every month",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "maintenance quantum",
+            "monthly maintenance allowance"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20",
+            "HMA 25"
+          ],
+          "laya_question": "What monthly maintenance is being asked for — and is the husband's income known, or must quantum be escalated?"
+        },
+        {
+          "phrase_en": "I need money for my daughter's school fees",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "child maintenance",
+            "monetary relief — school fees"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Are school fees for the 8-year-old daughter part of the maintenance/monetary relief claimed?"
+        },
+        {
+          "phrase_en": "he left us and stopped sending money",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "desertion",
+            "neglect to maintain"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Did the husband leave and stop all maintenance payments?"
+        },
+        {
+          "phrase_en": "can I get maintenence without divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "maintenance during subsistence of marriage"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is maintenance sought while the marriage still subsists, with no divorce asked for?"
+        },
+        {
+          "phrase_en": "I need support while my case is going on",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "maintenance pendente lite",
+            "interim maintenance"
+          ],
+          "section_candidates": [
+            "HMA 24",
+            "BNSS 144"
+          ],
+          "laya_question": "Is there an HMA proceeding pending, so interim maintenance during proceedings applies?"
+        },
+        {
+          "phrase_en": "will I get money for life after divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "permanent alimony",
+            "permanent maintenance"
+          ],
+          "section_candidates": [
+            "HMA 25"
+          ],
+          "laya_question": "Is a decree being passed, so permanent alimony after decree is the relief in play?"
+        },
+        {
+          "phrase_en": "he cut off all money after we separated",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "economic abuse",
+            "neglect to maintain"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Was maintenance cut off after separation, as economic abuse in a domestic relationship?"
+        },
+        {
+          "phrase_en": "I cannot manage the house expenses alone",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "unable to maintain herself",
+            "household expenses"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is the wife unable to meet household and child expenses on her own income?"
+        },
+        {
+          "phrase_en": "my husband is not giving me money for my daughter's food and clothes",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "child maintenance",
+            "neglect to maintain"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is the father refusing maintenance for the minor child's food, clothing and daily needs?"
+        },
+        {
+          "phrase_en": "I want monthly money from my husband",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "monthly maintenance allowance"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is a monthly maintenance allowance sought from the husband?"
+        }
+      ]
+    },
+    "custody": {
+      "phrases": [
+        {
+          "phrase_en": "who will get my daughter",
+          "phrase_kn": "ನನ್ನ ಮಗಳನ್ನು ಯಾರು ಪಡೆಯುತ್ತಾರೆ",
+          "phrase_kn_transliteration": "Nanna magalanu yaru padeyuttare",
+          "gloss": "Who will get my daughter?",
+          "legal_terms": [
+            "custody of minor child",
+            "custody"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "HMGA 1956 s.6",
+            "welfare principle"
+          ],
+          "laya_question": "Is custody of the 8-year-old daughter in issue, and in which proceeding?"
+        },
+        {
+          "phrase_en": "I want my daughter to stay with me",
+          "phrase_kn": "ನನ್ನ ಮಗಳು ನನ್ನ ಜೊತೆ ಇರಬೇಕು",
+          "phrase_kn_transliteration": "Nanna magalu nanna jothe irabeku",
+          "gloss": "My daughter should stay with me",
+          "legal_terms": [
+            "custody",
+            "custody with mother"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Is the mother seeking custody of her minor daughter?"
+        },
+        {
+          "phrase_en": "he says he will take my daughter away",
+          "phrase_kn": "ಅವನು ನನ್ನ ಮಗಳನ್ನು ಕರೆದುಕೊಂಡು ಹೋಗುತ್ತೇನೆ ಎನ್ನುತ್ತಾನೆ",
+          "phrase_kn_transliteration": "Avanu nanna magalanu karedukondhu hoguttene ennuttane",
+          "gloss": "He says he will take my daughter away",
+          "legal_terms": [
+            "custody dispute",
+            "threat to take child"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Is the father threatening to take the child, so custody must be decided by the court?"
+        },
+        {
+          "phrase_en": "custody of kid",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "custody of minor child"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Is custody of the minor child being asked for?"
+        },
+        {
+          "phrase_en": "can my husband take my child from me",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "custody",
+            "natural guardian"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "HMGA 1956 s.6",
+            "welfare principle"
+          ],
+          "laya_question": "Can the father, as natural guardian, take the child — or does the child's welfare decide custody?"
+        },
+        {
+          "phrase_en": "my daughter is only eight, who looks after her",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "custody of minor child",
+            "welfare of the child"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Who currently cares for the 8-year-old, and whose custody best serves her welfare?"
+        },
+        {
+          "phrase_en": "I am the mother, I should keep my child",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "natural guardian",
+            "mother's custody claim"
+          ],
+          "section_candidates": [
+            "HMGA 1956 s.6",
+            "HMA 26",
+            "welfare principle"
+          ],
+          "laya_question": "Is the mother claiming custody — noting that for a child above five the father is natural guardian in law, so welfare must be shown?"
+        },
+        {
+          "phrase_en": "he never looks after our daughter, why should he get her",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "welfare of the child",
+            "unfit parent"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Is the father's care of the child in question, so welfare — not only natural-guardian status — decides custody?"
+        },
+        {
+          "phrase_en": "can I get custody without filing for divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "custody without matrimonial proceeding",
+            "standalone custody"
+          ],
+          "section_candidates": [
+            "Guardians and Wards Act 1890",
+            "HMA 26"
+          ],
+          "laya_question": "Is custody sought with no HMA proceeding filed, so the Guardians and Wards Act route applies?"
+        },
+        {
+          "phrase_en": "will the court give my daughter to her father because he is the father",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "natural guardian",
+            "welfare principle"
+          ],
+          "section_candidates": [
+            "HMGA 1956 s.6",
+            "HMA 26",
+            "welfare principle"
+          ],
+          "laya_question": "Does the father being natural guardian decide custody, or does the welfare of the child override it?"
+        },
+        {
+          "phrase_en": "my daughter wants to live with me",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "welfare of the child",
+            "child's wishes"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "What does the 8-year-old child's welfare and preference indicate about custody?"
+        },
+        {
+          "phrase_en": "can he stop me from seeing my daughter",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "visitation",
+            "access rights"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890"
+          ],
+          "laya_question": "Is visitation/access for the non-custodial parent in issue?"
+        },
+        {
+          "phrase_en": "who is the legal guardian of my daughter",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "natural guardian",
+            "guardianship"
+          ],
+          "section_candidates": [
+            "HMGA 1956 s.6",
+            "Guardians and Wards Act 1890"
+          ],
+          "laya_question": "Who is the natural guardian of this Hindu minor, and is guardianship itself disputed?"
+        },
+        {
+          "phrase_en": "I want full custody of my 8 year old",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "custody of minor child"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Is full custody of the 8-year-old daughter sought, and in which forum?"
+        },
+        {
+          "phrase_en": "he took my daughter to his parents' house and won't bring her back",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "custody",
+            "wrongful retention"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Has the child been taken and kept away, so an urgent custody order is needed?"
+        },
+        {
+          "phrase_en": "my daughter lives with me now, can that continue",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "custody",
+            "status quo",
+            "welfare of the child"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Is the child already living with the mother, and does her welfare favour continuing that arrangement?"
+        },
+        {
+          "phrase_en": "what if my husband says I am not a good mother",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "welfare of the child",
+            "fitness"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Is the mother's fitness disputed — and does the evidence show custody with her serves the child's welfare?"
+        },
+        {
+          "phrase_en": "custody and school — who decides her school",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "custody",
+            "education of minor"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "Guardians and Wards Act 1890",
+            "welfare principle"
+          ],
+          "laya_question": "Is the child's education and schooling part of the custody decision?"
+        }
+      ]
+    },
+    "stridhan": {
+      "phrases": [
+        {
+          "phrase_en": "he took my gold and cash and won't return it",
+          "phrase_kn": "ಅವನು ನನ್ನ ಚಿನ್ನ ಮತ್ತು ಹಣ ತೆಗೆದುಕೊಂಡು ವಾಪಸ್ ಕೊಡುತ್ತಿಲ್ಲ",
+          "phrase_kn_transliteration": "Avanu nanna chinna mattu hana tegedukondu vapas koduttilla",
+          "gloss": "He took my gold and money and is not returning them",
+          "legal_terms": [
+            "Stridhan",
+            "return of Stridhan",
+            "criminal breach of trust"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is the gold and cash the wife's Stridhan, held by the husband's family and not returned?"
+        },
+        {
+          "phrase_en": "my gold is with my husband's family",
+          "phrase_kn": "ನನ್ನ ಚಿನ್ನ ನನ್ನ ಗಂಡನ ಮನೆಯವರ ಬಳಿ ಇದೆ",
+          "phrase_kn_transliteration": "Nanna chinna nanna gandana maneyavara bali ide",
+          "gloss": "My gold is with my husband's family",
+          "legal_terms": [
+            "Stridhan",
+            "property of wife"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is the wife's gold held by the husband's family, and is its return sought?"
+        },
+        {
+          "phrase_en": "stridhan gold",
+          "phrase_kn": "ಸ್ತ್ರೀಧನ ಚಿನ್ನ",
+          "phrase_kn_transliteration": "Stridhana chinna",
+          "gloss": "Stridhan gold",
+          "legal_terms": [
+            "Stridhan"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is the property in question the wife's Stridhan?"
+        },
+        {
+          "phrase_en": "my jewellery worth 5 lakh is with them",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "return of property"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is jewellery worth Rs 5 lakh, the wife's Stridhan, being withheld?"
+        },
+        {
+          "phrase_en": "they took 2 lakh cash given at my wedding",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "return of property"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Was Rs 2 lakh cash given at the wedding the wife's Stridhan, now held and not returned?"
+        },
+        {
+          "phrase_en": "how do I get my gold back",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "return of Stridhan",
+            "disposal of property"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is return of the wife's Stridhan the relief sought, and in which proceeding?"
+        },
+        {
+          "phrase_en": "my mother gave me gold, it is mine",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "absolute property of wife"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Was the gold gifted to the wife, making it her Stridhan and her absolute property?"
+        },
+        {
+          "phrase_en": "he sold my gold without asking me",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "criminal breach of trust",
+            "misappropriation"
+          ],
+          "section_candidates": [
+            "BNS 316",
+            "HMA 27"
+          ],
+          "laya_question": "Was the wife's Stridhan sold or disposed of without her consent?"
+        },
+        {
+          "phrase_en": "they are not returning my wedding gifts",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "return of property"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Are wedding gifts that are the wife's Stridhan being withheld?"
+        },
+        {
+          "phrase_en": "my stridhan is in my in-laws' locker",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "entrustment"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Was the Stridhan entrusted to the husband's family, who now refuse to return it?"
+        },
+        {
+          "phrase_en": "can I file a case for my gold and cash",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "criminal breach of trust"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is a claim for return of Stridhan — civil return and/or criminal breach of trust — being considered?"
+        },
+        {
+          "phrase_en": "he says the gold belongs to his family, not me",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "ownership of Stridhan"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is ownership of the gold disputed — is it the wife's Stridhan or family property?"
+        },
+        {
+          "phrase_en": "I have no proof of my gold, can I still claim it",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "proof of Stridhan"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "What proof of the Stridhan exists — bills, photos, wedding records — and is the claim still maintainable without full proof?"
+        },
+        {
+          "phrase_en": "my husband used my cash for his business",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "misappropriation"
+          ],
+          "section_candidates": [
+            "BNS 316",
+            "HMA 27"
+          ],
+          "laya_question": "Was the wife's Stridhan cash used by the husband without her consent?"
+        },
+        {
+          "phrase_en": "return my gold, it was given to me by my parents",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "return of property"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is return sought of gold gifted by the wife's parents, as her Stridhan?"
+        },
+        {
+          "phrase_en": "they kept my jewellery when I left the house",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "withholding of property"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Was the wife's jewellery kept back when she left the shared household?"
+        },
+        {
+          "phrase_en": "is my gold different from dowry",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "distinction from dowry"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is the property the wife's own Stridhan, distinct from any dowry question?"
+        },
+        {
+          "phrase_en": "I want my 5 lakh gold and 2 lakh cash back",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "Stridhan",
+            "return of property"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is return of Rs 5 lakh gold and Rs 2 lakh cash, as Stridhan, the relief sought?"
+        }
+      ]
+    },
+    "residence": {
+      "phrases": [
+        {
+          "phrase_en": "they are throwing me out of the house",
+          "phrase_kn": "ಅವರು ನನ್ನನ್ನು ಮನೆಯಿಂದ ಹೊರಹಾಕುತ್ತಿದ್ದಾರೆ",
+          "phrase_kn_transliteration": "Avaru nannannu maneyinda horahakuttiddare",
+          "gloss": "They are throwing me out of the house",
+          "legal_terms": [
+            "right to reside in shared household",
+            "eviction threat"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 18",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is the wife being thrown out of the shared household?"
+        },
+        {
+          "phrase_en": "the house is in my husband's name, can I still stay",
+          "phrase_kn": "ಮನೆ ನನ್ನ ಗಂಡನ ಹೆಸರಿನಲ್ಲಿದೆ, ನಾನು ಇನ್ನೂ ಇರಬಹುದೇ",
+          "phrase_kn_transliteration": "Mane nanna gandana hesarinallide, nanu innu irabahude",
+          "gloss": "The house is in my husband's name, can I still stay?",
+          "legal_terms": [
+            "right to reside in shared household",
+            "shared household"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19"
+          ],
+          "laya_question": "Does the house being in the husband's name defeat her right to reside in the shared household?"
+        },
+        {
+          "phrase_en": "I have nowhere to go",
+          "phrase_kn": "ನನಗೆ ಹೋಗಲು ಎಲ್ಲೂ ಇಲ್ಲ",
+          "phrase_kn_transliteration": "Nanage hogalu ellu illa",
+          "gloss": "I have nowhere to go",
+          "legal_terms": [
+            "right to reside",
+            "alternate accommodation"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19",
+            "PWDVA 20"
+          ],
+          "laya_question": "Does the wife have no other home, so residence in the shared household or alternate accommodation is needed?"
+        },
+        {
+          "phrase_en": "my in-laws are forcing me to leave",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "eviction",
+            "domestic violence"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 18",
+            "PWDVA 19"
+          ],
+          "laya_question": "Are the in-laws forcing her out of the shared household?"
+        },
+        {
+          "phrase_en": "can they change the lock and keep me out",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "eviction",
+            "right to reside"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 18",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is she being kept out of the shared household by locking her out?"
+        },
+        {
+          "phrase_en": "this is my home too, I lived here for years",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "shared household",
+            "right to reside"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is this the shared household where she lived with her husband, giving her a right to reside?"
+        },
+        {
+          "phrase_en": "he says it is his house so I must leave",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "shared household",
+            "right to reside"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is the husband claiming ownership alone defeats her right to reside in the shared household?"
+        },
+        {
+          "phrase_en": "where will my daughter and I live",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "residence",
+            "right to reside"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19",
+            "PWDVA 20"
+          ],
+          "laya_question": "Where will the mother and her 8-year-old daughter live — shared household or alternate accommodation?"
+        },
+        {
+          "phrase_en": "can the court stop them from throwing me out",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "protection order",
+            "residence order"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is a protection order or residence order needed to stop eviction from the shared household?"
+        },
+        {
+          "phrase_en": "I want to stay in the same house with my daughter",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "right to reside in shared household"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is continued residence in the shared household with the child the relief sought?"
+        },
+        {
+          "phrase_en": "they cut water and electricity to make me leave",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "eviction by harassment"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 18",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is she being forced out by cutting essential services — domestic violence in the shared household?"
+        },
+        {
+          "phrase_en": "my husband lives elsewhere, can I stay in our house",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "shared household",
+            "right to reside"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is the house still the shared household even though the husband now lives elsewhere?"
+        },
+        {
+          "phrase_en": "is this tenancy rights",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "right to reside in shared household"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is the user asking about residence — which is a right to reside in the shared household, NOT tenancy rights?"
+        },
+        {
+          "phrase_en": "can I get a separate house or rent money instead",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "alternate accommodation",
+            "monetary relief — rent"
+          ],
+          "section_candidates": [
+            "PWDVA 19",
+            "PWDVA 20"
+          ],
+          "laya_question": "If she cannot stay in the shared household, is rent or alternate accommodation sought?"
+        },
+        {
+          "phrase_en": "my in-laws say I have no right in this house",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "right to reside in shared household"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is her right to reside in the shared household being denied by the husband's family?"
+        },
+        {
+          "phrase_en": "they are throwing me out of the house and my daughter has school here",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "right to reside",
+            "welfare of the child"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19",
+            "HMA 26"
+          ],
+          "laya_question": "Would eviction disrupt the child's schooling, strengthening the residence claim?"
+        },
+        {
+          "phrase_en": "I was married in this house, I should not be thrown out",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "shared household",
+            "right to reside"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is this the matrimonial/shared household she entered on marriage?"
+        },
+        {
+          "phrase_en": "can my husband sell the house while I live here",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "shared household",
+            "restraint on disposal"
+          ],
+          "section_candidates": [
+            "PWDVA 17",
+            "PWDVA 18",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is an order needed to stop disposal of the shared household while she resides there?"
+        }
+      ]
+    },
+    "protection/violence": {
+      "phrases": [
+        {
+          "phrase_en": "he beats me / threatens me",
+          "phrase_kn": "ಅವನು ನನ್ನನ್ನು ಹೊಡೆಯುತ್ತಾನೆ / ಬೆದರಿಸುತ್ತಾನೆ",
+          "phrase_kn_transliteration": "Avanu nannannu hodeyuttane / bedarisuttane",
+          "gloss": "He beats me / threatens me",
+          "legal_terms": [
+            "domestic violence",
+            "physical violence",
+            "threat"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Has the husband used physical violence or threats against the wife?"
+        },
+        {
+          "phrase_en": "he beats me",
+          "phrase_kn": "ಅವನು ನನ್ನನ್ನು ಹೊಡೆಯುತ್ತಾನೆ",
+          "phrase_kn_transliteration": "Avanu nannannu hodeyuttane",
+          "gloss": "He beats me",
+          "legal_terms": [
+            "domestic violence",
+            "physical abuse"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Has the husband beaten the wife?"
+        },
+        {
+          "phrase_en": "he threatens to kill me",
+          "phrase_kn": "ಅವನು ನನ್ನನ್ನು ಕೊಲ್ಲುತ್ತೇನೆ ಎಂದು ಬೆದರಿಸುತ್ತಾನೆ",
+          "phrase_kn_transliteration": "Avanu nannannu kolluttene endu bedarisuttane",
+          "gloss": "He threatens to kill me",
+          "legal_terms": [
+            "domestic violence",
+            "threat to life"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Has the husband threatened the wife's life?"
+        },
+        {
+          "phrase_en": "he shouts at me and scares my daughter",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "verbal/emotional abuse"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is there verbal or emotional abuse affecting the wife and child?"
+        },
+        {
+          "phrase_en": "he does not give money and abuses me",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "economic abuse",
+            "domestic violence"
+          ],
+          "section_candidates": [
+            "PWDVA 20",
+            "PWDVA 18",
+            "BNSS 144"
+          ],
+          "laya_question": "Is withholding money combined with abuse — economic abuse in a domestic relationship?"
+        },
+        {
+          "phrase_en": "my in-laws harass me every day",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "harassment by family"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is the wife harassed daily by the husband's family in the shared household?"
+        },
+        {
+          "phrase_en": "he hits me when he is angry",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "physical abuse"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is physical violence used against the wife?"
+        },
+        {
+          "phrase_en": "I am scared to go back home",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "fear",
+            "protection"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is the wife afraid to return home, so a protection order is needed?"
+        },
+        {
+          "phrase_en": "he threatened to throw acid / hurt my daughter",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "threat to child"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Has the husband threatened the wife or the child with harm?"
+        },
+        {
+          "phrase_en": "he controls all the money and does not let me go out",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "economic abuse",
+            "domestic violence"
+          ],
+          "section_candidates": [
+            "PWDVA 20",
+            "PWDVA 18"
+          ],
+          "laya_question": "Is the husband controlling money and movement — economic abuse?"
+        },
+        {
+          "phrase_en": "can I get protection from my husband",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "protection order",
+            "domestic violence"
+          ],
+          "section_candidates": [
+            "PWDVA 18"
+          ],
+          "laya_question": "Is a protection order restraining further violence sought?"
+        },
+        {
+          "phrase_en": "he abuses me on the phone and follows me",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "harassment"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is there continued harassment and intimidation after separation?"
+        },
+        {
+          "phrase_en": "my husband drinks and beats me",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "physical abuse"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is alcohol-linked physical violence alleged?"
+        },
+        {
+          "phrase_en": "they torture me for more money",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "harassment for money"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is the wife harassed or tortured for money — domestic violence?"
+        },
+        {
+          "phrase_en": "I need help, I am not safe at home",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "protection"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 19"
+          ],
+          "laya_question": "Is the wife unsafe at home, needing a protection and/or residence order urgently?"
+        },
+        {
+          "phrase_en": "he broke my phone and things in anger",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "damage to property"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20"
+          ],
+          "laya_question": "Has the husband damaged the wife's property as domestic violence?"
+        },
+        {
+          "phrase_en": "he threatens me if I go to court",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "intimidation"
+          ],
+          "section_candidates": [
+            "PWDVA 18"
+          ],
+          "laya_question": "Is the wife threatened for seeking legal help, so protection is needed?"
+        },
+        {
+          "phrase_en": "he beats me and also does not give money for my child",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "domestic violence",
+            "economic abuse",
+            "child maintenance"
+          ],
+          "section_candidates": [
+            "PWDVA 18",
+            "PWDVA 20",
+            "BNSS 144"
+          ],
+          "laya_question": "Is physical violence combined with withholding child maintenance?"
+        }
+      ]
+    },
+    "divorce": {
+      "phrases": [
+        {
+          "phrase_en": "I want a divorce",
+          "phrase_kn": "ನನಗೆ ವಿಚ್ಛೇದನ ಬೇಕು",
+          "phrase_kn_transliteration": "Nanage vichchedana beku",
+          "gloss": "I want a divorce",
+          "legal_terms": [
+            "divorce",
+            "dissolution of marriage"
+          ],
+          "section_candidates": [
+            "HMA 13"
+          ],
+          "laya_question": "Is divorce actually being asked for?"
+        },
+        {
+          "phrase_en": "should I divorce my husband",
+          "phrase_kn": "ನಾನು ನನ್ನ ಗಂಡನಿಗೆ ವಿಚ್ಛೇದನ ನೀಡಬೇಕೇ",
+          "phrase_kn_transliteration": "Nanu nanna gandanige vichchedana nidabeke",
+          "gloss": "Should I divorce my husband?",
+          "legal_terms": [
+            "divorce",
+            "advice on divorce"
+          ],
+          "section_candidates": [
+            "HMA 13",
+            "HMA 13B"
+          ],
+          "laya_question": "Is the user asking whether to seek divorce, and on what ground?"
+        },
+        {
+          "phrase_en": "can I get divorce after 2 years separation",
+          "phrase_kn": "ಎರಡು ವರ್ಷ ಬೇರೆಯಾದ ನಂತರ ನನಗೆ ವಿಚ್ಛೇದನ ಸಿಗುತ್ತದೆಯೇ",
+          "phrase_kn_transliteration": "Eradu varsha bereyada nantara nanage vichchedana siguttadeye",
+          "gloss": "Can I get a divorce after two years' separation?",
+          "legal_terms": [
+            "divorce",
+            "desertion/separation"
+          ],
+          "section_candidates": [
+            "HMA 13"
+          ],
+          "laya_question": "Is divorce sought after two years' separation — and on which ground?"
+        },
+        {
+          "phrase_en": "we both want to end the marriage peacefully",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce by mutual consent"
+          ],
+          "section_candidates": [
+            "HMA 13B"
+          ],
+          "laya_question": "Do both spouses agree to end the marriage, so divorce by mutual consent applies?"
+        },
+        {
+          "phrase_en": "he cheated on me, can I divorce him",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce",
+            "adultery ground"
+          ],
+          "section_candidates": [
+            "HMA 13"
+          ],
+          "laya_question": "Is divorce sought on the ground of adultery?"
+        },
+        {
+          "phrase_en": "he left me, I want to end this marriage",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce",
+            "desertion"
+          ],
+          "section_candidates": [
+            "HMA 13"
+          ],
+          "laya_question": "Is divorce sought on desertion after separation?"
+        },
+        {
+          "phrase_en": "I do not want divorce, I only want money and my gold back",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "no divorce asked",
+            "maintenance and Stridhan only"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20",
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Has divorce NOT been asked for — so HMA 13/13B must NOT fire?"
+        },
+        {
+          "phrase_en": "what is the difference between divorce and separation",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce",
+            "judicial separation"
+          ],
+          "section_candidates": [
+            "HMA 13",
+            "HMA 13B"
+          ],
+          "laya_question": "Is the user asking about divorce itself, or about separation without ending the marriage?"
+        },
+        {
+          "phrase_en": "how long does divorce take in Bangalore",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce procedure",
+            "timeline"
+          ],
+          "section_candidates": [
+            "HMA 13",
+            "HMA 13B"
+          ],
+          "laya_question": "Is divorce procedure/timeline being asked about — after confirming divorce is wanted?"
+        },
+        {
+          "phrase_en": "can I get divorce and also custody of my daughter",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce",
+            "custody in matrimonial proceedings"
+          ],
+          "section_candidates": [
+            "HMA 13",
+            "HMA 26",
+            "welfare principle"
+          ],
+          "laya_question": "Is divorce sought together with custody of the minor child?"
+        },
+        {
+          "phrase_en": "my husband will not agree to divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "contested divorce"
+          ],
+          "section_candidates": [
+            "HMA 13"
+          ],
+          "laya_question": "Is a contested divorce sought where the other spouse will not agree?"
+        },
+        {
+          "phrase_en": "we agree to divorce, what is the process",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce by mutual consent"
+          ],
+          "section_candidates": [
+            "HMA 13B"
+          ],
+          "laya_question": "Do both spouses consent to divorce, so the mutual-consent route applies?"
+        },
+        {
+          "phrase_en": "I want to live separately but not divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "judicial separation",
+            "no divorce"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is separation without divorce wanted — so HMA 13/13B must NOT fire?"
+        },
+        {
+          "phrase_en": "he is cruel to me, is that a reason for divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce",
+            "cruelty ground"
+          ],
+          "section_candidates": [
+            "HMA 13"
+          ],
+          "laya_question": "Is divorce sought on the ground of cruelty?"
+        },
+        {
+          "phrase_en": "after divorce will I get alimony for life",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "permanent alimony",
+            "divorce"
+          ],
+          "section_candidates": [
+            "HMA 25",
+            "HMA 13"
+          ],
+          "laya_question": "Is permanent alimony after a divorce decree being asked about?"
+        },
+        {
+          "phrase_en": "can I remarry after divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce",
+            "remarriage after decree"
+          ],
+          "section_candidates": [
+            "HMA 13"
+          ],
+          "laya_question": "Is the user asking about remarriage after a divorce decree?"
+        },
+        {
+          "phrase_en": "I am confused — I want help but I am not sure about divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce not decided",
+            "escalate"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is divorce undecided — so do NOT cite HMA 13/13B, and escalate the divorce decision to a human lawyer?"
+        },
+        {
+          "phrase_en": "divorce and my gold — will I get my stridhan back in divorce",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "divorce",
+            "Stridhan return"
+          ],
+          "section_candidates": [
+            "HMA 13",
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "Is Stridhan return sought alongside a divorce, or independently of it?"
+        }
+      ]
+    },
+    "documents/court": {
+      "phrases": [
+        {
+          "phrase_en": "which court should I go to",
+          "phrase_kn": "ನಾನು ಯಾವ ನ್ಯಾಯಾಲಯಕ್ಕೆ ಹೋಗಬೇಕು",
+          "phrase_kn_transliteration": "Nanu yava nyayalayakke hogabeku",
+          "gloss": "Which court should I go to?",
+          "legal_terms": [
+            "court",
+            "jurisdiction"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20",
+            "HMA 26"
+          ],
+          "laya_question": "Which court is picked by the graph — Family Court Bengaluru for HMA, Magistrate for BNSS 144 / PWDVA — without asking the user to pick?"
+        },
+        {
+          "phrase_en": "what documents do I need",
+          "phrase_kn": "ನನಗೆ ಯಾವ ದಾಖಲೆಗಳು ಬೇಕು",
+          "phrase_kn_transliteration": "Nanage yava dakhalegalu beku",
+          "gloss": "What documents do I need?",
+          "legal_terms": [
+            "documents",
+            "procedure"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20",
+            "HMA 27"
+          ],
+          "laya_question": "What documents are needed for the maintenance / Stridhan / residence claims?"
+        },
+        {
+          "phrase_en": "I do not have my husband's salary slips",
+          "phrase_kn": "ನನ್ನ ಬಳಿ ನನ್ನ ಗಂಡನ ಸಂಬಳದ ಚೀಟಿಗಳಿಲ್ಲ",
+          "phrase_kn_transliteration": "Nanna bali nanna gandana sambalada chitigalilla",
+          "gloss": "I do not have my husband's salary slips",
+          "legal_terms": [
+            "documents",
+            "husband's income — no salary slips"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Does the user lack the husband's salary slips — so ask for his income estimate, never demand the slips?"
+        },
+        {
+          "phrase_en": "do I need my marriage certificate",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "documents",
+            "marriage proof"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "HMA 26"
+          ],
+          "laya_question": "Is proof of the 2012 Hindu marriage needed, and what can substitute for a certificate?"
+        },
+        {
+          "phrase_en": "how long will the case take",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "procedure",
+            "timeline"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "What is the timeline for the maintenance / PWDVA case — without inventing a fixed duration?"
+        },
+        {
+          "phrase_en": "where is the family court in Bangalore",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "court",
+            "Family Court Bengaluru"
+          ],
+          "section_candidates": [
+            "HMA 26",
+            "HMA 24",
+            "HMA 25"
+          ],
+          "laya_question": "Is the HMA forum Family Court, Bengaluru — picked by the graph?"
+        },
+        {
+          "phrase_en": "can I file the case in Bangalore where I live",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "jurisdiction",
+            "court"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is Bengaluru the correct jurisdiction because the wife resides there?"
+        },
+        {
+          "phrase_en": "do I need a lawyer",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "procedure",
+            "legal representation"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is legal representation needed, and should the matter be escalated to a human lawyer?"
+        },
+        {
+          "phrase_en": "what is the birth certificate for my daughter for",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "birth certificate",
+            "Registration of Births and Deaths Act 1969"
+          ],
+          "section_candidates": [
+            "Births & Deaths Act 1969"
+          ],
+          "laya_question": "Is the daughter's birth certificate needed — under the Births and Deaths Act 1969, NOT the HMA?"
+        },
+        {
+          "phrase_en": "how much will the case cost",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "procedure",
+            "court fees/costs"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "What are the costs of filing — without inventing a fee amount?"
+        },
+        {
+          "phrase_en": "can I file without my husband's address",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "jurisdiction",
+            "service",
+            "husband's whereabouts"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is the husband's current address unknown — so ask where he lives now, for jurisdiction and service?"
+        },
+        {
+          "phrase_en": "what proof do I need for my gold",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "documents",
+            "proof of Stridhan"
+          ],
+          "section_candidates": [
+            "HMA 27",
+            "BNS 316"
+          ],
+          "laya_question": "What proof of Stridhan exists — bills, photos, wedding records?"
+        },
+        {
+          "phrase_en": "how do I start the case, what is the first step",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "procedure",
+            "first step"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "What is the first filing step for maintenance / PWDVA relief?"
+        },
+        {
+          "phrase_en": "will my husband know I filed a case",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "procedure",
+            "notice/service"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Will the husband be served notice of the application?"
+        },
+        {
+          "phrase_en": "I have only my Aadhaar and my daughter's school ID",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "documents",
+            "identity proof"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20"
+          ],
+          "laya_question": "Are the available identity/school documents sufficient to start, and what else is needed?"
+        },
+        {
+          "phrase_en": "can I get interim money while the case runs",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "interim maintenance",
+            "interim relief"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "HMA 24",
+            "PWDVA 20"
+          ],
+          "laya_question": "Is interim maintenance during pendency sought — and is an HMA proceeding pending for HMA 24?"
+        },
+        {
+          "phrase_en": "which court — family court or magistrate court",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "court selection",
+            "graph picks court"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "PWDVA 20",
+            "HMA 26"
+          ],
+          "laya_question": "Which forum applies to which relief — Magistrate for BNSS 144/PWDVA, Family Court for HMA — without asking the user to choose?"
+        },
+        {
+          "phrase_en": "I lost my marriage photos, what else proves my marriage",
+          "phrase_kn": null,
+          "phrase_kn_transliteration": null,
+          "gloss": null,
+          "legal_terms": [
+            "documents",
+            "marriage proof"
+          ],
+          "section_candidates": [
+            "BNSS 144",
+            "HMA 26"
+          ],
+          "laya_question": "What alternative proof of marriage is available if photos/certificate are missing?"
+        }
+      ]
+    }
+  },
+  "counts": {
+    "maintenance": 18,
+    "custody": 18,
+    "stridhan": 18,
+    "residence": 18,
+    "protection/violence": 18,
+    "divorce": 18,
+    "documents/court": 18,
+    "total": 126
+  },
+  "unmapped_phrases": [
+    {
+      "phrase_en": "I am confused — I want help but I am not sure about divorce",
+      "reason": "No section can be picked for divorce: divorce is undecided, so HMA 13/13B must NOT fire; mapped only to BNSS 144 / PWDVA 20 for the live maintenance/protection relief and flagged for escalation to a human lawyer on the divorce decision itself."
+    },
+    {
+      "phrase_en": "is this tenancy rights",
+      "reason": "Not mappable to any tenancy provision: residence is a right to reside in the shared household under PWDVA 17/19, never 'tenancy rights'; included as a trap phrase so Stage 2 drops the tenancy label."
+    },
+    {
+      "phrase_en": "I do not want divorce, I only want money and my gold back",
+      "reason": "No divorce section applies: HMA 13/13B are deliberately absent from its candidates; it maps only to maintenance (BNSS 144 / PWDVA 20) and Stridhan (HMA 27 / BNS 316)."
+    },
+    {
+      "phrase_en": "how much money can I get every month",
+      "reason": "Section can be picked (BNSS 144 / PWDVA 20 / HMA 25) but the QUANTUM cannot be mapped to an amount: husband's income is unknown, so the amount must be escalated, never invented."
+    }
+  ],
+  "notes": "Kannada (script + transliteration + gloss) is given for the 3 most common phrasings per issue (21 phrases); other phrases have null Kannada fields. Misspellings kept verbatim: 'maintanance', 'maintenence'. Multi-issue phrases are included (e.g. maintenance+child, violence+maintenance, divorce+custody, residence+school). No new BNS/CrPC sections invented; all section_candidates are from the verified list in SHARED_BRIEF_V2.md."
+}

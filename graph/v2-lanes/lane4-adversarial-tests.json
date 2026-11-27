@@ -1,0 +1,1175 @@
+{
+  "lane": "lane4-adversarial-tests",
+  "version": "v2-lane4",
+  "date": "2026-11-26",
+  "v1_file_tested": "laya-crpc-bns-section-decision-tree.json (v1, DO NOT EDIT)",
+  "v1_counts": {
+    "sections_unique": 29,
+    "nodes": 38,
+    "edges": 66
+  },
+  "design_understanding": {
+    "stage_1_layman_to_section": "STAGE 1 — Layman -> article/section: pick ALL layman words/phrases in the user's question, fetch them into article-section format. Convert every layman expression into legal terms, then map legal terms to section(s) via Laya choice questions. The user asks in layman format (e.g. 'my husband is not giving me money', 'he took my gold and cash and won't return it', 'they are throwing me out of the house', 'who will get my daughter', 'I need money for my child', 'he beats me / threatens me'). One Laya choice per decision node; no free-text generation for section selection. A multi-issue question runs the root choice once, then each selected lane's choice nodes in parallel.",
+    "stage_2_recheck_inside_section": "STAGE 2 — Recheck inside the article section: after Stage 1 picks sections, RECHECK each picked section against ALL its relations — prerequisites, exclusions/not_for, related_sections, guardrails, court, co-firing sections. Only after recheck is the answer final. A section failing recheck (wrong issue, missing prerequisite, divorce not asked, no proceeding pending, no demand made, no domestic violence for PWDVA 20, no shared-household claim for PWDVA 17/19) must be DROPPED with a reason, not kept. Examples applied in this suite: BNSS 144 firing must recheck HMA 24 vs 25 and PWDVA 20; Stridhan must recheck HMA 27 + BNS 316 together plus the demand gate; custody must recheck welfare-of-the-child overriding the natural-guardian default and HMA 26's pending-proceeding prerequisite; residence must recheck PWDVA 17+18+19+20 as a set, each gated on its own trigger.",
+    "verdict_rule": "PASS only if stage1_sections == stage2_kept == expected_sections (and escalation behaviour matches where escalate_expected is true). FAIL if (a) Stage 1 over- or under-fired and v1 has no node that performs the needed drop/add — even if a hand Stage-2 recheck could correct it, the correction is not in the graph, so the graph fails; or (b) even a hand Stage-2 recheck cannot reach the expected sections (section missing from v1 entirely, e.g. HMA 13/13B, Births and Deaths Act 1969, or Kannada unmapped). stage2_kept in this file is what the brief's Stage-2 rules would keep if applied by hand; stage2_dropped_with_reason records every drop with its reason. This is deliberate: v1 has NO Stage-2 recheck node among its 38 nodes, so every case that needs a drop is a v1 failure, not a pass.",
+    "never_fails_claim": "NO 'never fails' claim is made. The honest pass rate is reported below and every failure is listed with a fix. Any future claim that the graph 'never fails' would be false on this suite alone."
+  },
+  "verified_sections_used": [
+    "BNSS s.144 (old CrPC s.125)",
+    "HMA s.24",
+    "HMA s.25",
+    "HMA s.26",
+    "HMA s.27",
+    "HMA s.13 / s.13B (ONLY if divorce asked)",
+    "PWDVA s.17",
+    "PWDVA s.18",
+    "PWDVA s.19",
+    "PWDVA s.20",
+    "Guardians and Wards Act 1890",
+    "Hindu Minority and Guardianship Act 1956 s.6",
+    "welfare-of-the-child principle",
+    "BNS s.316 (IPC s.406 equivalent)",
+    "Registration of Births and Deaths Act 1969 (birth certificate, NOT HMA)"
+  ],
+  "forbidden_mappings_checked": [
+    "Rajnesh v. Neha = maintenance ONLY, never Stridhan/custody/residence/divorce",
+    "Satish Chander Ahuja = shared household / residence ONLY, never custody",
+    "Residence is NOT 'tenancy rights'",
+    "Never ask the user to pick the court — graph picks Family Court Bengaluru (HMA) / Magistrate (BNSS 144, PWDVA)",
+    "Never demand salary slips she said she does not have; ask husband's income, school fees, where husband lives now",
+    "Maintenance quantum: escalate, never invent an amount"
+  ],
+  "method": "Each test was run BY HAND against the v1 graph logic: root:issue-classification choice, then the selected lane's choice nodes and section-set/leaf nodes (maintenance-root, interim-vs-permanent, maintenance-section-set, bnss-144-leaf, hma-24-leaf, hma-25-leaf, custody_sub_issue_choice, custody_section_set, stridhan-subissue, civil-vs-criminal, stridhan-section-set, residence_sub_issue, protection_vs_residence, residence_section_set, leaf_PWDVA_17/18/19/20), then the brief's Stage-2 recheck rules applied by hand using each section's not_for/prerequisite lists and the guardrails. Section ids use v1 ids exactly (bnss-144, hma-24, hma-25, hma-26, hma-27, hma-13, hma-13b, pwdva-17, pwdva-18, pwdva-19, pwdva-20, gwa-1890, hmga-1956-s6, welfare-principle, bns-316, births-deaths-act-1969). hma-13/hma-13b and births-deaths-act-1969 do NOT exist as section ids in v1 — they appear only in expected_sections, which is itself the failure. Test case facts throughout: 35yo Hindu woman, Bengaluru, married 2012, separated 2y, husband Rs 40,000/month paying no maintenance, 8yo daughter, Stridhan Rs 5 lakh gold + Rs 2 lakh cash held by husband's family, eviction threats.",
+  "summary": {
+    "total_tests": 34,
+    "pass": 15,
+    "fail": 19,
+    "pass_rate": 0.4412,
+    "pass_rate_percent": 44.1,
+    "kannada_tests": 5,
+    "kannada_pass": 0,
+    "full_case_rephrases": 5,
+    "single_issue": 6,
+    "multi_issue": 5,
+    "tricky": 10,
+    "out_of_scope": 5,
+    "kannada_single_issue": 3,
+    "failures": [
+      "A3",
+      "A5",
+      "B2",
+      "B4",
+      "B5",
+      "B6",
+      "C1",
+      "C4",
+      "D2",
+      "D5",
+      "D6",
+      "D7",
+      "D8",
+      "D9",
+      "D10",
+      "E2",
+      "F1",
+      "F2",
+      "F3"
+    ]
+  },
+  "tests": [
+    {
+      "id": "A1",
+      "category": "full-case-rephrase",
+      "question_layman": "I am a 35-year-old Hindu woman in Bengaluru. I married in 2012, my husband left me 2 years ago and gives me no money at all. I have an 8-year-old daughter. My gold worth 5 lakh and 2 lakh cash are with my husband's family and they will not return them. They are threatening to throw me out of the house, which is in my husband's name. I need money for me and my daughter, custody of my daughter, my gold and cash back, and to stay in the house. Which court do I go to, what papers do I need, and how long will it take?",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_kept": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "v1 test-report full set. HMA 24/25/26/27 kept as CONDITIONAL/future routes (HMA 24 only once an HMA proceeding is filed; HMA 25 only at/after a decree; HMA 26/27 only inside a matrimonial proceeding) — conditionality is a note, not a drop, exactly as the v1 test report records it. No divorce asked, so HMA 13/13B correctly absent. Quantum escalated, no amount invented."
+    },
+    {
+      "id": "A2",
+      "category": "full-case-rephrase",
+      "question_layman": "My husband and I have lived separately for two years. I do not want a divorce, I just want support. He earns about forty thousand a month but sends nothing for me or our 8-year-old daughter. My stridhan — five lakh in gold and two lakh in cash — is kept by his family. They keep saying I must leave the house. Can I get maintenance, keep my daughter with me, get my things back and stay in the house?",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_kept": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Explicit 'I do not want a divorce' — divorce gate correctly closed. Same full set as A1 with the same conditional flags on HMA 24/25/26/27."
+    },
+    {
+      "id": "A3",
+      "category": "full-case-rephrase-kannada",
+      "question_layman": "Kannada (same full test case): see question_kannada.",
+      "question_kannada": "ನಾನು 35 ವರ್ಷದ ಹಿಂದೂ ಮಹಿಳೆ, ಬೆಂಗಳೂರಿನಲ್ಲಿ ಇದ್ದೇನೆ. 2012ರಲ್ಲಿ ಮದುವೆಯಾಗಿತ್ತು, ಗಂಡ 2 ವರ್ಷದಿಂದ ಬೇರೆ ಇದ್ದಾರೆ, ದುಡ್ಡು ಕೊಡ್ತಿಲ್ಲ. ನನಗೆ 8 ವರ್ಷದ ಮಗಳು ಇದ್ದಾಳೆ. ನನ್ನ 5 ಲಕ್ಷ ಬಂಗಾರ ಮತ್ತೆ 2 ಲಕ್ಷ ಹಣ ಗಂಡನ ಮನೆಯವರ ಹತ್ತಿರ ಇದೆ, ವಾಪಸ್ ಕೊಡ್ತಿಲ್ಲ. ಮನೆಯಿಂದ ಹೊರಹಾಕ್ತೀವಿ ಅಂತ ಬೆದರಿಕೆ ಹಾಕ್ತಾರೆ. ನನಗೆ ಜೀವನಾಂಶ, ಮಗಳು, ಬಂಗಾರ ವಾಪಸ್ ಮತ್ತೆ ಮನೆಯಲ್ಲಿ ಇರೋ ಹಕ್ಕು ಬೇಕು.",
+      "expected_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add a Kannada layman phrasebook (Lane 1) and Kannada Stage-1 mapping (Lane 2) before any Kannada question can pass. v1's model, phrasebook and node questions are English-only; the Laya model file is the English model. Until then every Kannada question must escalate with a clear 'Kannada not yet supported — please ask in English or wait for a human' message, not silently map to the wrong sections.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Stage 1 cannot pick any lane from Kannada text in v1 — no Kannada phrases exist in the graph. A hand Stage-2 recheck cannot invent sections Stage 1 never fired, so stage2_kept is empty."
+    },
+    {
+      "id": "A4",
+      "category": "full-case-rephrase",
+      "question_layman": "He gives no money, he took my gold and cash, they are throwing me out, and my little daughter is with me. What can I do?",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_kept": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Shortest layman form of the full case. Stage 1 root picks all four lanes (maintenance, custody, stridhan, residence); each lane returns its full set. Same conditional flags on HMA 24/25/26/27 as A1."
+    },
+    {
+      "id": "A5",
+      "category": "full-case-rephrase",
+      "question_layman": "Same as the full test case — 35, Hindu, Bengaluru, married 2012, separated 2 years, no maintenance, 8-year-old daughter, 5 lakh gold + 2 lakh cash held by his family, eviction threats — AND this time I also want a divorce from him. I want maintenance, custody, my stridhan back, to stay in the house, and a divorce.",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "hma-13",
+        "hma-13b"
+      ],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_kept": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add real section entries for HMA s.13 and s.13B (with the divorce gate: fire ONLY when divorce is expressly asked) to the sections list, plus a divorce leaf node. The v1 file has only a procedure item 'proc-divorce-gate' with no section ids, so no Stage-1 or Stage-2 step can ever return HMA 13/13B.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Divorce IS asked here, so the gate opens — but v1 has nowhere to put the sections. Stage-2 recheck cannot add a section that does not exist in the graph."
+    },
+    {
+      "id": "B1",
+      "category": "single-issue",
+      "question_layman": "My husband gives me no money at all. I need money now for me and my daughter. No case has been filed yet.",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144"
+      ],
+      "stage1_sections": [
+        "bnss-144"
+      ],
+      "stage2_kept": [
+        "bnss-144"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "v1 encodes this correctly at Stage 1, not Stage 2: maintenance-root option 'immediate maintenance now, no HMA case filed' routes to bnss-144-leaf. HMA 24/25 and PWDVA 20 are never fired on this route (no pending proceeding, no decree, no domestic-violence allegation)."
+    },
+    {
+      "id": "B2",
+      "category": "single-issue",
+      "question_layman": "Who will get my 8-year-old daughter? I want her to stay with me. No case has been filed yet.",
+      "question_kannada": null,
+      "expected_sections": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage1_sections": [
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage2_kept": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "hma-26",
+          "reason": "HMA s.26 is custody INSIDE a matrimonial proceeding (its own not_for list: 'Custody where no HMA proceeding exists'). No proceeding is pending, so it must drop; standalone custody is Guardians and Wards Act 1890, with HMGA s.6 for natural-guardian status and welfare paramount."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add a Stage-2 recheck rule 'custody-no-proceeding: drop HMA 26, keep GWA 1890 + HMGA s.6 + welfare' and a v1 node that can return the 3-section subset. v1 custody_section_set only ever returns all four together.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Father is the natural guardian in law for a child above five (HMGA s.6), so the claim rests on welfare, not on denying his status — that part of v1 is right; the failure is only the unconditional HMA 26."
+    },
+    {
+      "id": "B3",
+      "category": "single-issue",
+      "question_layman": "My gold worth 5 lakh and 2 lakh cash are with my husband's family. I already asked them to return it and they refused. How do I get it back?",
+      "question_kannada": null,
+      "expected_sections": [
+        "hma-27",
+        "bns-316"
+      ],
+      "stage1_sections": [
+        "hma-27",
+        "bns-316"
+      ],
+      "stage2_kept": [
+        "hma-27",
+        "bns-316"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Demand already made and refused, so both routes are live: HMA 27 (civil return, Family Court) together with BNS 316 (criminal breach of trust). Neither replaces the other. Rajnesh v. Neha correctly NOT cited for stridhan."
+    },
+    {
+      "id": "B4",
+      "category": "single-issue",
+      "question_layman": "They are threatening to throw me out of the house. I am still living there. I am not asking for money and there has been no violence, I just want to stay in the house.",
+      "question_kannada": null,
+      "expected_sections": [
+        "pwdva-17",
+        "pwdva-19"
+      ],
+      "stage1_sections": [
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage2_kept": [
+        "pwdva-17",
+        "pwdva-19"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "pwdva-20",
+          "reason": "No money asked for and no domestic-violence consequence to compensate; PWDVA s.20 is monetary relief, not a residence remedy. Its own not_for: not a standalone maintenance code."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): break the hardwired leaf chain leaf_PWDVA_19 -> leaf_PWDVA_20. Each PWDVA section must be gated on its own trigger (17 = shared household, 18 = violence/threats, 19 = dispossession, 20 = money asked). Add a Stage-2 rule 'residence-only: drop PWDVA 20 unless money is asked'.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "v1 residence_section_set DOES offer a '17+19 only' option, but leaf_PWDVA_19's only next step is leaf_PWDVA_20, so PWDVA 20 is forced in anyway. The option and the chain contradict each other."
+    },
+    {
+      "id": "B5",
+      "category": "single-issue",
+      "question_layman": "How do I get my daughter's birth certificate? The school is asking for it.",
+      "question_kannada": null,
+      "expected_sections": [
+        "births-deaths-act-1969"
+      ],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add a verified section entry for the Registration of Births and Deaths Act 1969 (birth certificate) to the sections list, with a Stage-1 mapping from layman 'birth certificate' and a Stage-2 guardrail 'never under HMA'. v1 has only a procedure item (doc-birth-certificate), not a citable section id.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "The brief lists the Births and Deaths Act 1969 as VERIFIED, so this is a missing-section failure, not an unverified_excluded case. Stage 1 returns no section at all; Stage 2 cannot invent one."
+    },
+    {
+      "id": "B6",
+      "category": "single-issue",
+      "question_layman": "I want a divorce from my husband. How do I get one?",
+      "question_kannada": null,
+      "expected_sections": [
+        "hma-13",
+        "hma-13b"
+      ],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): same as A5 — add HMA s.13 and s.13B as real sections with the divorce gate, plus a divorce leaf. Also add the mutual-consent (13B) vs contested (13) distinction as a Stage-1 choice question; v1 cannot express it at all.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Divorce expressly asked, gate open, but v1's only divorce artefact is proc-divorce-gate, a procedure item with no section ids. Even a perfect hand recheck returns nothing."
+    },
+    {
+      "id": "C1",
+      "category": "multi-issue",
+      "question_layman": "My husband pays no maintenance and I want my 8-year-old daughter to stay with me. No case has been filed yet.",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage2_kept": [
+        "bnss-144",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "hma-24",
+          "reason": "No HMA proceeding pending — HMA 24 is interim maintenance pendente lite only."
+        },
+        {
+          "section": "hma-25",
+          "reason": "No decree in prospect — HMA 25 is permanent alimony at/after a decree."
+        },
+        {
+          "section": "pwdva-20",
+          "reason": "No domestic violence alleged — PWDVA 20 is relief for DV consequences, not a standalone maintenance code."
+        },
+        {
+          "section": "hma-26",
+          "reason": "No HMA proceeding pending — custody inside a matrimonial proceeding does not apply; standalone route is GWA 1890."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add Stage-2 recheck rules that drop HMA 24/25/26 and PWDVA 20 when their prerequisites are absent, and make the maintenance/custody section-set nodes return the reduced subset instead of the full set. The 'full maintenance picture' node must not be the default for a live immediate claim.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Four sections over-fire at once. This is the same over-firing as the 2026-11-26 retest error pattern (HMA 13/13B listed though not asked) — here it is HMA 24/25/26 listed though their prerequisites are absent."
+    },
+    {
+      "id": "C2",
+      "category": "multi-issue",
+      "question_layman": "My husband's family will not return my 5 lakh gold and 2 lakh cash — I have already asked and they refused — and they are threatening to throw me out of the house. I also need money to live on.",
+      "question_kannada": null,
+      "expected_sections": [
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage1_sections": [
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage2_kept": [
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "All three triggers genuinely present: demand made and refused (stridhan both routes), eviction threats/intimidation (PWDVA 17+18+19), money asked (PWDVA 20). No over-firing. PWDVA 20 is shared by maintenance and residence lanes and counted once."
+    },
+    {
+      "id": "C3",
+      "category": "multi-issue",
+      "question_layman": "He beats me, he gives no money, and they threaten to throw me out. What are all my options? No case filed yet.",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage2_kept": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "PASS only because the user asked for 'all my options' — HMA 24/25 are kept as conditional/future routes (file an HMA proceeding first; permanent only at decree), exactly as in A1. Violence present, so PWDVA 18 and 20 are properly triggered. Contrast C1, where the same sections were claimed as live immediate remedies."
+    },
+    {
+      "id": "C4",
+      "category": "multi-issue-kannada",
+      "question_layman": "Kannada (maintenance + custody, same test case): see question_kannada.",
+      "question_kannada": "ನನ್ನ ಗಂಡ ದುಡ್ಡು ಕೊಡ್ತಿಲ್ಲ, ನನ್ನ 8 ವರ್ಷದ ಮಗಳು ನನ್ನ ಜೊತೆ ಇರಬೇಕು ಅಂತ ನಾನು ಬಯಸ್ತೀನಿ. ಗಂಡ ಎಲ್ಲಿದ್ದಾನೆ ಅಂತ ಗೊತ್ತಿಲ್ಲ, ಅವನ ಸಂಬಳ ಎಷ್ಟು ಅಂತೂ ಗೊತ್ತಿಲ್ಲ.",
+      "expected_sections": [
+        "bnss-144",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): same as A3 — Kannada phrasebook + Kannada Stage-1 mapping. Also note: even in English this question needs the HMA 26 drop (no proceeding), so the Kannada fix must land together with the custody-no-proceeding Stage-2 rule (B2).",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Two failures stacked: Kannada unmapped AND (in English) HMA 26 would over-fire. Stage 2 kept is empty because Stage 1 fired nothing."
+    },
+    {
+      "id": "C5",
+      "category": "multi-issue",
+      "question_layman": "He gives no money for me or my 8-year-old daughter, I want her with me, and they threaten to throw us out of the house. I do not have his salary slips and I do not know his income or the exact school fees. What can I do?",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_kept": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-27",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Full-set pass with guardrails holding: procedure nodes ask husband's income / school fees / whereabouts instead of demanding salary slips (doc-income-ask-not-demand), and maintenance quantum is escalated, not invented. Same conditional flags on HMA 24/25/26/27 as A1."
+    },
+    {
+      "id": "D1",
+      "category": "tricky-divorce-not-asked",
+      "question_layman": "My husband and I have been separated for two years. I do not want a divorce. I just need money to live on.",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144"
+      ],
+      "stage1_sections": [
+        "bnss-144"
+      ],
+      "stage2_kept": [
+        "bnss-144"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Separation alone does not trigger the divorce gate (v1 guardrail proc-divorce-gate says so explicitly). HMA 13/13B correctly absent. This is the exact error the 2026-11-26 retest made and v1 fixes."
+    },
+    {
+      "id": "D2",
+      "category": "tricky-birth-certificate",
+      "question_layman": "I want custody of my 8-year-old daughter, but I do not have her birth certificate and the school needs it for admission. No case filed yet.",
+      "question_kannada": null,
+      "expected_sections": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "births-deaths-act-1969"
+      ],
+      "stage1_sections": [
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage2_kept": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "hma-26",
+          "reason": "No HMA proceeding pending — see B2."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): two fixes together — (1) custody-no-proceeding Stage-2 rule dropping HMA 26 (B2 fix); (2) add the Births and Deaths Act 1969 as a real section (B5 fix). Even after the HMA 26 drop, the birth-certificate half of the answer has no section to return.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Stage-2 kept is missing the birth-certificate section entirely: v1 only has the doc-birth-certificate procedure item, which is a document note, not a citable section."
+    },
+    {
+      "id": "D3",
+      "category": "tricky-salary-slips-missing",
+      "question_layman": "I do not have my husband's salary slips. Can I still get maintenance for me and my daughter?",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144"
+      ],
+      "stage1_sections": [
+        "bnss-144"
+      ],
+      "stage2_kept": [
+        "bnss-144"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Section answer is BNSS 144 via the immediate-maintenance leaf. Behavioural guardrail also holds: v1 procedure item doc-income-ask-not-demand forbids demanding the slips and instead asks what income she knows. Pass on both the section and the guardrail."
+    },
+    {
+      "id": "D4",
+      "category": "tricky-income-unknown",
+      "question_layman": "My husband's income is unknown to me and I do not know the school fees yet. How much maintenance will I get each month?",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144"
+      ],
+      "stage1_sections": [
+        "bnss-144"
+      ],
+      "stage2_kept": [
+        "bnss-144"
+      ],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Section is BNSS 144 (immediate maintenance). The AMOUNT is not a section and v1 correctly escalates it: guardrail 'quantum' says escalate, never invent an amount. Pass because no amount was invented and the section is right — but the answer must say the amount is unknown until income/fees are known."
+    },
+    {
+      "id": "D5",
+      "category": "tricky-demand-not-yet-made",
+      "question_layman": "My 5 lakh gold and 2 lakh cash are with my husband's family. I have never asked them to return it. Can I file a criminal case against them right away?",
+      "question_kannada": null,
+      "expected_sections": [
+        "hma-27"
+      ],
+      "stage1_sections": [
+        "hma-27",
+        "bns-316"
+      ],
+      "stage2_kept": [
+        "hma-27"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "bns-316",
+          "reason": "No demand for return has been made yet, so there is no dishonest refusal to return entrusted property. BNS 316 (criminal breach of trust) is premature; demand first, then re-evaluate. HMA 27 civil return stays as the live route, with the demand step flagged."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add the demand gate the v1 test report mentions but v1 never encodes — a Stage-1 choice 'was a demand made and refused?' with a node 'entrusted_no_demand_yet' (demand first, then re-evaluate BNS 316). v1 stridhan-subissue has no demand option at all; civil-vs-criminal fires both routes unconditionally.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "This is a v1 test-report open question ('Was a demand for Stridhan return made?') that the graph itself cannot ask. The criminal route firing before any demand is the over-firing counterpart of the retest's wrong-section errors."
+    },
+    {
+      "id": "D6",
+      "category": "tricky-no-proceeding-pending",
+      "question_layman": "No case has been filed yet. Can I get interim maintenance under HMA section 24 right now?",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144"
+      ],
+      "stage1_sections": [
+        "hma-24"
+      ],
+      "stage2_kept": [
+        "bnss-144"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "hma-24",
+          "reason": "HMA 24 is maintenance pendente lite — it exists only DURING a pending HMA proceeding. No proceeding is pending, so it cannot be the live remedy; BNSS 144 is."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): gate the hma-24-leaf on a Stage-2 check 'is an HMA proceeding pending?' — if no, drop HMA 24 and route to BNSS 144 (with a note that HMA 24 becomes available once a proceeding is filed). v1's hma-24-leaf applies the section with no gate check.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Nuance recorded honestly: v1's interim-vs-permanent CHOICE node would route a neutrally-worded question correctly to bnss-144-leaf, but the direct hma-24-leaf (reached when the user names HMA 24) has no such check. A user who names the section gets the wrong live answer."
+    },
+    {
+      "id": "D7",
+      "category": "tricky-violence-only",
+      "question_layman": "He beats me. I live at my parents' house now, I am safe there, and I do not need the house or money — I just want him to stop hitting me and threatening me.",
+      "question_kannada": null,
+      "expected_sections": [
+        "pwdva-18"
+      ],
+      "stage1_sections": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage2_kept": [
+        "pwdva-18"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "pwdva-17",
+          "reason": "No shared-household residence claim — she lives at her parents' house and is not claiming the matrimonial home."
+        },
+        {
+          "section": "pwdva-19",
+          "reason": "No residence order needed — she is not seeking to stay in or return to the shared household."
+        },
+        {
+          "section": "pwdva-20",
+          "reason": "No money asked for; PWDVA 20 is monetary relief, not a protection remedy."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add a Stage-2 rule 'protection-only: keep PWDVA 18 alone when the only trigger is violence/threats and no residence or money is claimed', and a residence-lane leaf that returns PWDVA 18 alone. v1's protection_vs_residence node offers 'PWDVA 18 only' as an option, but the residence_section_set path it feeds into still bundles the full set, and the leaf chain re-adds 19/20.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [
+        "Any BNS cruelty / assault section for the beating itself — not in the verified list; escalate, do not invent."
+      ],
+      "notes": "Also recorded in unverified_excluded: any criminal cruelty section for the beating itself is NOT in the verified list — the graph must escalate that part (safety + criminal advice) rather than invent a BNS section. The verified answer for this question is PWDVA 18 only."
+    },
+    {
+      "id": "D8",
+      "category": "tricky-threats-only",
+      "question_layman": "They keep threatening to throw me out of the house. I still live there. No violence so far, and I am not asking for money.",
+      "question_kannada": null,
+      "expected_sections": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage1_sections": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "stage2_kept": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "pwdva-20",
+          "reason": "No money asked for — see B4."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): same as B4 — break the leaf_PWDVA_19 -> leaf_PWDVA_20 chain and gate PWDVA 20 on money being asked. Threats/intimidation do justify PWDVA 18 here (unlike B4, where no threats were mentioned, the eviction threat itself is intimidation).",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "PWDVA 18 is correctly kept here: eviction threats are intimidation, which a protection order covers. The single failure is the forced PWDVA 20."
+    },
+    {
+      "id": "D9",
+      "category": "tricky-vague",
+      "question_layman": "I have nothing. He doesn't take care of us at all.",
+      "question_kannada": null,
+      "expected_sections": [],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "bnss-144",
+          "reason": "No facts to support any maintenance head — income, separation, child, marriage not stated."
+        },
+        {
+          "section": "hma-24",
+          "reason": "No proceeding pending (not even stated to exist)."
+        },
+        {
+          "section": "hma-25",
+          "reason": "No decree in prospect."
+        },
+        {
+          "section": "pwdva-20",
+          "reason": "No domestic violence or money claim stated."
+        },
+        {
+          "section": "pwdva-17",
+          "reason": "No shared household or residence fact stated."
+        },
+        {
+          "section": "pwdva-18",
+          "reason": "No violence or threat stated."
+        },
+        {
+          "section": "pwdva-19",
+          "reason": "No dispossession fact stated."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add a Stage-1 confidence gate — if no issue can be picked with confidence from the words alone, do NOT force-pick the closest lanes; escalate to clarifying questions (are you married? separated? children? who holds what? where do you live? any violence?). v1 root's escalate_rule says this, but there is no node that performs it: the root is a forced choice over the five lanes, so a vague question gets a full multi-lane answer with no facts behind it.",
+      "escalate_expected": true,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Expected behaviour is clarify/escalate, with zero sections. This is the most dangerous failure mode in the suite: a confident-looking multi-section answer built on no facts."
+    },
+    {
+      "id": "D10",
+      "category": "tricky-no-violence-money",
+      "question_layman": "My husband gives no money and I need money for my daughter's school fees. There is no violence and no one is threatening me.",
+      "question_kannada": null,
+      "expected_sections": [
+        "bnss-144"
+      ],
+      "stage1_sections": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20"
+      ],
+      "stage2_kept": [
+        "bnss-144"
+      ],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "hma-24",
+          "reason": "No HMA proceeding pending."
+        },
+        {
+          "section": "hma-25",
+          "reason": "No decree in prospect."
+        },
+        {
+          "section": "pwdva-20",
+          "reason": "No domestic violence alleged — school fees are a child-maintenance head under BNSS 144, not PWDVA 20 monetary relief for DV consequences."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): same as C1 — the maintenance section-set node must not be the default route for an immediate claim; gate PWDVA 20 on a DV trigger and HMA 24/25 on proceeding/decree. Add a Stage-2 rule 'maintenance-no-DV-no-proceeding: keep BNSS 144 only'.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "School fees belong under BNSS 144 (child maintenance), which is why the expected set is BNSS 144 alone — not because fees are ignored, but because they are claimed under the right section."
+    },
+    {
+      "id": "E1",
+      "category": "out-of-scope",
+      "question_layman": "My brother took my father's house after my father died. Can I get the house back from my brother?",
+      "question_kannada": null,
+      "expected_sections": [],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": true,
+      "escalate_actual": true,
+      "unverified_excluded": [],
+      "notes": "No family-law lane fits (not a husband/wife, maintenance, custody, stridhan or shared-household issue). Root picks nothing with confidence and escalates. Correct: no section invented."
+    },
+    {
+      "id": "E2",
+      "category": "out-of-scope",
+      "question_layman": "My neighbour stole my gold chain from my house yesterday. Can I get it back?",
+      "question_kannada": null,
+      "expected_sections": [],
+      "stage1_sections": [
+        "hma-27",
+        "bns-316"
+      ],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [
+        {
+          "section": "hma-27",
+          "reason": "Not stridhan — the holder is a stranger/neighbour, not the husband or his family, and there is no matrimonial proceeding."
+        },
+        {
+          "section": "bns-316",
+          "reason": "Theft by a stranger is not criminal breach of trust over entrusted stridhan. The applicable criminal section is not in the verified list."
+        }
+      ],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): add a Stage-1 holder check to the stridhan lane — 'who holds the property: husband / husband's family / someone else?' If someone else, do NOT fire HMA 27/BNS 316; escalate. The layman trigger word 'gold' alone must never fire the stridhan lane.",
+      "escalate_expected": true,
+      "escalate_actual": false,
+      "unverified_excluded": [
+        "Any BNS theft section for stranger theft — not in the verified list; escalate, do not invent."
+      ],
+      "notes": "Classic keyword trap: 'gold taken' fires stridhan even though nothing about the facts is stridhan. The correct criminal section for stranger theft is unverified and must be escalated, not guessed."
+    },
+    {
+      "id": "E3",
+      "category": "out-of-scope",
+      "question_layman": "I need a visa to travel abroad with my daughter for a holiday. How do I apply?",
+      "question_kannada": null,
+      "expected_sections": [],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": true,
+      "escalate_actual": true,
+      "unverified_excluded": [],
+      "notes": "Travel/visa question — outside the verified section set entirely. Escalates correctly; no section invented."
+    },
+    {
+      "id": "E4",
+      "category": "out-of-scope",
+      "question_layman": "My husband's company has not paid his salary for three months. Can I file a case against the company?",
+      "question_kannada": null,
+      "expected_sections": [],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": true,
+      "escalate_actual": true,
+      "unverified_excluded": [],
+      "notes": "Employment dispute against a third-party employer — no lane fits. Escalates correctly. (The unpaid salary is relevant only as a fact for maintenance quantum later, not as its own claim.)"
+    },
+    {
+      "id": "E5",
+      "category": "out-of-scope",
+      "question_layman": "Are there any government loans or schemes for single mothers that I can apply for?",
+      "question_kannada": null,
+      "expected_sections": [],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "pass",
+      "failure_fix": "",
+      "escalate_expected": true,
+      "escalate_actual": true,
+      "unverified_excluded": [],
+      "notes": "Welfare-scheme question — outside the verified section set. Escalates correctly rather than mapping to a maintenance section."
+    },
+    {
+      "id": "F1",
+      "category": "single-issue-kannada",
+      "question_layman": "Kannada (maintenance only): see question_kannada.",
+      "question_kannada": "ನನ್ನ ಗಂಡ ನನಗೆ ದುಡ್ಡು ಕೊಡ್ತಿಲ್ಲ. ನಾನು ಮತ್ತೆ ನನ್ನ ಮಗಳು ಹೇಗೆ ಜೀವನ ಮಾಡೋದು? ನನಗೆ ಪ್ರತಿ ತಿಂಗಳು ದುಡ್ಡು ಬೇಕು.",
+      "expected_sections": [
+        "bnss-144"
+      ],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): same as A3 — Kannada phrasebook + Kannada Stage-1 mapping for the maintenance trigger words alone ('duddu kodalla' = not giving money).",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Even the simplest single-issue Kannada question fails Stage 1 in v1. This is the clearest proof the Kannada gap is total, not partial."
+    },
+    {
+      "id": "F2",
+      "category": "single-issue-kannada",
+      "question_layman": "Kannada (custody only): see question_kannada.",
+      "question_kannada": "ನನ್ನ 8 ವರ್ಷದ ಮಗಳು ಯಾರ ಜೊತೆ ಇರಬೇಕು? ನಾನು ಅವಳನ್ನು ನನ್ನ ಜೊತೆ ಇಟ್ಕೋಬಹುದಾ?",
+      "expected_sections": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): same as A3, plus the B2 custody-no-proceeding Stage-2 rule — a Kannada fix that returned the full four-section custody set would still over-fire HMA 26.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Kannada failure stacked on the custody over-firing failure (B2). Two independent fixes needed."
+    },
+    {
+      "id": "F3",
+      "category": "single-issue-kannada",
+      "question_layman": "Kannada (residence only): see question_kannada.",
+      "question_kannada": "ಗಂಡನ ಮನೆಯವರು ನನ್ನನ್ನು ಮನೆಯಿಂದ ಹೊರಹಾಕ್ತೀವಿ ಅಂತ ಹೇಳ್ತಾರೆ. ನಾನು ಅದೇ ಮನೆಯಲ್ಲಿ ಇರಬಹುದಾ?",
+      "expected_sections": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "stage1_sections": [],
+      "stage2_kept": [],
+      "stage2_dropped_with_reason": [],
+      "verdict": "fail",
+      "failure_fix": "FIX (v2): same as A3, plus the B4/D8 fix gating PWDVA 20 — a Kannada fix that returned the full residence set would still over-fire PWDVA 20.",
+      "escalate_expected": false,
+      "escalate_actual": false,
+      "unverified_excluded": [],
+      "notes": "Kannada failure stacked on the residence over-firing failure (B4/D8). Two independent fixes needed."
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Model weights and caches are never committed (808 MB — fetch as in README §1)
+models/
+*.safetensors
+*.bin
+*.pt
+*.gguf
+__pycache__/
+*.pyc
+.DS_Store
+# Local sync records for the GitHub snapshot tool (live next to the staging dir, not in the repo)
+*.muse-github-snapshot-sync.json

@@ -1,0 +1,1513 @@
+{
+ "aggregate": {
+  "system": "Laya 421M (classic ModernBERT checkpoint) + v2 two-stage graph, LIVE in Colab",
+  "loader": {
+   "loader_used": "laya.load(local PIXMELT snapshot dir)",
+   "load_seconds": 25.8,
+   "errors_before_success": {}
+  },
+  "n_questions": 16,
+  "exact_section_set_match": "5/16",
+  "mean_precision": 0.656,
+  "mean_recall": 0.492,
+  "micro_precision": 0.875,
+  "micro_recall": 0.368,
+  "micro_tp_fp_fn": [
+   21,
+   3,
+   36
+  ],
+  "forbidden_before_recheck_total": 2,
+  "forbidden_after_recheck_total": 0,
+  "court_correct": "10/16",
+  "escalates_correct": "11/16",
+  "questions_with_model_error": 0,
+  "prose_forbidden_mappings": "NOT MEASURED — section classification only, no answer prose generated",
+  "walk_ceiling_reference": "Graph-walk ceiling was 16/16 exact (deterministic walk, NOT live). Do not compare live numbers to it as if it were a baseline."
+ },
+ "per_question": [
+  {
+   "id": "K0",
+   "exact": false,
+   "precision": 1.0,
+   "recall": 0.2,
+   "tp": 2,
+   "fp": 0,
+   "fn": 8,
+   "pred_labels": [
+    "BNS 316",
+    "HMA 27"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20",
+    "GWA 1890",
+    "HMGA s.6",
+    "WELFARE",
+    "HMA 27",
+    "BNS 316",
+    "PWDVA 17",
+    "PWDVA 18",
+    "PWDVA 19"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 24.17
+  },
+  {
+   "id": "H1",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 2,
+   "pred_labels": [],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [],
+   "court_expected": [
+    "Magistrate"
+   ],
+   "court_correct": false,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "error": null,
+   "latency_s": 9.41
+  },
+  {
+   "id": "H2",
+   "exact": false,
+   "precision": 0.5,
+   "recall": 1.0,
+   "tp": 3,
+   "fp": 3,
+   "fn": 0,
+   "pred_labels": [
+    "GWA 1890",
+    "HMGA s.6",
+    "PWDVA 17",
+    "PWDVA 18",
+    "PWDVA 19",
+    "WELFARE"
+   ],
+   "gt_labels": [
+    "GWA 1890",
+    "HMGA s.6",
+    "WELFARE"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court"
+   ],
+   "court_correct": false,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 16.59
+  },
+  {
+   "id": "H3",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 2,
+   "fp": 0,
+   "fn": 0,
+   "pred_labels": [
+    "BNS 316",
+    "HMA 27"
+   ],
+   "gt_labels": [
+    "HMA 27",
+    "BNS 316"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 12.76
+  },
+  {
+   "id": "H4",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 3,
+   "pred_labels": [],
+   "gt_labels": [
+    "PWDVA 17",
+    "PWDVA 18",
+    "PWDVA 19"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [],
+   "court_expected": [
+    "Magistrate"
+   ],
+   "court_correct": false,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "error": null,
+   "latency_s": 7.41
+  },
+  {
+   "id": "H5",
+   "exact": false,
+   "precision": 1.0,
+   "recall": 0.571,
+   "tp": 4,
+   "fp": 0,
+   "fn": 3,
+   "pred_labels": [
+    "BNSS 144",
+    "HMA 13",
+    "PWDVA 18",
+    "PWDVA 20"
+   ],
+   "gt_labels": [
+    "HMA 13",
+    "BNSS 144",
+    "PWDVA 20",
+    "PWDVA 18",
+    "GWA 1890",
+    "HMGA s.6",
+    "WELFARE"
+   ],
+   "forbidden_before_recheck": [
+    "HMA 25 with no decree"
+   ],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 14.24
+  },
+  {
+   "id": "H6",
+   "exact": false,
+   "precision": 1.0,
+   "recall": 0.4,
+   "tp": 2,
+   "fp": 0,
+   "fn": 3,
+   "pred_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20",
+    "PWDVA 17",
+    "PWDVA 18",
+    "PWDVA 19"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 12.26
+  },
+  {
+   "id": "H7",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 1,
+   "fp": 0,
+   "fn": 0,
+   "pred_labels": [
+    "Births and Deaths Act 1969"
+   ],
+   "gt_labels": [
+    "Births and Deaths Act 1969"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Registrar"
+   ],
+   "court_expected": [
+    "Registrar"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 8.72
+  },
+  {
+   "id": "H8",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 2,
+   "pred_labels": [],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [],
+   "court_expected": [
+    "Magistrate"
+   ],
+   "court_correct": false,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "error": null,
+   "latency_s": 9.03
+  },
+  {
+   "id": "H9",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 2,
+   "fp": 0,
+   "fn": 0,
+   "pred_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "forbidden_before_recheck": [
+    "HMA 25 with no decree"
+   ],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 10.3
+  },
+  {
+   "id": "H10",
+   "exact": false,
+   "precision": 1.0,
+   "recall": 0.5,
+   "tp": 2,
+   "fp": 0,
+   "fn": 2,
+   "pred_labels": [
+    "BNS 316",
+    "HMA 27"
+   ],
+   "gt_labels": [
+    "HMA 27",
+    "BNS 316",
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 12.92
+  },
+  {
+   "id": "H11",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 2,
+   "pred_labels": [],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [],
+   "court_expected": [
+    "Magistrate"
+   ],
+   "court_correct": false,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "error": null,
+   "latency_s": 8.55
+  },
+  {
+   "id": "H12",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 0,
+   "pred_labels": [],
+   "gt_labels": [],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [],
+   "court_expected": [],
+   "court_correct": true,
+   "escalates_live": false,
+   "escalates_expected": false,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 8.41
+  },
+  {
+   "id": "H13",
+   "exact": false,
+   "precision": 1.0,
+   "recall": 0.2,
+   "tp": 1,
+   "fp": 0,
+   "fn": 4,
+   "pred_labels": [
+    "PWDVA 18"
+   ],
+   "gt_labels": [
+    "PWDVA 18",
+    "PWDVA 17",
+    "PWDVA 19",
+    "PWDVA 20",
+    "BNSS 144"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 11.64
+  },
+  {
+   "id": "H14",
+   "exact": false,
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 7,
+   "pred_labels": [],
+   "gt_labels": [
+    "HMA 13",
+    "HMA 26",
+    "HMGA s.6",
+    "WELFARE",
+    "HMA 24",
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [],
+   "court_expected": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_correct": false,
+   "escalates_live": false,
+   "escalates_expected": true,
+   "escalates_correct": false,
+   "error": null,
+   "latency_s": 9.81
+  },
+  {
+   "id": "H15",
+   "exact": true,
+   "precision": 1.0,
+   "recall": 1.0,
+   "tp": 2,
+   "fp": 0,
+   "fn": 0,
+   "pred_labels": [
+    "BNS 316",
+    "HMA 27"
+   ],
+   "gt_labels": [
+    "BNS 316",
+    "HMA 27"
+   ],
+   "forbidden_before_recheck": [],
+   "forbidden_after_recheck": [],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_expected": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "court_correct": true,
+   "escalates_live": true,
+   "escalates_expected": true,
+   "escalates_correct": true,
+   "error": null,
+   "latency_s": 12.14
+  }
+ ],
+ "raw_live_runs": [
+  {
+   "id": "K0",
+   "question": "My husband left us two years ago and gives no money. I earn forty thousand a month, it is not enough for me and my eight year old daughter. My gold worth five lakh and two lakh cash my parents gave me is with my husband's family and they will not return it. They are throwing me out of the house which is in my husband's name. Who will get my daughter, how do I get my gold back, and which court do I go to?",
+   "gt_ids": [
+    "bnss-144",
+    "pwdva-20",
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle",
+    "hma-27",
+    "bns-316",
+    "pwdva-17",
+    "pwdva-18",
+    "pwdva-19"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20",
+    "GWA 1890",
+    "HMGA s.6",
+    "WELFARE",
+    "HMA 27",
+    "BNS 316",
+    "PWDVA 17",
+    "PWDVA 18",
+    "PWDVA 19"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": true,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0773,
+    "custody": 0.222,
+    "stridhan": 0.9064,
+    "residence": 0.265,
+    "violence": 0.0527,
+    "divorce": 0.2189,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.0773,
+    "custody": 0.222,
+    "stridhan": 0.9064,
+    "residence": 0.265,
+    "violence": 0.0527,
+    "divorce": 0.2189,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [
+    "stridhan"
+   ],
+   "sub_choices": {
+    "stridhan:stridhan-subissue": "stridhan_held_not_returned",
+    "stridhan:civil-vs-criminal": "both_civil_and_criminal"
+   },
+   "candidates_before_stage2": [
+    "bns-316",
+    "hma-27"
+   ],
+   "kept_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 24.17
+  },
+  {
+   "id": "H1",
+   "question": "My husband has not given me any money for three months. I earn fifteen thousand a month and I have two small children and no case filed anywhere.",
+   "gt_ids": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.4795,
+    "custody": 0.0894,
+    "stridhan": 0.4948,
+    "residence": 0.0968,
+    "violence": 0.0811,
+    "divorce": 0.2804,
+    "birth_certificate": 0.0007
+   },
+   "stage1_probs": {
+    "maintenance": 0.4795,
+    "custody": 0.0894,
+    "stridhan": 0.4948,
+    "residence": 0.0968,
+    "violence": 0.0811,
+    "divorce": 0.2804,
+    "birth_certificate": 0.0007
+   },
+   "fired_issues": [],
+   "sub_choices": {},
+   "candidates_before_stage2": [],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "court_live": [],
+   "error": null,
+   "latency_s": 9.41
+  },
+  {
+   "id": "H2",
+   "question": "Who will get my six year old son? My husband says as the father he will take him away from me.",
+   "gt_ids": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "gt_labels": [
+    "GWA 1890",
+    "HMGA s.6",
+    "WELFARE"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0,
+    "custody": 0.852,
+    "stridhan": 0.0,
+    "residence": 0.8247,
+    "violence": 0.2105,
+    "divorce": 0.0739,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.0,
+    "custody": 0.852,
+    "stridhan": 0.0,
+    "residence": 0.8247,
+    "violence": 0.2105,
+    "divorce": 0.0739,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [
+    "custody",
+    "residence"
+   ],
+   "sub_choices": {
+    "custody:custody_sub_issue_choice": "A: Custody inside a matrimonial proceeding (HMA s.26)",
+    "residence:residence_sub_issue": "Threatened with eviction, still living in the house",
+    "residence:protection_vs_residence": "Both — protection order plus residence right and residence order"
+   },
+   "candidates_before_stage2": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "pwdva-17",
+    "pwdva-18",
+    "pwdva-19",
+    "welfare-principle"
+   ],
+   "kept_ids": [
+    "gwa-1890",
+    "hmga-1956-s6",
+    "pwdva-17",
+    "pwdva-18",
+    "pwdva-19",
+    "welfare-principle"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 16.59
+  },
+  {
+   "id": "H3",
+   "question": "My mother gave me gold at my wedding and my in-laws kept it. I have never asked them to return it.",
+   "gt_ids": [
+    "hma-27",
+    "bns-316"
+   ],
+   "gt_labels": [
+    "HMA 27",
+    "BNS 316"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": false,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0001,
+    "custody": 0.0744,
+    "stridhan": 0.9332,
+    "residence": 0.057,
+    "violence": 0.0003,
+    "divorce": 0.0753,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.0001,
+    "custody": 0.0744,
+    "stridhan": 0.9332,
+    "residence": 0.057,
+    "violence": 0.0003,
+    "divorce": 0.0753,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [
+    "stridhan"
+   ],
+   "sub_choices": {
+    "stridhan:stridhan-subissue": "stridhan_held_not_returned",
+    "stridhan:civil-vs-criminal": "both_civil_and_criminal"
+   },
+   "candidates_before_stage2": [
+    "bns-316",
+    "hma-27"
+   ],
+   "kept_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Stridhan: make a written demand for return first, then re-evaluate BNS s.316",
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 12.76
+  },
+  {
+   "id": "H4",
+   "question": "They changed the lock and I cannot enter my house. The house is in my husband's name.",
+   "gt_ids": [
+    "pwdva-17",
+    "pwdva-18",
+    "pwdva-19"
+   ],
+   "gt_labels": [
+    "PWDVA 17",
+    "PWDVA 18",
+    "PWDVA 19"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0,
+    "custody": 0.0492,
+    "stridhan": 0.0133,
+    "residence": 0.1267,
+    "violence": 0.1279,
+    "divorce": 0.0001,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.0,
+    "custody": 0.0492,
+    "stridhan": 0.0133,
+    "residence": 0.1267,
+    "violence": 0.1279,
+    "divorce": 0.0001,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [],
+   "sub_choices": {},
+   "candidates_before_stage2": [],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "court_live": [],
+   "error": null,
+   "latency_s": 7.41
+  },
+  {
+   "id": "H5",
+   "question": "I want a divorce from my husband. He beats me, I need money every month and I want my daughter to stay with me.",
+   "gt_ids": [
+    "hma-13",
+    "bnss-144",
+    "pwdva-20",
+    "pwdva-18",
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "gt_labels": [
+    "HMA 13",
+    "BNSS 144",
+    "PWDVA 20",
+    "PWDVA 18",
+    "GWA 1890",
+    "HMGA s.6",
+    "WELFARE"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": true
+   },
+   "stage1_raw": {
+    "maintenance": 0.5366,
+    "custody": 0.1098,
+    "stridhan": 0.0003,
+    "residence": 0.4882,
+    "violence": 0.8343,
+    "divorce": 0.9475,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.5366,
+    "custody": 0.1098,
+    "stridhan": 0.0003,
+    "residence": 0.4882,
+    "violence": 0.8343,
+    "divorce": 0.9475,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [
+    "maintenance",
+    "violence",
+    "divorce"
+   ],
+   "sub_choices": {
+    "maintenance:maintenance-root": "permanent alimony at/after an HMA decree",
+    "procedure:divorce-gate": "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B"
+   },
+   "candidates_before_stage2": [
+    "bnss-144",
+    "hma-13",
+    "hma-25",
+    "pwdva-18",
+    "pwdva-20"
+   ],
+   "kept_ids": [
+    "bnss-144",
+    "hma-13",
+    "pwdva-18",
+    "pwdva-20"
+   ],
+   "dropped": [
+    [
+     "hma-25",
+     "no decree"
+    ]
+   ],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 14.24
+  },
+  {
+   "id": "H6",
+   "question": "I do not want a divorce. I just want money every month from my husband and to stay in the house with my daughter.",
+   "gt_ids": [
+    "bnss-144",
+    "pwdva-20",
+    "pwdva-17",
+    "pwdva-18",
+    "pwdva-19"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20",
+    "PWDVA 17",
+    "PWDVA 18",
+    "PWDVA 19"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.898,
+    "custody": 0.1602,
+    "stridhan": 0.0555,
+    "residence": 0.2173,
+    "violence": 0.0543,
+    "divorce": 0.384,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.898,
+    "custody": 0.1602,
+    "stridhan": 0.0555,
+    "residence": 0.2173,
+    "violence": 0.0543,
+    "divorce": 0.384,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [
+    "maintenance"
+   ],
+   "sub_choices": {
+    "maintenance:maintenance-root": "immediate maintenance now, no HMA case filed"
+   },
+   "candidates_before_stage2": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "kept_ids": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 12.26
+  },
+  {
+   "id": "H7",
+   "question": "How do I get my daughter's birth certificate? The hospital did not give us one.",
+   "gt_ids": [
+    "births-deaths-act-1969"
+   ],
+   "gt_labels": [
+    "Births and Deaths Act 1969"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0,
+    "custody": 0.0281,
+    "stridhan": 0.0,
+    "residence": 0.0001,
+    "violence": 0.0,
+    "divorce": 0.0,
+    "birth_certificate": 0.6624
+   },
+   "stage1_probs": {
+    "maintenance": 0.0,
+    "custody": 0.0281,
+    "stridhan": 0.0,
+    "residence": 0.0001,
+    "violence": 0.0,
+    "divorce": 0.0,
+    "birth_certificate": 0.6624
+   },
+   "fired_issues": [
+    "birth_certificate"
+   ],
+   "sub_choices": {},
+   "candidates_before_stage2": [
+    "births-deaths-act-1969"
+   ],
+   "kept_ids": [
+    "births-deaths-act-1969"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Registrar"
+   ],
+   "error": null,
+   "latency_s": 8.72
+  },
+  {
+   "id": "H8",
+   "question": "I need maintenance but I do not have my husband's salary slips and I do not know what he earns.",
+   "gt_ids": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.1746,
+    "custody": 0.1237,
+    "stridhan": 0.0626,
+    "residence": 0.1008,
+    "violence": 0.0388,
+    "divorce": 0.1251,
+    "birth_certificate": 0.0002
+   },
+   "stage1_probs": {
+    "maintenance": 0.1746,
+    "custody": 0.1237,
+    "stridhan": 0.0626,
+    "residence": 0.1008,
+    "violence": 0.0388,
+    "divorce": 0.1251,
+    "birth_certificate": 0.0002
+   },
+   "fired_issues": [],
+   "sub_choices": {},
+   "candidates_before_stage2": [],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "court_live": [],
+   "error": null,
+   "latency_s": 9.03
+  },
+  {
+   "id": "H9",
+   "question": "How much money can I get every month from my husband?",
+   "gt_ids": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.7931,
+    "custody": 0.0796,
+    "stridhan": 0.2546,
+    "residence": 0.0608,
+    "violence": 0.003,
+    "divorce": 0.1262,
+    "birth_certificate": 0.0264
+   },
+   "stage1_probs": {
+    "maintenance": 0.7931,
+    "custody": 0.0796,
+    "stridhan": 0.2546,
+    "residence": 0.0608,
+    "violence": 0.003,
+    "divorce": 0.1262,
+    "birth_certificate": 0.0264
+   },
+   "fired_issues": [
+    "maintenance"
+   ],
+   "sub_choices": {
+    "maintenance:maintenance-root": "permanent alimony at/after an HMA decree"
+   },
+   "candidates_before_stage2": [
+    "bnss-144",
+    "hma-25",
+    "pwdva-20"
+   ],
+   "kept_ids": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "dropped": [
+    [
+     "hma-25",
+     "no decree"
+    ]
+   ],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 10.3
+  },
+  {
+   "id": "H10",
+   "question": "My husband has my gold and I have not asked for it back yet, and he gives no money for me and my child.",
+   "gt_ids": [
+    "hma-27",
+    "bns-316",
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "HMA 27",
+    "BNS 316",
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": false,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.1467,
+    "custody": 0.1082,
+    "stridhan": 0.8929,
+    "residence": 0.1461,
+    "violence": 0.0745,
+    "divorce": 0.1164,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.1467,
+    "custody": 0.1082,
+    "stridhan": 0.8929,
+    "residence": 0.1461,
+    "violence": 0.0745,
+    "divorce": 0.1164,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [
+    "stridhan"
+   ],
+   "sub_choices": {
+    "stridhan:stridhan-subissue": "stridhan_held_not_returned",
+    "stridhan:civil-vs-criminal": "civil_only_s27"
+   },
+   "candidates_before_stage2": [
+    "bns-316",
+    "hma-27"
+   ],
+   "kept_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Stridhan: make a written demand for return first, then re-evaluate BNS s.316",
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 12.92
+  },
+  {
+   "id": "H11",
+   "question": "I need money while my case is going on, but I have not filed any case yet.",
+   "gt_ids": [
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.1432,
+    "custody": 0.1065,
+    "stridhan": 0.081,
+    "residence": 0.0555,
+    "violence": 0.016,
+    "divorce": 0.0965,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.1432,
+    "custody": 0.1065,
+    "stridhan": 0.081,
+    "residence": 0.0555,
+    "violence": 0.016,
+    "divorce": 0.0965,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [],
+   "sub_choices": {},
+   "candidates_before_stage2": [],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "court_live": [],
+   "error": null,
+   "latency_s": 8.55
+  },
+  {
+   "id": "H12",
+   "question": "My brother and I are fighting over our father's ancestral house. Who owns it and can I stop him selling it?",
+   "gt_ids": [],
+   "gt_labels": [],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0,
+    "custody": 0.1218,
+    "stridhan": 0.1146,
+    "residence": 0.0468,
+    "violence": 0.0431,
+    "divorce": 0.085,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.0,
+    "custody": 0.1218,
+    "stridhan": 0.1146,
+    "residence": 0.0468,
+    "violence": 0.0431,
+    "divorce": 0.085,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [],
+   "sub_choices": {},
+   "candidates_before_stage2": [],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "court_live": [],
+   "error": null,
+   "latency_s": 8.41
+  },
+  {
+   "id": "H13",
+   "question": "He beats me, throws me out of the house and gives no money for my son's school fees.",
+   "gt_ids": [
+    "pwdva-18",
+    "pwdva-17",
+    "pwdva-19",
+    "pwdva-20",
+    "bnss-144"
+   ],
+   "gt_labels": [
+    "PWDVA 18",
+    "PWDVA 17",
+    "PWDVA 19",
+    "PWDVA 20",
+    "BNSS 144"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": null,
+    "violence": true
+   },
+   "stage1_raw": {
+    "maintenance": 0.1031,
+    "custody": 0.035,
+    "stridhan": 0.001,
+    "residence": 0.4212,
+    "violence": 0.8892,
+    "divorce": 0.0414,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.1031,
+    "custody": 0.035,
+    "stridhan": 0.001,
+    "residence": 0.4212,
+    "violence": 0.8892,
+    "divorce": 0.0414,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [
+    "violence"
+   ],
+   "sub_choices": {},
+   "candidates_before_stage2": [
+    "pwdva-18"
+   ],
+   "kept_ids": [
+    "pwdva-18"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 11.64
+  },
+  {
+   "id": "H14",
+   "question": "My divorce case is already going on in the Family Court. I want my son to stay with me and money for his school fees while the case goes on.",
+   "gt_ids": [
+    "hma-13",
+    "hma-26",
+    "hmga-1956-s6",
+    "welfare-principle",
+    "hma-24",
+    "bnss-144",
+    "pwdva-20"
+   ],
+   "gt_labels": [
+    "HMA 13",
+    "HMA 26",
+    "HMGA s.6",
+    "WELFARE",
+    "HMA 24",
+    "BNSS 144",
+    "PWDVA 20"
+   ],
+   "facts": {
+    "divorce_asked": true,
+    "proceeding_pending": true,
+    "decree": false,
+    "demand_made": null,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.2542,
+    "custody": 0.1321,
+    "stridhan": 0.097,
+    "residence": 0.1225,
+    "violence": 0.0001,
+    "divorce": 0.1395,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.2542,
+    "custody": 0.1321,
+    "stridhan": 0.097,
+    "residence": 0.1225,
+    "violence": 0.0001,
+    "divorce": 0.1395,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [],
+   "sub_choices": {},
+   "candidates_before_stage2": [],
+   "kept_ids": [],
+   "dropped": [],
+   "escalations": [],
+   "court_live": [],
+   "error": null,
+   "latency_s": 9.81
+  },
+  {
+   "id": "H15",
+   "question": "He sold my gold without asking me. The gold was given to me by my parents at my wedding.",
+   "gt_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "gt_labels": [
+    "BNS 316",
+    "HMA 27"
+   ],
+   "facts": {
+    "divorce_asked": false,
+    "proceeding_pending": false,
+    "decree": false,
+    "demand_made": true,
+    "violence": false
+   },
+   "stage1_raw": {
+    "maintenance": 0.0001,
+    "custody": 0.0859,
+    "stridhan": 0.9032,
+    "residence": 0.067,
+    "violence": 0.07,
+    "divorce": 0.0,
+    "birth_certificate": 0.0
+   },
+   "stage1_probs": {
+    "maintenance": 0.0001,
+    "custody": 0.0859,
+    "stridhan": 0.9032,
+    "residence": 0.067,
+    "violence": 0.07,
+    "divorce": 0.0,
+    "birth_certificate": 0.0
+   },
+   "fired_issues": [
+    "stridhan"
+   ],
+   "sub_choices": {
+    "stridhan:stridhan-subissue": "stridhan_held_not_returned",
+    "stridhan:civil-vs-criminal": "civil_only_s27"
+   },
+   "candidates_before_stage2": [
+    "bns-316",
+    "hma-27"
+   ],
+   "kept_ids": [
+    "bns-316",
+    "hma-27"
+   ],
+   "dropped": [],
+   "escalations": [
+    "Quantum: husband's income / school fees unknown — escalate the amount, never invent it",
+    "Ask husband's income (estimate/range), school-fee amount, where husband lives now; never demand salary slips"
+   ],
+   "court_live": [
+    "Family Court",
+    "Magistrate"
+   ],
+   "error": null,
+   "latency_s": 12.14
+  }
+ ],
+ "load_info": {
+  "loader_used": "laya.load(local PIXMELT snapshot dir)",
+  "load_seconds": 25.8,
+  "errors_before_success": {}
+ }
+}

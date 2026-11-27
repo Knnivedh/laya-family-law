@@ -1,0 +1,281 @@
+{
+  "set": "sealed-kannada-8",
+  "frozen_date": "2026-11-27",
+  "language": "kn",
+  "blind_writer": true,
+  "questions": [
+    {
+      "id": "KN1",
+      "question": "ನನ್ನ ಗಂಡ ಕಳೆದ ಮೂರು ತಿಂಗಳಿನಿಂದ ನನಗೆ ಹಣ ಕೊಡುತ್ತಿಲ್ಲ. ನನಗೆ ಸ್ವಂತ ಆದಾಯ ಇಲ್ಲ, ಮಕ್ಕಳ ಖರ್ಚು ನಿಭಾಯಿಸುವುದು ಕಷ್ಟವಾಗಿದೆ. ನಾನು ಎಲ್ಲಿಯೂ ಕೇಸ್ ಹಾಕಿಲ್ಲ.",
+      "primary_issue": "maintenance",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_labels": [
+        "maintenance"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income unknown; needed to fix the monthly amount."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "no-case-filed"
+      ]
+    },
+    {
+      "id": "KN2",
+      "question": "ನನ್ನ ನಾಲ್ಕು ವರ್ಷದ ಮಗಳನ್ನು ಗಂಡ ತನ್ನ ತಾಯಿಯ ಮನೆಗೆ ಕರೆದುಕೊಂಡು ಹೋಗಿದ್ದಾನೆ. ತಂದೆಯಾದ್ದರಿಂದ ಮಗು ತನಗೇ ಸಿಗುತ್ತದೆ ಎನ್ನುತ್ತಾನೆ. ಮಗಳು ಯಾರ ಬಳಿ ಇರಬೇಕು? ನಾನು ಎಲ್ಲಿಯೂ ಕೇಸ್ ಹಾಕಿಲ್ಲ.",
+      "primary_issue": "custody",
+      "gt_sections": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "gt_labels": [
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Daughter's present whereabouts unknown; needed before any custody step."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "no-case-filed",
+        "child-under-5"
+      ]
+    },
+    {
+      "id": "KN3",
+      "question": "ಮದುವೆಯಲ್ಲಿ ನನ್ನ ತಂದೆ-ತಾಯಿ ಕೊಟ್ಟ ಚಿನ್ನವನ್ನು ಅತ್ತೆಮನೆ ಅವರು ಇಟ್ಟುಕೊಂಡಿದ್ದಾರೆ. ನಾನು ಅದನ್ನು ವಾಪಸ್ ಕೇಳಿಯೇ ಇಲ್ಲ.",
+      "primary_issue": "stridhan",
+      "gt_sections": [
+        "hma-27",
+        "bns-316"
+      ],
+      "gt_labels": [
+        "stridhan"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court",
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "written-demand-first",
+          "reason": "No demand has been made yet; make a written demand before any complaint."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue",
+        "demand-not-made"
+      ]
+    },
+    {
+      "id": "KN4",
+      "question": "ನನ್ನ ಗಂಡ ಮನೆಯ ಬೀಗ ಬದಲಿಸಿ ನನ್ನನ್ನು ಒಳಗೆ ಬಿಡುತ್ತಿಲ್ಲ. ಮನೆ ಗಂಡನ ಹೆಸರಿನಲ್ಲಿದೆ.",
+      "primary_issue": "residence",
+      "gt_sections": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "gt_labels": [
+        "residence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Ask whether she wants to return to the house or alternate accommodation."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue"
+      ]
+    },
+    {
+      "id": "KN5",
+      "question": "ನಾನು ಗಂಡನಿಂದ ವಿಚ್ಛೇದನ ಬಯಸುತ್ತೇನೆ. ಅವನು ನನ್ನನ್ನು ಹೊಡೆಯುತ್ತಾನೆ, ಹಣ ಕೊಡುವುದಿಲ್ಲ, ಮಗಳನ್ನು ತಾನೇ ಇಟ್ಟುಕೊಳ್ಳುತ್ತೇನೆ ಎನ್ನುತ್ತಾನೆ.",
+      "primary_issue": "divorce",
+      "gt_sections": [
+        "hma-13",
+        "pwdva-18",
+        "bnss-144",
+        "pwdva-20",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "gt_labels": [
+        "divorce",
+        "violence",
+        "maintenance",
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": true,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": true
+      },
+      "expected_court": [
+        "Family Court",
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "safety",
+          "reason": "Ongoing violence — protection order and safety steps."
+        },
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income unknown."
+        }
+      ],
+      "difficulty_tags": [
+        "multi-issue",
+        "divorce-asked"
+      ]
+    },
+    {
+      "id": "KN6",
+      "question": "ನನಗೆ ವಿಚ್ಛೇದನ ಬೇಡ. ಗಂಡನಿಂದ ಪ್ರತಿ ತಿಂಗಳು ಹಣ ಬೇಕು ಮತ್ತು ಮನೆಯಲ್ಲಿ ಮಗಳೊಂದಿಗೆ ಇರಬೇಕು.",
+      "primary_issue": "divorce",
+      "gt_sections": [
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "gt_labels": [
+        "maintenance",
+        "residence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Family Court",
+        "Judicial Magistrate First Class"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "ask_missing_fact",
+          "reason": "Husband's income unknown."
+        }
+      ],
+      "difficulty_tags": [
+        "divorce-not-asked",
+        "negation"
+      ]
+    },
+    {
+      "id": "KN7",
+      "question": "ನನ್ನ ಮಗನ ಜನನ ಪ್ರಮಾಣಪತ್ರವನ್ನು ಹೇಗೆ ಪಡೆಯುವುದು? ಆಸ್ಪತ್ರೆಯಲ್ಲಿ ಅದನ್ನು ಕೊಟ್ಟಿಲ್ಲ.",
+      "primary_issue": "birth-certificate",
+      "gt_sections": [
+        "births-deaths-act-1969"
+      ],
+      "gt_labels": [
+        "birth-certificate"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [
+        "Registrar of Births and Deaths"
+      ],
+      "escalates": true,
+      "expected_escalations": [
+        {
+          "type": "registrar-procedure",
+          "reason": "Birth-certificate procedure to be confirmed with the Registrar."
+        }
+      ],
+      "difficulty_tags": [
+        "single-issue"
+      ]
+    },
+    {
+      "id": "KN8",
+      "question": "ನನ್ನ ಕಂಪನಿ ನನ್ನನ್ನು ಕೆಲಸದಿಂದ ತೆಗೆದುಹಾಕಿ ಎರಡು ತಿಂಗಳ ಸಂಬಳವನ್ನು ಕೊಟ್ಟಿಲ್ಲ. ನಾನು ಏನು ಮಾಡಬೇಕು?",
+      "primary_issue": "out-of-scope",
+      "gt_sections": [],
+      "gt_labels": [
+        "out-of-scope"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false
+      },
+      "expected_court": [],
+      "escalates": false,
+      "expected_escalations": [],
+      "difficulty_tags": [
+        "out-of-scope",
+        "single-issue"
+      ]
+    }
+  ]
+}

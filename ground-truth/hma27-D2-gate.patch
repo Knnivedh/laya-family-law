@@ -1,0 +1,363 @@
+--- a/laya-crpc-bns-section-decision-tree-v2.json
++++ b/laya-crpc-bns-section-decision-tree-v2.json
+@@ -3802,7 +3802,7 @@
+     "set_id": "maintenance-set"
+    },
+    {
+-    "rule": "Stridhan rechecks HMA 27 + BNS 316 TOGETHER: civil/family-court return (HMA 27) and criminal breach of trust (BNS 316) must be cited together for the same facts, never one without the other and never replaced by Rajnesh v. Neha. If no demand for return has been made yet, BNS 316 is NOT dropped — it goes to demand-first fallback: make a written demand / legal notice first, then re-evaluate BNS 316 (see bns-316 check R-BNS316-03).",
++    "rule": "Stridhan rechecks the civil return route + BNS 316 TOGETHER: BNS 316 (criminal) and the civil return route must be cited together — HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151; never cite BNS 316 as the civil recovery route by itself, and never cite HMA 27 without a proceeding. If no demand for return has been made yet, BNS 316 is NOT dropped — it goes to demand-first fallback: make a written demand / legal notice first, then re-evaluate BNS 316 (see bns-316 check R-BNS316-03).",
+     "sections": [
+      "hma-27",
+      "bns-316"
+@@ -4225,10 +4225,10 @@
+      },
+      {
+       "check_id": "R-HMA27-04",
+-      "condition": "A matrimonial proceeding under the HMA is pending or being filed (s.27 operates within / in connection with such proceedings).",
+-      "drop_reason": null,
++      "condition": "HMA 27 fires only when a matrimonial proceeding under the HMA (ss. 9–13/13B) is pending, or is being filed together with the property claim, and the s.27 application is made before that proceeding is decided. ‘Being filed’ means the user states they are filing, will file, or have instructed the filing of an HMA petition; wanting a divorce or wanting the property back, without more, does not count.",
++      "drop_reason": "No HMA proceeding pending or being filed — HMA s.27 cannot be invoked standalone; route Stridhan return to the Family Court under Family Courts Act s.7(1) Expl. (c) / CPC s.151, and keep BNS s.316 as the criminal route.",
+       "fact_needed": "whether a matrimonial proceeding is already pending or must be freshly filed",
+-      "if_fail": "escalate",
++      "if_fail": "drop",
+       "kind": "prerequisite"
+      },
+      {
+@@ -4241,7 +4241,7 @@
+      },
+      {
+       "check_id": "R-HMA27-06",
+-      "condition": "Co-fire BNS 316: the criminal route for the same withheld Stridhan must be cited TOGETHER with HMA 27, never one without the other.",
++      "condition": "Co-fire BNS 316: the criminal route for the same withheld Stridhan must be cited TOGETHER with the civil return route — HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151; never cite BNS 316 as the civil recovery route by itself, and never cite HMA 27 without a proceeding.",
+       "drop_reason": null,
+       "fact_needed": "BNS 316 recheck outcome (entrustment, demand, dishonest refusal)",
+       "if_fail": "escalate",
+@@ -4273,7 +4273,7 @@
+      }
+     ],
+     "co_fire_rules": [
+-     "stridhan-set: HMA 27 (civil return) + BNS 316 (criminal) cited together; coordinate with PWDVA 20 so the same Rs 7 lakh is not double-counted; PWDVA 18 can restrain disposal/alienation of the Stridhan while the claim is pending."
++     "stridhan-set: the civil return route (HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151) + BNS 316 (criminal) cited together; coordinate with PWDVA 20 so the same Rs 7 lakh is not double-counted; PWDVA 18 can restrain disposal/alienation of the Stridhan while the claim is pending."
+     ],
+     "guardrails": [
+      "g-rajnesh",
+@@ -4725,7 +4725,7 @@
+      },
+      {
+       "check_id": "R-BNS316-05",
+-      "condition": "Relief sought is criminal prosecution for criminal breach of trust, NOT civil recovery by itself (that is HMA 27), NOT maintenance, custody or residence.",
++      "condition": "Relief sought is criminal prosecution for criminal breach of trust, NOT civil recovery by itself (that is the civil return route — HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151), NOT maintenance, custody or residence.",
+       "drop_reason": "BNS s.316 used as a civil recovery remedy, or for maintenance/custody/residence — section use is invalid as framed.",
+       "fact_needed": null,
+       "if_fail": "drop",
+@@ -4733,9 +4733,9 @@
+      },
+      {
+       "check_id": "R-BNS316-06",
+-      "condition": "Co-fire HMA 27: the civil/family-court return claim must be cited TOGETHER with BNS 316 for the same facts, never one without the other. A criminal conviction does not by itself order return — the s.27 claim does. Warn the user: filing an FIR is a criminal step with its own consequences and should be taken on legal advice, alongside (not instead of) the civil claim.",
++      "condition": "Co-fire the civil return route: the civil/family-court return claim must be cited TOGETHER with BNS 316 for the same facts, never one without the other — HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151. A criminal conviction does not by itself order return — the civil return claim does. Warn the user: filing an FIR is a criminal step with its own consequences and should be taken on legal advice, alongside (not instead of) the civil claim.",
+       "drop_reason": null,
+-      "fact_needed": "HMA 27 recheck outcome",
++      "fact_needed": "civil return route recheck outcome (HMA 27 / FCA s.7(1) Expl. (c))",
+       "if_fail": "escalate",
+       "kind": "co_fire"
+      },
+@@ -4749,7 +4749,7 @@
+      },
+      {
+       "check_id": "R-BNS316-08",
+-      "condition": "Forum is a criminal complaint / FIR at the jurisdictional police station (Bengaluru) or a private complaint before the jurisdictional Magistrate; trial before the Magistrate's court. The civil return claim runs in parallel in the Family Court under HMA 27. The graph picks the forum — never ask the user to pick.",
++      "condition": "Forum is a criminal complaint / FIR at the jurisdictional police station (Bengaluru) or a private complaint before the jurisdictional Magistrate; trial before the Magistrate's court. The civil return claim runs in parallel in the Family Court under the civil return route (HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151). The graph picks the forum — never ask the user to pick.",
+       "drop_reason": null,
+       "fact_needed": "whether an FIR / complaint has already been filed, and its status",
+       "if_fail": "escalate",
+@@ -4765,7 +4765,7 @@
+      }
+     ],
+     "co_fire_rules": [
+-     "stridhan-set: BNS 316 (criminal) + HMA 27 (civil) cited together; coordinate with PWDVA 20 so the same Rs 7 lakh is not double-counted; PWDVA 18 can restrain disposal/alienation of the Stridhan while the complaint and s.27 claim are pending."
++     "stridhan-set: BNS 316 (criminal) + the civil return route (HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151) cited together; coordinate with PWDVA 20 so the same Rs 7 lakh is not double-counted; PWDVA 18 can restrain disposal/alienation of the Stridhan while the complaint and the civil return claim are pending."
+     ],
+     "guardrails": [
+      "g-rajnesh",
+@@ -5855,7 +5855,7 @@
+     "NOT for residence in the shared household — residence is PWDVA ss.17–19",
+     "NOT for property that was gifted to the husband or his family for their own use (not the wife's Stridhan)",
+     "NOT for divorce — HMA ss.13/13B are cited only if divorce is expressly asked for, which it was not in the test case",
+-    "NOT a standalone criminal remedy — the criminal route for withheld Stridhan is BNS s.316, cited alongside s.27, not instead of it",
++    "NOT a standalone criminal remedy — the criminal route for withheld Stridhan is BNS s.316, cited alongside the civil return route (HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151), not instead of it",
+     "Rajnesh v. Neha is a MAINTENANCE precedent (quantum of maintenance) and must NEVER be cited for Stridhan"
+    ],
+    "id": "hma-27",
+@@ -5916,11 +5916,11 @@
+     "Valid Hindu marriage under the Hindu Marriage Act, 1955",
+     "Property claimed is the wife's Stridhan — i.e. gifts/property given to the wife at or around marriage, or acquired by her (not property gifted to the husband or his family for their own use)",
+     "Stridhan is presently in the possession/control of the husband or his family",
+-    "A matrimonial proceeding under the HMA is pending or being filed (s.27 operates within / in connection with such proceedings); alternatively the claim is pressed as part of the family-court case for maintenance/custody/residence"
++    "HMA 27 fires only when a matrimonial proceeding under the HMA (ss. 9–13/13B) is pending, or is being filed together with the property claim, and the s.27 application is made before that proceeding is decided. A freestanding s.27 application with no HMA proceeding is not maintainable. A Family Court case under another Act (BNSS s.144, PWDVA, GWA 1890) is not an HMA proceeding for this purpose. ‘Being filed’ means the user states they are filing, will file, or have instructed the filing of an HMA petition; wanting a divorce or wanting the property back, without more, does not count."
+    ],
+    "related_sections": [
+     {
+-     "relationship": "CRIMINAL ROUTE — same facts (Stridhan withheld) support criminal breach of trust; s.27 (civil/family-court return) and s.316 (criminal complaint/FIR) must be cited TOGETHER, never one without the other, and never replaced by Rajnesh v. Neha",
++     "relationship": "CRIMINAL ROUTE — same facts (Stridhan withheld) support criminal breach of trust; the civil return route (HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151) and s.316 (criminal complaint/FIR) must be cited TOGETHER, never one without the other, and never replaced by Rajnesh v. Neha",
+      "section": "BNS s.316"
+     },
+     {
+@@ -5981,7 +5981,7 @@
+   },
+   {
+    "act": "Bharatiya Nyaya Sanhita, 2023",
+-   "court": "Criminal complaint / FIR at the jurisdictional police station (Bengaluru) or a private complaint before the jurisdictional Magistrate; trial before the Magistrate's court. The civil return claim runs in parallel in the Family Court under HMA s.27. The graph picks the forum — never ask the user to pick the court.",
++   "court": "Criminal complaint / FIR at the jurisdictional police station (Bengaluru) or a private complaint before the jurisdictional Magistrate; trial before the Magistrate's court. The civil return claim runs in parallel in the Family Court under the civil return route (HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151). The graph picks the forum — never ask the user to pick the court.",
+    "escalate_rule": {
+     "condition": "Escalate to a human lawyer / LLM review when confidence is low or any of the missing facts below is absent; do NOT advise filing an FIR on guessed facts.",
+     "missing_facts": [
+@@ -5995,11 +5995,11 @@
+     "on_missing": "If no demand has been made, the first step is a written demand / legal notice, not an immediate FIR. If proof or the holder is unknown, flag s.316 as 'provisional — entrustment/demand unconfirmed' and escalate rather than asserting criminal breach of trust as established."
+    },
+    "exclusions": [
+-    "NOT a civil recovery remedy by itself — the civil/family-court return route is HMA s.27; s.316 is the criminal route and the two must be cited TOGETHER",
++    "NOT a civil recovery remedy by itself — the civil/family-court return route is HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151; s.316 is the criminal route and the two must be cited TOGETHER",
+     "NOT for maintenance, custody, or residence — those are BNSS s.144 / HMA ss.24–26 / PWDVA ss.17–20",
+     "NOT for a mere civil dispute with no entrustment and no dishonest intent (e.g. a genuine dispute over who a gift was given to, with no refusal after demand)",
+     "NOT for property gifted to the husband or his family for their own use (no entrustment of the wife's property)",
+-    "NOT a substitute for the s.27 return order — a criminal conviction does not by itself order return; the family-court s.27 claim does",
++    "NOT a substitute for the civil return order — a criminal conviction does not by itself order return; the family-court civil return claim does",
+     "Rajnesh v. Neha must NEVER be cited here — it is maintenance only"
+    ],
+    "id": "bns-316",
+@@ -6038,7 +6038,7 @@
+     "type": "choice"
+    },
+    "not_for": [
+-    "civil return of property (that is HMA s.27)",
++    "civil return of property (that is the civil return route — HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151)",
+     "maintenance",
+     "custody",
+     "residence",
+@@ -6063,11 +6063,11 @@
+    ],
+    "related_sections": [
+     {
+-     "relationship": "CIVIL ROUTE — the family-court claim for return of the Stridhan; s.316 (criminal) and s.27 (civil) must be cited TOGETHER for the same facts. The retest failure was citing Rajnesh v. Neha instead and never mentioning BNS s.316 at all.",
++     "relationship": "CIVIL ROUTE — the family-court claim for return of the Stridhan; s.316 (criminal) and the civil return route (HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151) must be cited TOGETHER for the same facts. The retest failure was citing Rajnesh v. Neha instead and never mentioning BNS s.316 at all.",
+      "section": "HMA s.27"
+     },
+     {
+-     "relationship": "Protection order can restrain disposal/alienation of the Stridhan while the criminal complaint and s.27 claim are pending",
++     "relationship": "Protection order can restrain disposal/alienation of the Stridhan while the criminal complaint and the civil return claim are pending",
+      "section": "PWDVA s.18"
+     },
+     {
+@@ -6079,7 +6079,7 @@
+      "section": "PWDVA s.19"
+     }
+    ],
+-   "relief": "Criminal prosecution for criminal breach of trust — punishment under BNS s.316 (imprisonment and fine as prescribed) — and, in practice, pressure/lever for return of the Stridhan; the actual return order comes from the parallel HMA s.27 family-court claim. Warn the user: filing an FIR is a criminal step with its own consequences and should be taken on legal advice, alongside (not instead of) the civil claim.",
++   "relief": "Criminal prosecution for criminal breach of trust — punishment under BNS s.316 (imprisonment and fine as prescribed) — and, in practice, pressure/lever for return of the Stridhan; the actual return order comes from the parallel civil return claim in the Family Court (HMA 27 where an HMA proceeding is pending/being filed, otherwise the Family Court property suit under Family Courts Act s.7(1) Expl. (c) / CPC s.151). Warn the user: filing an FIR is a criminal step with its own consequences and should be taken on legal advice, alongside (not instead of) the civil claim.",
+    "section": "s.316",
+    "title": "Criminal breach of trust (IPC s.406 equivalent) — Stridhan withheld",
+    "triggers": [
+--- a/laya-graph/live-laya-colab-test-v5-precision.ipynb
++++ b/laya-graph/live-laya-colab-test-v5-precision.ipynb
+@@ -308,6 +308,12 @@
+     "# \"I want my son/daughter to stay with me\" is a CUSTODY stay, not a claim\n",
+     "# to stay in the shared house, so H5/H14 are False under this rule.\n",
+     "# Ground truth is otherwise byte-identical to v3.\n",
++    "# v6 D2 ADDS one facts field, \"being_filed\" (bool, frozen annotation, same\n",
++    "# status as the other facts): true iff the question states the user is filing,\n",
++    "# will file, or has instructed the filing of an HMA petition (lane 3 §1.4).\n",
++    "# \"I want a divorce\" / wanting the property back, without more, does NOT count\n",
++    "# (consistent with HMA 24 handling on H5). Values: False for all 16 — no\n",
++    "# question states a filing / intended filing of an HMA petition.\n",
+     "TEST_SET = [\n",
+     " {\n",
+     "  \"id\": \"K0\",\n",
+@@ -340,6 +346,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": True,\n",
+     "   \"violence\": False,\n",
+@@ -368,6 +375,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -397,6 +405,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -424,6 +433,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": False,\n",
+     "   \"violence\": False,\n",
+@@ -454,6 +464,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -491,6 +502,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": True,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": True,\n",
+@@ -525,6 +537,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -550,6 +563,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -577,6 +591,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -604,6 +619,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -635,6 +651,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": False,\n",
+     "   \"violence\": False,\n",
+@@ -663,6 +680,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -684,6 +702,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -715,6 +734,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": True,\n",
+@@ -752,6 +772,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": True,\n",
+     "   \"proceeding_pending\": True,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": None,\n",
+     "   \"violence\": False,\n",
+@@ -780,6 +801,7 @@
+     "  \"facts\": {\n",
+     "   \"divorce_asked\": False,\n",
+     "   \"proceeding_pending\": False,\n",
++    "   \"being_filed\": False,\n",
+     "   \"decree\": False,\n",
+     "   \"demand_made\": True,\n",
+     "   \"violence\": False,\n",
+@@ -952,6 +974,18 @@
+     "#     when residence is gated out and violence fires, PWDVA 18 still comes\n",
+     "#     in through violence (that is how H5's missing PWDVA 18 is predicted\n",
+     "#     to return — see v4-change-log.md §5).\n",
++    "#  9. D2 HMA 27 GATE (v6 lane 3 §1.4; same logged change as the D1 GT\n",
++    "#     correction): HMA 27 fires only when a matrimonial proceeding under the\n",
++    "#     HMA is pending, or is being filed together with the property claim.\n",
++    "#     \"Being filed\" = Cell 6 fact being_filed (user states they are filing /\n",
++    "#     will file / have instructed filing of an HMA petition; wanting a divorce\n",
++    "#     or wanting the property back, without more, does not count — consistent\n",
++    "#     with HMA 24 handling on H5). Gate shape is the HMA 25 Layer B shape:\n",
++    "#     hma-27 is removed from kept (never added to dropped[]) and the drop is\n",
++    "#     recorded in gated_out with its own distinct reason; hma-27 stays in\n",
++    "#     candidates_before_gate. BNS 316 is NOT gated — it stays as the criminal\n",
++    "#     Stridhan route, with the civil return route now the Family Court\n",
++    "#     property suit under FCA s.7(1) Expl. (c) / CPC s.151.\n",
+     "# HARD RULES (unchanged from v1): every issue pick comes from agent.predict().\n",
+     "# If a predict call raises on the FULL-question pass, the question is recorded\n",
+     "# as an ERROR and scored as a miss. There is NO fallback to keyword / phrase /\n",
+@@ -1146,6 +1180,19 @@
+     "            kept.remove('hma-25')\n",
+     "            gated_out.append(\"hma-25: gated before generation (Layer B) — sub-choice said 'permanent alimony at/after an HMA decree' but decree=false\")\n",
+     "            # NOT added to dropped[]: it was never a candidate after gating.\n",
++    "    # --- D2 HMA 27 gate (lane 3 §1.4; same logged change as D1): HMA 27 fires\n",
++    "    # only when a matrimonial proceeding under the HMA is pending, or is being\n",
++    "    # filed together with the property claim. 'Being filed' means the user\n",
++    "    # states they are filing, will file, or have instructed the filing of an HMA\n",
++    "    # petition; wanting a divorce or wanting the property back, without more,\n",
++    "    # does not count. BNS 316 STAYS as the criminal Stridhan route.\n",
++    "    if 'hma-27' in kept:\n",
++    "        if facts.get('proceeding_pending') or facts.get('being_filed', False):\n",
++    "            pass  # proceeding pending / being filed: keep\n",
++    "        else:\n",
++    "            kept.remove('hma-27')\n",
++    "            gated_out.append(\"hma-27: gated (D2) — no HMA proceeding pending or being filed; HMA s.27 cannot be invoked standalone; civil return route is the Family Court property suit under FCA s.7(1) Expl. (c) / CPC s.151; BNS s.316 kept as the criminal route\")\n",
++    "            # NOT added to dropped[]: gated before generation, like hma-25 Layer B.\n",
+     "    # The old 'if not facts[decree] and hma-25 in kept: drop' recheck block is\n",
+     "    # DELETED per plan §3.1 (it would preserve the propose-then-drop shape).\n",
+     "    # --- typed escalations: quantum ONLY for maintenance questions ---\n",
+@@ -1206,6 +1253,20 @@
+     "print('HMA25 gate shadow test: PASS (decree=false -> gated, not kept, in candidates_before_gate; decree=true -> kept)')\n",
+     "\n",
+     "\n",
++    "# --- Offline shadow test of the D2 HMA 27 gate (no model calls; fails fast) ---\n",
++    "_shadow_stridhan_facts = {'divorce_asked': False, 'proceeding_pending': False, 'being_filed': False, 'decree': False, 'demand_made': True, 'violence': False}\n",
++    "_k3, _d3, _e3, _g3, _cbg3 = stage2({'stridhan'}, {}, _shadow_stridhan_facts)\n",
++    "assert 'hma-27' not in _k3, 'HMA27 gate shadow test FAILED: hma-27 kept with no proceeding pending/being filed'\n",
++    "assert 'bns-316' in _k3, 'HMA27 gate shadow test FAILED: bns-316 dropped with hma-27 (BNS 316 stays as the criminal route)'\n",
++    "assert any(g.startswith('hma-27:') for g in _g3), 'HMA27 gate shadow test FAILED: no hma-27 gated_out entry'\n",
++    "assert 'hma-27' in _cbg3, 'HMA27 gate shadow test FAILED: hma-27 missing from candidates_before_gate'\n",
++    "_k4, _d4, _e4, _g4, _cbg4 = stage2({'stridhan'}, {}, {**_shadow_stridhan_facts, 'proceeding_pending': True})\n",
++    "assert 'hma-27' in _k4, 'HMA27 gate shadow test FAILED: hma-27 dropped with proceeding pending'\n",
++    "_k5, _d5, _e5, _g5, _cbg5 = stage2({'stridhan'}, {}, {**_shadow_stridhan_facts, 'being_filed': True})\n",
++    "assert 'hma-27' in _k5, 'HMA27 gate shadow test FAILED: hma-27 dropped when being filed'\n",
++    "print('HMA27 gate shadow test: PASS (no proceeding -> gated, BNS 316 kept, in candidates_before_gate; pending/being-filed -> kept)')\n",
++    "\n",
++    "\n",
+     "RESULTS = []\n",
+     "for t in TEST_SET:\n",
+     "    q = t['question']\n",

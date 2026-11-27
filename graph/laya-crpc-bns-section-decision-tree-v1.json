@@ -1,0 +1,3501 @@
+{
+  "model": "Laya (convaiinnovations/laya) — System One decision model, NOT LLaMA",
+  "purpose": "Section classification for Indian family law: CrPC/BNSS + BNS (+ HMA / PWDVA / guardianship Acts where the retest proved them necessary). One Laya choice per decision node; no free-text generation for section selection.",
+  "version": "1.0",
+  "date": "2026-11-26",
+  "source": "Fresh English retest 2026-11-26, rated 4/10 overall (legal accuracy 3/10). Test case: 35yo Hindu woman, Bengaluru, Hindu marriage 2012, husband separated 2 years, Rs 40,000/month, paying no maintenance, 8yo daughter, Stridhan Rs 5 lakh gold + Rs 2 lakh cash held by husband's family, eviction threats from house in husband's name. Asked maintenance, custody, Stridhan return, residence, court, documents, timeline.",
+  "model_download_status": "NOT part of this file. Official convaiinnovations/laya weights failed with 403; PIXMELT/laya (~810 MB English checkpoint) download was running separately to ~/workspace/models/laya-english. This graph works with any Laya checkpoint once loaded.",
+  "guardrails": {
+    "rajnesh_v_neha": "Maintenance ONLY. NEVER cite for Stridhan, custody, residence or divorce.",
+    "satish_chander_ahuja": "Shared household / residence ONLY. NEVER cite for custody.",
+    "residence_label": "Right to reside in the SHARED HOUSEHOLD. NEVER call it 'tenancy rights'.",
+    "court_selection": "The graph picks the court (Family Court, Bengaluru for HMA matters; Magistrate for BNSS s.144 and PWDVA matters). NEVER ask the user to pick the court.",
+    "divorce_gate": "HMA s.13 / s.13B ONLY if divorce was asked. In the test case no divorce was asked, so they must NOT fire.",
+    "birth_certificate": "Registration of Births and Deaths Act 1969. NOT the Hindu Marriage Act.",
+    "salary_slips": "Ask husband's income / school fees / where husband lives now. Do NOT demand salary slips the user said she does not have.",
+    "quantum": "Section selection is high-confidence on the test facts; maintenance QUANTUM is low-confidence until husband's income is known — escalate quantum, not section selection. Never invent an amount.",
+    "no_double_counting": "Do not double-count the same maintenance under both PWDVA s.20 and BNSS s.144 / HMA ss.24-25. PWDVA s.20 is one canonical section, shared by the maintenance and residence lanes."
+  },
+  "fast_path": {
+    "design": "root choice (1 forward pass) -> one choice per selected lane (parallel) -> section_set node -> procedure court/documents node. No generation step for section selection.",
+    "laya_primitives_used": [
+      "choice",
+      "score",
+      "noul"
+    ],
+    "escalate_on": "low confidence, missing facts, or a question outside the verified section set"
+  },
+  "counts": {
+    "lanes": {
+      "maintenance": {
+        "sections_raw": 4,
+        "nodes": 7,
+        "edges": 12,
+        "file": "laya-graph/lanes/maintenance.json"
+      },
+      "custody": {
+        "sections_raw": 4,
+        "nodes": 4,
+        "edges": 4,
+        "file": "laya-graph/lanes/custody.json"
+      },
+      "stridhan": {
+        "sections_raw": 2,
+        "nodes": 8,
+        "edges": 8,
+        "file": "laya-graph/lanes/stridhan.json"
+      },
+      "residence": {
+        "sections_raw": 4,
+        "nodes": 9,
+        "edges": 21,
+        "file": "laya-graph/lanes/residence.json"
+      },
+      "procedure": {
+        "sections_raw": 16,
+        "nodes": 9,
+        "edges": 12,
+        "file": "laya-graph/lanes/procedure.json"
+      }
+    },
+    "sections_statutory_and_principle": 13,
+    "procedure_items": 16,
+    "sections_total_unique": 29,
+    "nodes_total": 38,
+    "edges_total": 66
+  },
+  "sections": [
+    {
+      "act": "Bharatiya Nagarik Suraksha Sanhita, 2023 (BNSS)",
+      "court": "Judicial Magistrate First Class (Magistrate's Court), Bengaluru — where the wife resides (or last resided with the husband, or where the husband resides). The graph picks the court; never ask the user to pick the court.",
+      "escalate_rule": {
+        "do_not_demand": [
+          "Salary slips of the husband (user said she does not have them)",
+          "The user picking the court"
+        ],
+        "escalate_to": "human lawyer / LLM review",
+        "missing_facts_to_ask": [
+          "Husband's income (monthly salary/business income — ask for an estimate or range, and whether he is employed; do NOT demand salary slips, the user said she does not have them)",
+          "School fees of the 8yo daughter (monthly/annual amount)",
+          "Where the husband lives now (city/address — needed for jurisdiction and service)"
+        ],
+        "note": "Section selection (BNSS s.144 applies) is high confidence on the test facts; QUANTUM (the amount) is low confidence until the husband's income is known — escalate quantum, not section selection.",
+        "when": "Low confidence on any prerequisite, or any of the missing facts below is unknown and material to quantum."
+      },
+      "exclusions": [
+        "NOT for permanent alimony after a divorce decree — that is HMA s.25.",
+        "NOT for interim support inside a pending HMA proceeding — that is HMA s.24.",
+        "NOT a property/Stridhan return remedy — Stridhan is HMA s.27 / BNS s.316.",
+        "NOT a residence/shared-household remedy — that is PWDVA ss.17-19.",
+        "NOT for a wife who is living in adultery, or who refuses to live with the husband without sufficient reason, or who is living separately by mutual consent (statutory bars — none apply on the test facts).",
+        "Does NOT by itself fix a lump-sum permanent settlement."
+      ],
+      "id": "bnss-144",
+      "keywords": [
+        "maintenance",
+        "monthly allowance",
+        "unable to maintain",
+        "neglect",
+        "refusal to maintain",
+        "wife",
+        "minor child"
+      ],
+      "laya_question": {
+        "confidence_basis": "Marriage subsisting since 2012, 2-year separation, zero maintenance paid, wife's Rs 40,000/month insufficient for herself plus an 8yo daughter.",
+        "expected_answer_for_test_case": "yes — wife unable to maintain herself, husband neglecting/refusing (and separately: yes — minor child; the 8yo daughter's maintenance is a second head under the same section)",
+        "options": [
+          "yes — wife unable to maintain herself, husband neglecting/refusing",
+          "yes — minor child unable to maintain itself, father neglecting/refusing",
+          "no — applicant can maintain herself and respondent is paying",
+          "unclear — income/means or neglect not yet established"
+        ],
+        "question": "Is the applicant a wife (or minor child) who is unable to maintain herself, whose husband has sufficient means but has neglected or refused to maintain her?",
+        "type": "choice"
+      },
+      "old_equivalent": "CrPC s.125",
+      "precedent": {
+        "case": "Rajnesh v. Neha (2021) 2 SCC 324",
+        "issue": "maintenance ONLY — criteria for determining the quantum of maintenance and the affidavit of assets and liabilities both parties must file",
+        "never_use_for": [
+          "Stridhan return",
+          "custody",
+          "residence",
+          "divorce"
+        ],
+        "note": "Rajnesh v. Neha governs HOW MUCH maintenance, not whether Stridhan is returned. Citing it for Stridhan was a retest error."
+      },
+      "prerequisites": [
+        "A legally valid marriage (Hindu marriage 2012 — subsisting, no divorce decree).",
+        "Applicant is unable to maintain herself / the child is unable to maintain itself.",
+        "Respondent (husband/father) has sufficient means to pay.",
+        "Respondent has neglected or refused to maintain the applicant (here: 2 years of separation with zero payment).",
+        "Territorial jurisdiction: Magistrate where the wife resides or last resided with the husband, or where the husband resides (Bengaluru — wife resides there; husband's current residence must be asked, not assumed)."
+      ],
+      "related_sections": [
+        {
+          "relationship": "Parallel interim route: if an HMA proceeding (e.g. restitution, judicial separation, divorce) is filed, HMA s.24 interim maintenance runs alongside BNSS s.144; the two cannot be double-counted — amounts are adjusted against each other.",
+          "section_id": "hma-24"
+        },
+        {
+          "relationship": "Successor route: BNSS s.144 maintenance during subsistence of marriage; HMA s.25 permanent alimony applies at/after decree. Cite together, sequence by stage.",
+          "section_id": "hma-25"
+        },
+        {
+          "relationship": "Overlapping monetary relief: PWDVA s.20 can cover maintenance, loss of earnings, medical and school expenses arising from domestic violence; may run in addition, with set-off against BNSS s.144 amounts.",
+          "section_id": "pwdva-20"
+        },
+        {
+          "relationship": "Custody lane: BNSS s.144 child maintenance pairs with HMA s.26 custody — who the 8yo daughter lives with determines who claims child maintenance on her behalf.",
+          "section_id": "hma-26"
+        },
+        {
+          "relationship": "Custody lane: Hindu Minority and Guardianship Act s.6 — mother is natural guardian of a minor child; supports the mother's standing to claim the daughter's maintenance.",
+          "section_id": "hmga-6"
+        },
+        {
+          "relationship": "Residence lane: maintenance under BNSS s.144 does not itself secure residence; PWDVA s.17 right to reside in the shared household is the residence remedy.",
+          "section_id": "pwdva-17"
+        }
+      ],
+      "relief": "Monthly maintenance allowance for the wife and, separately, for the 8yo daughter; interim maintenance during the pendency of the s.144 application; costs of the proceedings. Quantum is fixed on the Rajnesh v. Neha criteria (parties' status, reasonable wants, income and means of both, number of dependents) — no fixed amount can be stated without the husband's income, which must be asked.",
+      "section": "144",
+      "title": "Order for maintenance of wives, children and parents",
+      "triggers": [
+        "maintenance",
+        "husband not paying",
+        "no maintenance",
+        "separated husband",
+        "wife unable to maintain herself",
+        "child maintenance",
+        "monthly allowance",
+        "neglects to maintain",
+        "refuses to maintain"
+      ],
+      "when_used": "A wife, legitimate or illegitimate minor child, or parent who is unable to maintain herself/himself asks a Magistrate for a monthly maintenance order against a person who has sufficient means but neglects or refuses to maintain them. Triggered here by ALL of: (a) Hindu marriage subsisting since 2012 (no divorce decree), (b) husband separated for 2 years, (c) husband paying NO maintenance at all, (d) wife earns Rs 40,000/month but cannot fully maintain herself and her 8yo daughter on it, (e) husband has sufficient means (income to be established — do not assume an amount). Applies to the wife AND independently to the 8yo daughter (child maintenance is a separate head under the same section).",
+      "lane": "maintenance",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "maintenance",
+          "original_id": "bnss-144"
+        }
+      ],
+      "lanes": [
+        "maintenance"
+      ]
+    },
+    {
+      "act": "Hindu Marriage Act, 1955 (HMA)",
+      "court": "The District Court / Family Court seized of the HMA proceeding, Bengaluru (Family Court, Bengaluru, if an HMA case is filed there). The graph picks the court; never ask the user to pick the court.",
+      "escalate_rule": {
+        "do_not_demand": [
+          "Salary slips of the husband (user said she does not have them)",
+          "The user picking the court"
+        ],
+        "escalate_to": "human lawyer / LLM review",
+        "missing_facts_to_ask": [
+          "Whether any HMA proceeding (divorce, judicial separation, restitution) has been filed or is intended — s.24 cannot be invoked without one",
+          "Husband's income (estimate/range; do NOT demand salary slips, the user said she does not have them)",
+          "School fees of the 8yo daughter (for the interim quantum)",
+          "Where the husband lives now (jurisdiction/service)"
+        ],
+        "note": "If no HMA proceeding is filed, route to BNSS s.144 + PWDVA s.20 instead of s.24 — do not force s.24.",
+        "when": "Low confidence on whether an HMA proceeding exists or will be filed, or on the applicant's income sufficiency."
+      },
+      "exclusions": [
+        "NOT available when no HMA proceeding is pending or filed — use BNSS s.144 or PWDVA s.20 instead.",
+        "NOT permanent alimony — it ends when the proceeding ends; permanent relief is HMA s.25.",
+        "NOT a standalone maintenance claim independent of an HMA case.",
+        "NOT for Stridhan return (HMA s.27), custody (HMA s.26), or residence (PWDVA ss.17-19)."
+      ],
+      "id": "hma-24",
+      "keywords": [
+        "interim",
+        "pendente lite",
+        "during proceedings",
+        "maintenance pending",
+        "litigation expenses"
+      ],
+      "laya_question": {
+        "confidence_basis": "Test case asks for maintenance with no HMA proceeding mentioned; s.24 is conditional, not currently triggered.",
+        "expected_answer_for_test_case": "no — no HMA proceeding pending or filed (on the test facts no divorce/restitution case has been filed; s.24 becomes available only if/when one is filed, and BNSS s.144 is the immediate route)",
+        "options": [
+          "yes — HMA proceeding pending/filed and applicant lacks sufficient income",
+          "no — no HMA proceeding pending or filed",
+          "unclear — proceeding status or applicant income unknown"
+        ],
+        "question": "Is there an HMA proceeding currently pending (or being filed) between the spouses, and does the applicant lack sufficient independent income to support herself and meet the litigation expenses during that proceeding?",
+        "type": "choice"
+      },
+      "precedent": {
+        "case": "Rajnesh v. Neha (2021) 2 SCC 324",
+        "issue": "maintenance ONLY — criteria for fixing quantum of maintenance (interim and permanent) and the mandatory affidavit of assets and liabilities",
+        "never_use_for": [
+          "Stridhan return",
+          "custody",
+          "residence",
+          "divorce"
+        ],
+        "note": "The affidavit requirement applies to s.24 applications too; the wife files her own affidavit of assets/liabilities — she is NOT required to produce the husband's salary slips."
+      },
+      "prerequisites": [
+        "A proceeding under the HMA is pending (or being instituted) between the spouses.",
+        "The applicant spouse has no independent income sufficient for her/his support and the expenses of the proceeding.",
+        "The other spouse has the capacity to pay.",
+        "Application is made to the court seized of the HMA proceeding."
+      ],
+      "related_sections": [
+        {
+          "relationship": "Parallel route: BNSS s.144 maintenance can be claimed without any HMA proceeding; if both are claimed, amounts are set off against each other — never double-counted. The retest error was citing ONLY HMA s.24 and omitting BNSS s.144.",
+          "section_id": "bnss-144"
+        },
+        {
+          "relationship": "Temporal pair: s.24 is interim (during proceedings); s.25 is permanent (at/after decree). Always state both and which stage applies. Never cite s.24 as if it were the permanent remedy.",
+          "section_id": "hma-25"
+        },
+        {
+          "relationship": "Overlapping monetary relief during pendency — PWDVA s.20 can cover expenses and losses while proceedings run.",
+          "section_id": "pwdva-20"
+        },
+        {
+          "relationship": "Custody lane: interim maintenance for the 8yo daughter's upkeep is often sought together with interim custody under HMA s.26 in the same proceeding.",
+          "section_id": "hma-26"
+        }
+      ],
+      "relief": "Monthly interim maintenance (maintenance pendente lite) from the date of application until disposal of the HMA proceeding, plus expenses of the proceeding (litigation costs). Quantum per Rajnesh v. Neha criteria; interim amount is adjustable against the final s.25 order.",
+      "section": "24",
+      "title": "Maintenance pendente lite and expenses of proceedings",
+      "triggers": [
+        "interim maintenance",
+        "maintenance during proceedings",
+        "pendente lite",
+        "maintenance while case is pending",
+        "litigation expenses",
+        "expenses of proceedings",
+        "support during divorce case"
+      ],
+      "when_used": "INTERIM maintenance DURING the pendency of any proceeding under the HMA (restitution of conjugal rights, judicial separation, divorce, nullity). Triggered when: (a) an HMA proceeding is pending or being filed, AND (b) either spouse has no independent income sufficient for her/his support and the necessary expenses of the proceeding. In the test case it applies ONLY if/when an HMA proceeding is filed — it does not apply standalone while no HMA case is pending. It is the interim, time-bound companion to HMA s.25, not a substitute for BNSS s.144 (which needs no HMA proceeding).",
+      "lane": "maintenance",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "maintenance",
+          "original_id": "hma-24"
+        }
+      ],
+      "lanes": [
+        "maintenance"
+      ]
+    },
+    {
+      "act": "Hindu Marriage Act, 1955 (HMA)",
+      "court": "The District Court / Family Court that passes (or passed) the HMA decree, Bengaluru. The graph picks the court; never ask the user to pick the court.",
+      "escalate_rule": {
+        "do_not_demand": [
+          "Salary slips of the husband (user said she does not have them)",
+          "The user picking the court",
+          "A divorce decision the user has not made"
+        ],
+        "escalate_to": "human lawyer / LLM review",
+        "missing_facts_to_ask": [
+          "Whether divorce or judicial separation is intended at all — s.25 needs a decree; do not assume divorce is wanted",
+          "Husband's income and assets (estimate/range; do NOT demand salary slips, the user said she does not have them)",
+          "School fees of the 8yo daughter (for the permanent quantum, especially education provision)",
+          "Where the husband lives now (jurisdiction/service)"
+        ],
+        "note": "Do not present s.25 as the current remedy; present it as the decree-stage route, and keep BNSS s.144 as the live remedy.",
+        "when": "Low confidence on decree status, or the user asks for a permanent settlement figure without the husband's income/assets being known."
+      },
+      "exclusions": [
+        "NOT available while the marriage subsists with no HMA decree in prospect — use BNSS s.144 (and PWDVA s.20) for maintenance during subsistence.",
+        "NOT interim support during a pending proceeding — that is HMA s.24.",
+        "NOT a Stridhan/property-division remedy — Stridhan return is HMA s.27 / BNS s.316.",
+        "NOT a custody remedy (HMA s.26) or a residence remedy (PWDVA ss.17-19).",
+        "Never cite HMA s.25 together with HMA ss.13/13B unless divorce has actually been asked for — in the test case it has not, so s.25 is named as the future permanent route only, with no divorce sections cited."
+      ],
+      "id": "hma-25",
+      "keywords": [
+        "permanent alimony",
+        "alimony",
+        "after decree",
+        "lump sum",
+        "permanent maintenance"
+      ],
+      "laya_question": {
+        "confidence_basis": "Test case: Hindu marriage 2012, separated 2 years, no divorce asked for and no decree mentioned.",
+        "expected_answer_for_test_case": "no — no decree, marriage subsists (no divorce asked for; s.25 is the future permanent route at decree stage, not the current remedy)",
+        "options": [
+          "yes — decree being passed or already passed",
+          "no — no decree, marriage subsists",
+          "unclear — decree status unknown"
+        ],
+        "question": "Is an HMA decree being passed or has one already been passed, so that permanent alimony (rather than interim or subsistence maintenance) is the relief in play?",
+        "type": "choice"
+      },
+      "precedent": {
+        "case": "Rajnesh v. Neha (2021) 2 SCC 324",
+        "issue": "maintenance ONLY — criteria for determining the quantum of maintenance (including permanent alimony) and the affidavit of assets and liabilities",
+        "never_use_for": [
+          "Stridhan return",
+          "custody",
+          "residence",
+          "divorce"
+        ],
+        "note": "Quantum cannot be fixed without the husband's income and the parties' assets — the amount must not be guessed."
+      },
+      "prerequisites": [
+        "An HMA decree is being passed or has already been passed (divorce, judicial separation, or nullity).",
+        "The applicant spouse is entitled to ongoing support considering the respondent's income/property, the applicant's own income/property, and the conduct of the parties.",
+        "Application made to the court that passed the decree (or a court of competent jurisdiction thereafter)."
+      ],
+      "related_sections": [
+        {
+          "relationship": "Temporal pair: s.24 interim during proceedings; s.25 permanent at/after decree. Interim amounts paid under s.24 are adjusted against the s.25 order.",
+          "section_id": "hma-24"
+        },
+        {
+          "relationship": "Stage pair: BNSS s.144 covers maintenance while the marriage subsists; s.25 takes over as the permanent order at/after decree. Cite together so the user is not left with only one stage covered.",
+          "section_id": "bnss-144"
+        },
+        {
+          "relationship": "Overlapping monetary relief — PWDVA s.20 relief can continue alongside or be adjusted against a s.25 order.",
+          "section_id": "pwdva-20"
+        },
+        {
+          "relationship": "Stridhan lane: s.25 alimony is about ongoing support; HMA s.27 is about disposal/return of property (Stridhan) — separate heads, do not merge them.",
+          "section_id": "hma-27"
+        },
+        {
+          "relationship": "Custody lane: a s.25 order may include provision for the 8yo daughter's maintenance/education as part of the permanent settlement.",
+          "section_id": "hma-26"
+        }
+      ],
+      "relief": "Permanent alimony/maintenance — either a gross lump sum or a monthly/periodical payment for life or for a specified period, as the court directs, secured as the court thinks fit. Quantum per Rajnesh v. Neha criteria; the court may vary, modify or rescind the order on change of circumstances.",
+      "section": "25",
+      "title": "Permanent alimony and maintenance",
+      "triggers": [
+        "permanent alimony",
+        "permanent maintenance",
+        "alimony after divorce",
+        "maintenance after decree",
+        "lump sum settlement",
+        "alimony"
+      ],
+      "when_used": "PERMANENT alimony/maintenance ordered at the time of passing any decree under the HMA, or at any time subsequent thereto, on application by either spouse. Triggered when: (a) an HMA decree is being passed or has been passed (divorce, judicial separation, nullity), AND (b) the applicant spouse requires ongoing support after the marriage ends or is judicially separated. In the test case it does NOT apply yet — no divorce was asked for and no decree exists — but it must be named in the section set so the user understands the permanent route exists at decree stage, and so the s.24/s.25 distinction is explicit. It is the permanent counterpart of interim s.24.",
+      "lane": "maintenance",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "maintenance",
+          "original_id": "hma-25"
+        }
+      ],
+      "lanes": [
+        "maintenance"
+      ]
+    },
+    {
+      "act": "Protection of Women from Domestic Violence Act, 2005 (PWDVA)",
+      "court": "Judicial Magistrate First Class under the PWDVA, Bengaluru (same Magistrate's Court route as BNSS s.144 in practice). The graph picks the court; never ask the user to pick the court.",
+      "cross_link": "Shared with Lane 4 (Residence). Defined here for its maintenance/monetary function; Lane 4 defines it for residence-linked relief. Cross-link, do not duplicate as a separate section.",
+      "escalate_rule": {
+        "do_not_demand": [
+          "Salary slips of the husband (user said she does not have them)",
+          "The user picking the court"
+        ],
+        "escalate_to": "human lawyer / LLM review",
+        "missing_facts_to_ask": [
+          "Husband's income (estimate/range; do NOT demand salary slips, the user said she does not have them)",
+          "School fees of the 8yo daughter (monthly/annual amount — a direct s.20 head)",
+          "Where the husband lives now (jurisdiction/service)",
+          "Any medical expenses or rent/alternate-accommodation costs incurred"
+        ],
+        "note": "Section selection (PWDVA s.20 applies) is high confidence on the test facts; QUANTUM per expense head needs the missing facts — escalate quantum, not section selection.",
+        "when": "Low confidence on whether the facts amount to domestic violence/economic abuse, or on the quantum of any expense head."
+      },
+      "exclusions": [
+        "NOT a standalone maintenance code — it is relief for domestic-violence consequences; the core maintenance claim remains BNSS s.144 (cite together, never instead of it).",
+        "NOT a Stridhan return remedy — Stridhan is HMA s.27 / BNS s.316.",
+        "NOT a custody determination — custody is HMA s.26 / HMGA s.6 / GWA.",
+        "NOT a residence order by itself — residence is PWDVA ss.17-19 (Lane 4); s.20 covers the money side (including rent for alternate accommodation).",
+        "NOT available where there is no domestic relationship and no domestic-violence allegation."
+      ],
+      "id": "pwdva-20",
+      "keywords": [
+        "monetary relief",
+        "economic abuse",
+        "domestic violence",
+        "maintenance",
+        "expenses",
+        "compensation"
+      ],
+      "laya_question": {
+        "confidence_basis": "Marriage 2012 (domestic relationship), 2 years of zero maintenance (economic abuse), eviction threats.",
+        "expected_answer_for_test_case": "yes — domestic relationship plus economic abuse (maintenance withheld) (2-year separation, zero maintenance, plus eviction threats from the shared household)",
+        "options": [
+          "yes — domestic relationship plus economic abuse (maintenance withheld)",
+          "yes — domestic relationship plus physical/other violence",
+          "no — no domestic relationship or no domestic violence alleged",
+          "unclear — violence/economic abuse not yet established"
+        ],
+        "question": "Is the applicant in a domestic relationship with the respondent and has she suffered domestic violence, including economic abuse such as withholding maintenance?",
+        "type": "choice"
+      },
+      "precedent": {
+        "case": "Rajnesh v. Neha (2021) 2 SCC 324",
+        "issue": "maintenance ONLY — criteria for fixing the quantum of maintenance, applicable to monetary relief under PWDVA s.20 insofar as it includes maintenance",
+        "never_use_for": [
+          "Stridhan return",
+          "custody",
+          "residence",
+          "divorce"
+        ],
+        "note": "Rajnesh v. Neha is cited here only for the maintenance quantum inside s.20 relief, never for Stridhan or residence."
+      },
+      "prerequisites": [
+        "A domestic relationship between the applicant and the respondent (marriage 2012 — satisfied).",
+        "An allegation of domestic violence, including economic abuse (withholding maintenance for 2 years; eviction threats).",
+        "Expenses or losses actually incurred or reasonably anticipated (maintenance, school fees, medical, accommodation).",
+        "Application under the PWDVA before the Magistrate."
+      ],
+      "related_sections": [
+        {
+          "relationship": "Parallel monetary route: PWDVA s.20 relief can be claimed alongside BNSS s.144 maintenance; amounts are set off so there is no double recovery for the same month.",
+          "section_id": "bnss-144"
+        },
+        {
+          "relationship": "Interim overlap: s.20 relief can cover expenses during a pending HMA proceeding alongside s.24 interim maintenance.",
+          "section_id": "hma-24"
+        },
+        {
+          "relationship": "Permanent overlap: s.20 relief may be adjusted against a later s.25 permanent alimony order.",
+          "section_id": "hma-25"
+        },
+        {
+          "relationship": "Residence lane (Lane 4): s.17 right to reside in the shared household; s.20 covers the money consequences when residence is denied (e.g. rent for alternate accommodation).",
+          "section_id": "pwdva-17"
+        },
+        {
+          "relationship": "Residence lane (Lane 4): s.18 protection order restraining further violence/eviction threats; s.20 quantifies the monetary loss.",
+          "section_id": "pwdva-18"
+        },
+        {
+          "relationship": "Residence lane (Lane 4): s.19 residence order; s.20 covers rent/alternate accommodation if she is kept out.",
+          "section_id": "pwdva-19"
+        },
+        {
+          "relationship": "Custody lane: s.20 can include the 8yo daughter's school fees and medical expenses as part of monetary relief.",
+          "section_id": "hma-26"
+        }
+      ],
+      "relief": "Monetary reliefs: maintenance for the woman and the 8yo daughter, compensation for loss of earnings, medical expenses, school fees, loss/damage to property, and rent or alternate-accommodation costs where she has been kept out of the shared household. The Magistrate may also order a lump sum.",
+      "section": "20",
+      "title": "Monetary reliefs",
+      "triggers": [
+        "monetary relief",
+        "domestic violence",
+        "economic abuse",
+        "husband not paying maintenance",
+        "expenses",
+        "school fees",
+        "medical expenses",
+        "loss of earnings"
+      ],
+      "when_used": "Monetary reliefs for a woman who has suffered domestic violence (including economic abuse — here: 2 years of separation with NO maintenance paid, and eviction threats from the shared household). Triggered when: (a) the applicant is in a domestic relationship with the respondent, AND (b) domestic violence is alleged (economic abuse by withholding maintenance counts), AND (c) she has incurred or will incur expenses/losses: maintenance for herself and the 8yo daughter, loss of earnings, medical expenses, school fees, loss/damage to property, or rent/alternate accommodation costs. It is a fast, Magistrate-level route that can run alongside BNSS s.144.",
+      "lane": "maintenance",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "maintenance",
+          "original_id": "pwdva-20"
+        },
+        {
+          "lane": "residence",
+          "original_id": "PWDVA_20"
+        }
+      ],
+      "lanes": [
+        "maintenance",
+        "residence"
+      ],
+      "alternate_face": {
+        "residence": {
+          "when_used": "Defined in this lane for its residence/monetary-relief face: the woman has suffered economic loss or expense because of domestic violence — including loss of earnings, medical expenses, loss/damage to property, and rent for alternative accommodation where she cannot live in the shared household — and needs money to meet those expenses and maintain herself and her child. Test-case trigger: husband (Rs 40,000/month) pays no maintenance for two years while threatening eviction; monetary relief under s.20 runs alongside the residence claim (ss.17-19) so that the right to stay is not defeated by cutting off money, and covers rent if she is forced out. Shared with Lane 1 (maintenance) — this lane defines it only for its residence/monetary-relief intersection; Lane 1 owns the maintenance computation.",
+          "court": "Judicial Magistrate First Class (Magistrate) under the PWDVA, on an application under PWDVA s.12. The graph picks this court — never ask the user to pick the court. Cross-link: maintenance may also be sought under BNSS s.144 / HMA ss.24-25 in the appropriate forum; the graph must not double-count the same maintenance under two heads.",
+          "escalate_rule": "Escalate to human/LLM if: confidence is low, OR any of these facts is missing — the husband's income (stated Rs 40,000/month in the test case; verify if unstated), what maintenance if any he pays, the woman's and child's monthly needs, whether she needs rent/alternative accommodation, or any specific expenses/losses. Cross-link to Lane 1 for the maintenance figure; do NOT invent an amount here. Do NOT double-count maintenance under both s.20 and BNSS s.144/HMA ss.24-25.",
+          "exclusions": [
+            "Does NOT replace or duplicate a maintenance computation — BNSS s.144 and HMA ss.24-25 are the maintenance provisions; s.20 is the DV Act's monetary-relief route and must be coordinated with them, not double-counted",
+            "Does NOT decide custody — HMA s.26 / Guardians and Wards Act / HMGA s.6",
+            "Does NOT decide Stridhan return — HMA s.27 / BNS s.316 (Rs 5 lakh gold + Rs 2 lakh cash is Stridhan, not s.20 monetary relief)",
+            "Does NOT decide residence/possession — ss.17-19 do that; s.20 covers the money, including rent if she cannot stay",
+            "Does NOT decide divorce — HMA ss.13/13B only if divorce is asked for, which it is not here"
+          ]
+        }
+      }
+    },
+    {
+      "act": "Hindu Marriage Act, 1955",
+      "court": "District Court / Family Court where the matrimonial proceeding under the HMA is pending (Family Courts Act, 1984). The graph picks the court; never ask the user to pick the court.",
+      "escalate_rule": "Escalate to a human lawyer / LLM review if: (a) confidence that an HMA proceeding exists or will be filed is low; (b) it is unclear whether the parties are governed by the HMA; (c) the child is near majority or age is unknown; (d) there are allegations of abuse, neglect, or risk to the child that need urgent interim orders. Missing facts to ask before deciding: child's exact age and school; where the child lives now and with whom; husband's whereabouts and current address; whether any matrimonial petition has already been filed and in which court; any existing custody or visitation order.",
+      "exclusions": [
+        "Not for custody disputes where no matrimonial proceeding under the HMA exists or is contemplated (use Guardians and Wards Act 1890 instead)",
+        "Not for appointment of a guardian of the child's person or property as a standalone matter (use Guardians and Wards Act 1890 / HMGA s.6)",
+        "Not for determining who is the natural guardian in the abstract (HMGA s.6)",
+        "Not for non-Hindu parties (HMA does not apply)"
+      ],
+      "id": "hma-26",
+      "keywords": [
+        "custody",
+        "minor child",
+        "matrimonial proceedings",
+        "interim custody",
+        "visitation rights",
+        "welfare of child"
+      ],
+      "laya_question": {
+        "expected_answer": "A",
+        "expected_answer_for_test_case": "A — Hindu marriage 2012, separated 2 years, 8yo daughter, mother seeking custody in matrimonial proceedings",
+        "options": [
+          "A: Yes — HMA proceeding pending/filed and minor child custody in issue",
+          "B: No HMA proceeding — standalone custody/guardianship dispute",
+          "C: No minor child in issue"
+        ],
+        "question": "Is there a matrimonial proceeding under the Hindu Marriage Act pending or being filed, and is a minor child's custody in issue?",
+        "type": "choice"
+      },
+      "not_for": [
+        "Standalone guardianship appointment",
+        "Custody where no HMA proceeding exists",
+        "Non-Hindu parties"
+      ],
+      "precedent": "None cited for custody in this fragment. NOTE: Satish Chander Ahuja v. Sneha Ahuja is a shared-household/residence case under the PWDVA — it is NEVER a custody precedent and must not be cited for custody. Rajnesh v. Neha is a maintenance case only and must not be cited for custody.",
+      "prerequisites": [
+        "Parties are Hindus governed by the Hindu Marriage Act, 1955",
+        "A matrimonial proceeding under the HMA is pending, or is being filed (custody can be sought as part of it)",
+        "The child is a minor (below 18 years)",
+        "The court has jurisdiction over the matrimonial proceeding"
+      ],
+      "related_sections": [
+        "Guardians and Wards Act 1890 (standalone custody/guardianship when no matrimonial proceeding; welfare is the paramount test there too)",
+        "HMGA_1956_s6 (natural guardian status that frames who ordinarily has custody)",
+        "WELFARE_PRINCIPLE (paramount consideration governing every order under HMA s.26)",
+        "BNSS s.144 (maintenance for the child, separate from custody)",
+        "HMA s.24 (interim maintenance pendente lite, including for the child during proceedings)",
+        "HMA s.25 (permanent alimony/maintenance, may include child support)",
+        "PWDVA s.17 (right to reside in the shared household — relevant if the custodial parent and child need to remain in the home)",
+        "PWDVA s.18 (protection order)",
+        "PWDVA s.19 (residence order — alternative route to secure the home for the custodial parent and child)"
+      ],
+      "relief": "Interim or final custody order; visitation/access rights for the non-custodial parent; directions on the child's maintenance and education during the proceedings; the court may revoke, suspend or vary the order as circumstances change.",
+      "section": "s.26",
+      "title": "Custody of children in matrimonial proceedings",
+      "triggers": [
+        "custody of child",
+        "who gets the child",
+        "child custody",
+        "minor child",
+        "daughter/son custody",
+        "custody during divorce",
+        "custody in matrimonial proceedings",
+        "interim custody",
+        "visitation",
+        "child's education and maintenance in divorce"
+      ],
+      "when_used": "A Hindu marriage proceeding (divorce, judicial separation, restitution of conjugal rights, nullity, or any pending matrimonial petition) is before the court AND the parties have a minor child whose custody, maintenance or education needs to be decided; the court may pass interim or final orders on custody at any stage of the proceeding. Test case: mother in a Hindu marriage (2012), separated 2 years, asks for custody of her 8yo daughter while a matrimonial proceeding is pending or filed.",
+      "lane": "custody",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "custody",
+          "original_id": "HMA_26"
+        }
+      ],
+      "lanes": [
+        "custody"
+      ]
+    },
+    {
+      "act": "Guardians and Wards Act, 1890",
+      "court": "District Court / Family Court having jurisdiction where the minor ordinarily resides (Bengaluru for the test case). The graph picks the court; never ask the user to pick the court.",
+      "escalate_rule": "Escalate to a human lawyer / LLM review if: (a) it is unclear whether an HMA proceeding exists or will be filed, so the HMA s.26 vs GWA route cannot be chosen; (b) the child's welfare facts are contested (abuse, neglect, alienation, relocation); (c) guardianship of substantial property is involved; (d) the other parent's whereabouts are unknown, so service of the application is in doubt. Missing facts to ask before deciding: child's age/school; where the child lives now and with whom; husband's whereabouts and current address; whether any custody/guardianship order already exists; who currently cares for the child day to day.",
+      "exclusions": [
+        "Not the primary route when custody can be decided inside a pending HMA matrimonial proceeding (use HMA s.26 there)",
+        "Does not by itself decide who is the natural guardian — that status is governed by the personal law (HMGA s.6 for Hindus)",
+        "Not for maintenance (BNSS s.144 / HMA ss.24-25) or residence (PWDVA ss.17-19), which are separate reliefs"
+      ],
+      "id": "gwa-1890",
+      "keywords": [
+        "guardian",
+        "Guardians and Wards Act",
+        "court-appointed guardian",
+        "minor",
+        "welfare of minor",
+        "guardianship"
+      ],
+      "laya_question": {
+        "expected_answer": "B",
+        "expected_answer_for_test_case": "B — custody is sought alongside the matrimonial proceedings (HMA s.26 is the primary route); the Guardians and Wards Act is the fallback/parallel route if no HMA proceeding is filed, and it governs any standalone guardianship of the child's person or property",
+        "options": [
+          "A: Yes — standalone custody/guardianship, no HMA proceeding",
+          "B: No — custody is inside a pending HMA matrimonial proceeding (use HMA s.26)",
+          "C: No minor child / no guardianship question"
+        ],
+        "question": "Is custody/guardianship being sought as a standalone matter (no HMA matrimonial proceeding pending), with a minor child needing a court-appointed or declared guardian?",
+        "type": "choice"
+      },
+      "not_for": [
+        "Custody inside a pending HMA proceeding (use HMA s.26)",
+        "Determining natural-guardian status in the abstract (HMGA s.6)",
+        "Maintenance or residence relief"
+      ],
+      "precedent": "None cited for custody in this fragment. NOTE: Satish Chander Ahuja v. Sneha Ahuja is a shared-household/residence case under the PWDVA — it is NEVER a custody or guardianship precedent and must not be cited for custody or guardianship.",
+      "prerequisites": [
+        "The child is a minor (below 18 years)",
+        "An application is made to the District Court (or Family Court) for appointment/declaration of a guardian",
+        "The court is satisfied that appointment is for the welfare of the minor",
+        "No exclusive alternative forum already seized of the same custody question (if an HMA s.26 order is available and pending, that route is used first)"
+      ],
+      "related_sections": [
+        "HMA_26 (custody inside matrimonial proceedings — the parallel route when an HMA petition is pending)",
+        "HMGA_1956_s6 (natural guardian of a Hindu minor; the court under the GWA considers this status but welfare prevails)",
+        "WELFARE_PRINCIPLE (paramount consideration in every guardianship/custody decision under this Act)",
+        "BNSS s.144 (maintenance for the child, separate relief to be claimed alongside)",
+        "HMA s.24 / HMA s.25 (maintenance routes if an HMA proceeding is also filed)",
+        "PWDVA s.17 (right to reside in the shared household — relevant if the guardian/custodial parent and child need to remain in the home)",
+        "PWDVA s.18 (protection order)",
+        "PWDVA s.19 (residence order)"
+      ],
+      "relief": "Appointment or declaration of a guardian of the minor's person and/or property; custody order in favour of the fit person; visitation/access for the other parent; directions for the child's welfare, education and property; the court may remove or replace a guardian who is unfit.",
+      "section": "Guardians and Wards Act, 1890 (whole Act; guardianship and custody of minors)",
+      "title": "Guardianship and custody of minors — court-appointed guardian",
+      "triggers": [
+        "guardian appointment",
+        "court-appointed guardian",
+        "guardianship of minor",
+        "custody without divorce",
+        "custody when separated but no case filed",
+        "guardian of child's property",
+        "who is the legal guardian",
+        "minor's welfare"
+      ],
+      "when_used": "A minor child's custody or guardianship (of the person or of property) needs to be decided by a court and there is no matrimonial proceeding under the HMA in which custody can be decided under HMA s.26 — e.g. parents are separated but no divorce/separation petition is filed, the parties are not governed by the HMA, the natural guardian is unavailable/unfit, or a guardian of the child's property must be appointed. The court appoints or declares a guardian after considering the welfare of the minor as the paramount consideration. Test case fallback: if no HMA proceeding is filed, the mother's custody claim for her 8yo daughter proceeds under this Act.",
+      "lane": "custody",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "custody",
+          "original_id": "GWA_1890"
+        }
+      ],
+      "lanes": [
+        "custody"
+      ]
+    },
+    {
+      "act": "Hindu Minority and Guardianship Act, 1956",
+      "court": "District Court / Family Court deciding the custody or guardianship matter (the status question is decided as part of the HMA s.26 or GWA proceeding). The graph picks the court; never ask the user to pick the court.",
+      "escalate_rule": "Escalate to a human lawyer / LLM review if: (a) the child's religion/personal law is unclear or mixed; (b) the child is near five years old, so the below-five custody presumption is borderline; (c) there is a dispute about legitimacy or adoption affecting natural-guardian status; (d) the natural guardian is alleged unfit. Missing facts to ask before deciding: child's exact age (above/below five matters); child's school; where the child lives now; husband's whereabouts; whether the father is fit and available to care for the child.",
+      "exclusions": [
+        "Not a standalone custody remedy — s.6 defines who the natural guardian IS; it does not by itself grant custody or appoint a guardian (custody orders come from HMA s.26 or the Guardians and Wards Act)",
+        "Not applicable to non-Hindu minors",
+        "Does not override the welfare-of-the-child principle: a natural guardian who is unfit, or where the child's welfare requires it, can be denied custody"
+      ],
+      "id": "hmga-1956-s6",
+      "keywords": [
+        "natural guardian",
+        "Hindu minor",
+        "father",
+        "mother",
+        "child below five years",
+        "guardianship"
+      ],
+      "laya_question": {
+        "expected_answer": "A",
+        "expected_answer_for_test_case": "A — 8yo Hindu daughter (above five), so the father is the natural guardian in law; the mother's custody claim rests on the welfare-of-the-child principle, which overrides the default natural-guardian order",
+        "options": [
+          "A: Yes — Hindu minor; natural-guardian status in issue (child above five: father is natural guardian, mother claims custody on welfare grounds)",
+          "B: Yes — Hindu minor below five years (custody ordinarily with the mother)",
+          "C: No — non-Hindu minor, or natural guardianship not in issue"
+        ],
+        "question": "Is the child a Hindu minor, and is the question who the natural guardian is (father first, then mother; mother ordinarily for a child below five)?",
+        "type": "choice"
+      },
+      "not_for": [
+        "Granting custody by itself",
+        "Appointing a guardian (Guardians and Wards Act)",
+        "Non-Hindu minors",
+        "Overriding welfare of the child"
+      ],
+      "precedent": "None cited for custody in this fragment. NOTE: Satish Chander Ahuja v. Sneha Ahuja is a shared-household/residence case under the PWDVA — it is NEVER a custody or natural-guardianship precedent and must not be cited here.",
+      "prerequisites": [
+        "The child is a Hindu minor (below 18 years)",
+        "The question of natural guardianship arises — who is the natural guardian of the child's person or property",
+        "For a legitimate child: father first, then mother; for a child below five years, custody ordinarily with the mother; for an illegitimate child: mother first, then father"
+      ],
+      "related_sections": [
+        "HMA_26 (custody orders inside matrimonial proceedings, where the natural-guardian status under HMGA s.6 is one factor)",
+        "GWA_1890 (court-appointed guardian; the court considers natural-guardian status but welfare prevails)",
+        "WELFARE_PRINCIPLE (paramount — overrides the default natural-guardian order when the child's welfare requires it)",
+        "BNSS s.144 (maintenance for the child, separate relief)",
+        "HMA s.24 / HMA s.25 (maintenance routes if an HMA proceeding is filed)",
+        "PWDVA s.17 (right to reside in the shared household — relevant to where the custodial parent and child live)",
+        "PWDVA s.19 (residence order)"
+      ],
+      "relief": "Declaration/recognition of natural-guardian status; framing of the custody claim — for a child above five, the mother's claim is built on the welfare principle rather than on natural-guardian priority; for a child below five, custody ordinarily with the mother.",
+      "section": "s.6",
+      "title": "Natural guardians of a Hindu minor",
+      "triggers": [
+        "natural guardian",
+        "who is the natural guardian",
+        "father is natural guardian",
+        "mother custody of child below five",
+        "minor's guardian",
+        "Hindu minor guardian"
+      ],
+      "when_used": "The question is who is the natural guardian of a Hindu minor child — for a legitimate child, the father is the natural guardian and after him the mother; for a child below five years, the mother ordinarily has custody; the natural guardian's powers, and any dispute about who holds that status, arise in any custody or guardianship matter involving a Hindu minor. Test case: 8yo daughter of Hindu parents — the father is the natural guardian in law after the mother for a child above five, so the mother's custody claim must be framed with the welfare principle overriding the default natural-guardian order, not by denying the father's status.",
+      "lane": "custody",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "custody",
+          "original_id": "HMGA_1956_s6"
+        }
+      ],
+      "lanes": [
+        "custody"
+      ]
+    },
+    {
+      "act": "Principle of law (not a statute section)",
+      "court": "Same court as the underlying custody/guardianship proceeding (District Court / Family Court, Bengaluru for the test case). The graph picks the court; never ask the user to pick the court.",
+      "escalate_rule": "Escalate to a human lawyer / LLM review if: (a) welfare facts are missing or contested — the welfare assessment cannot be completed without them; (b) there are allegations of abuse, neglect, substance abuse, or risk to the child; (c) the child is old enough to express wishes and those wishes are unknown or conflict with the claim. Missing facts to ask before deciding: child's age/school; where the child lives now and with whom; who is the day-to-day caregiver; husband's whereabouts and involvement with the child; any history of neglect, violence, or instability.",
+      "exclusions": [
+        "Not a standalone remedy — it is a principle that governs the application of HMA s.26, the Guardians and Wards Act 1890, and HMGA s.6; it is never cited as if it were a statute section granting custody by itself",
+        "Not a substitute for the procedural route (the custody application must still be filed under the correct Act)"
+      ],
+      "id": "welfare-principle",
+      "keywords": [
+        "welfare",
+        "best interests",
+        "paramount",
+        "child welfare",
+        "stability",
+        "schooling"
+      ],
+      "laya_question": {
+        "expected_answer": "A",
+        "expected_answer_for_test_case": "A — on the facts known (8yo daughter, mother seeking custody, husband separated 2 years and paying no maintenance), welfare provisionally favours the mother, subject to confirming where the child lives now, the child's school, and the husband's whereabouts",
+        "options": [
+          "A: Welfare clearly favours the mother (stable schooling, mother is primary caregiver, father absent 2 years)",
+          "B: Welfare factors are balanced or unclear",
+          "C: Welfare clearly favours the father"
+        ],
+        "question": "On the facts known, does the child's welfare favour custody with the mother? Score the welfare factors: (1) child's age/school stability in Bengaluru, (2) current primary caregiver, (3) each parent's availability and fitness, (4) risk of disruption from moving the child.",
+        "type": "score"
+      },
+      "not_for": [
+        "Standalone custody remedy",
+        "Maintenance or residence relief (it governs custody/guardianship, not the amount of maintenance or the right to reside)"
+      ],
+      "precedent": "None cited in this fragment. NOTE: Satish Chander Ahuja v. Sneha Ahuja is a shared-household/residence case under the PWDVA — it is NEVER a custody precedent and must not be cited for custody or for the welfare principle in a custody context.",
+      "prerequisites": [
+        "A custody or guardianship question concerning a minor child is before the court",
+        "Facts about the child's life are available or can be gathered: age, schooling, current residence, health, emotional bonds, each parent's ability to care"
+      ],
+      "related_sections": [
+        "HMA_26 (welfare governs every custody order under HMA s.26)",
+        "GWA_1890 (welfare is the statutory paramount test for appointing a guardian)",
+        "HMGA_1956_s6 (welfare overrides the default natural-guardian order)",
+        "BNSS s.144 (child's maintenance supports welfare but is a separate relief)",
+        "HMA s.24 / HMA s.25 (maintenance during/after proceedings supports the child's welfare)",
+        "PWDVA s.17 (right to reside — a stable home serves the child's welfare)",
+        "PWDVA s.19 (residence order — secures the child's home)"
+      ],
+      "relief": "Custody/visitation/guardianship decided in the child's best interests; the court may order interim custody, supervised access, counselling, or a welfare report; the order can be varied if the child's welfare requires it.",
+      "section": "Welfare-of-the-child principle — paramount consideration",
+      "title": "Welfare of the child is the paramount consideration in custody and guardianship",
+      "triggers": [
+        "welfare of the child",
+        "best interests of the child",
+        "paramount consideration",
+        "child's welfare",
+        "what is best for the child"
+      ],
+      "when_used": "In EVERY custody or guardianship decision — under HMA s.26, under the Guardians and Wards Act 1890, and in any consideration of natural guardianship under HMGA s.6. Whenever a court decides who a minor child lives with, who cares for the child, visitation, or guardianship, the child's welfare (health, education, emotional well-being, stability, wishes if old enough) is the first and paramount consideration and overrides the parents' rights, the natural-guardian default order, and any other consideration. Test case: the 8yo daughter's welfare — her schooling in Bengaluru, stability, current living arrangement, and bond with each parent — decides custody, not the father's natural-guardian status alone.",
+      "lane": "custody",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "custody",
+          "original_id": "WELFARE_PRINCIPLE"
+        }
+      ],
+      "lanes": [
+        "custody"
+      ]
+    },
+    {
+      "act": "Hindu Marriage Act, 1955",
+      "court": "Family Court, Bengaluru (under the Family Courts Act, 1984; HMA s.27 application made in the matrimonial proceeding before the Family Court). The graph picks the court — never ask the user to pick the court.",
+      "escalate_rule": {
+        "condition": "Escalate to a human lawyer / LLM review when confidence is low or any of the missing facts below is absent; do NOT guess the list of items, who holds them, or whether a demand was made.",
+        "missing_facts": [
+          "Proof of Stridhan — receipts, bills, photographs, gift lists, bank withdrawal records for the Rs 5 lakh gold and Rs 2 lakh cash",
+          "Itemised list of Stridhan — weight/pieces of gold, denominations/amounts of cash, who gave each item and when",
+          "Who holds it now — husband, mother-in-law, father-in-law, or another family member; where it is kept",
+          "Any demand made — whether the wife (or her family) has demanded return, when, in what form (oral / written / legal notice), and what reply, if any, was given",
+          "Whether any of the Stridhan has been sold, pledged, or otherwise disposed of (affects in-specie return vs value recovery)",
+          "Whether a matrimonial proceeding is already pending (s.27 needs a proceeding) or must be freshly filed"
+        ],
+        "on_missing": "Ask for the missing facts once; if still missing, flag the section as 'provisional — proof of Stridhan outstanding' and escalate rather than asserting the claim as established."
+      },
+      "exclusions": [
+        "NOT for maintenance — maintenance is BNSS s.144 / HMA ss.24–25 / PWDVA s.20, never s.27",
+        "NOT for custody — custody is HMA s.26 / Guardians and Wards Act 1890 / Hindu Minority and Guardianship Act 1956 s.6",
+        "NOT for residence in the shared household — residence is PWDVA ss.17–19",
+        "NOT for property that was gifted to the husband or his family for their own use (not the wife's Stridhan)",
+        "NOT for divorce — HMA ss.13/13B are cited only if divorce is expressly asked for, which it was not in the test case",
+        "NOT a standalone criminal remedy — the criminal route for withheld Stridhan is BNS s.316, cited alongside s.27, not instead of it",
+        "Rajnesh v. Neha is a MAINTENANCE precedent (quantum of maintenance) and must NEVER be cited for Stridhan"
+      ],
+      "id": "hma-27",
+      "keywords": [
+        "stridhan",
+        "streedhan",
+        "gold",
+        "jewellery",
+        "cash",
+        "marriage gifts",
+        "return of property",
+        "disposal of property"
+      ],
+      "laya_question": {
+        "expected_answer": "yes_stridhan_held",
+        "expected_reason": "Test case: Rs 5 lakh gold + Rs 2 lakh cash given as Stridhan, held by the husband's family, not returned after 2 years of separation.",
+        "options": [
+          {
+            "label": "Yes — her Stridhan, held by husband's family, not returned",
+            "option": "yes_stridhan_held"
+          },
+          {
+            "label": "Yes, but no list / receipts / proof of the items",
+            "option": "yes_but_no_proof"
+          },
+          {
+            "label": "No — the property was gifted to the husband / his family for their use",
+            "option": "gift_to_husband_family"
+          },
+          {
+            "label": "No — already returned to her",
+            "option": "already_returned"
+          }
+        ],
+        "question": "Is the property claimed the wife's own Stridhan (gold/cash/gifts given to HER at or around marriage) that is now held by the husband or his family and not returned?",
+        "type": "choice"
+      },
+      "not_for": [
+        "maintenance",
+        "custody",
+        "residence / tenancy rights",
+        "divorce (unless expressly asked)",
+        "property gifted to the husband's family for their own use",
+        "criminal punishment (that is BNS s.316)"
+      ],
+      "precedent": [
+        {
+          "case": "Pratibha Rani v. Suraj Kumar (1985) 2 SCC 370",
+          "issue": "Stridhan is the wife's absolute property; the husband / his family hold it as trustees; refusal to return it on demand is criminal breach of trust (then IPC s.406, now BNS s.316). Correct issue: Stridhan ownership and entrustment."
+        },
+        {
+          "case": "Rashmi Kumar v. Mahesh Kumar Bhada (1997) 2 SCC 397",
+          "issue": "Stridhan return — the wife is entitled to recovery of her Stridhan from the husband / in-laws; refusal to return after demand supports both civil recovery and criminal breach of trust. Correct issue: Stridhan return."
+        }
+      ],
+      "precedent_never_to_cite": "Rajnesh v. Neha — maintenance quantum ONLY; citing it for Stridhan was the retest failure and must never recur.",
+      "prerequisites": [
+        "Valid Hindu marriage under the Hindu Marriage Act, 1955",
+        "Property claimed is the wife's Stridhan — i.e. gifts/property given to the wife at or around marriage, or acquired by her (not property gifted to the husband or his family for their own use)",
+        "Stridhan is presently in the possession/control of the husband or his family",
+        "A matrimonial proceeding under the HMA is pending or being filed (s.27 operates within / in connection with such proceedings); alternatively the claim is pressed as part of the family-court case for maintenance/custody/residence"
+      ],
+      "related_sections": [
+        {
+          "relationship": "CRIMINAL ROUTE — same facts (Stridhan withheld) support criminal breach of trust; s.27 (civil/family-court return) and s.316 (criminal complaint/FIR) must be cited TOGETHER, never one without the other, and never replaced by Rajnesh v. Neha",
+          "section": "BNS s.316"
+        },
+        {
+          "relationship": "Monetary reliefs under the Protection of Women from Domestic Violence Act can include compensation / return of Stridhan value as part of monetary relief; coordinate with the s.27 claim so the same amount is not double-counted",
+          "section": "PWDVA s.20"
+        },
+        {
+          "relationship": "Protection order can restrain the husband's family from disposing of / alienating the Stridhan while the s.27 claim is pending",
+          "section": "PWDVA s.18"
+        },
+        {
+          "relationship": "Interim maintenance pendente lite — a parallel claim in the same matrimonial proceeding; does not substitute for the Stridhan return claim",
+          "section": "HMA s.24"
+        },
+        {
+          "relationship": "Permanent alimony/maintenance — a parallel claim in the same proceeding; distinct relief from return of the wife's own property",
+          "section": "HMA s.25"
+        },
+        {
+          "relationship": "Maintenance under BNSS s.144 (old CrPC s.125) is a separate summary maintenance route; it does not cover Stridhan return",
+          "section": "BNSS s.144"
+        },
+        {
+          "relationship": "Custody of the 8-year-old daughter is a parallel claim in the same family-court proceeding; no overlap with Stridhan, but the same court hears both",
+          "section": "HMA s.26"
+        }
+      ],
+      "relief": "Direction for return of the Stridhan in specie (the gold itself) or, if it has been disposed of, its value — Rs 5 lakh gold + Rs 2 lakh cash (total Rs 7 lakh) — plus a direction restraining disposal/alienation of the property pending return. This is return of the wife's own property, not maintenance and not alimony.",
+      "section": "s.27",
+      "title": "Disposal of property — return of Stridhan / joint property in matrimonial proceedings",
+      "triggers": [
+        "stridhan",
+        "streedhan",
+        "gold",
+        "jewellery",
+        "jewelry",
+        "cash given at marriage",
+        "gifts at marriage",
+        "return my gold",
+        "husband's family holding",
+        "not returned",
+        "disposal of property",
+        "joint property",
+        "marriage gifts"
+      ],
+      "when_used": "A Hindu wife's Stridhan (gold, jewellery, cash, gifts given to her at/around marriage by her parents, relatives or in-laws, or acquired by her) is held by the husband or his family and has not been returned to her, in the context of a matrimonial proceeding (including a petition for maintenance, judicial separation, divorce, or restitution) or an application in such a proceeding. Triggered in the test case by: Rs 5 lakh gold + Rs 2 lakh cash given as Stridhan, held by the husband's family, not returned after 2 years of separation.",
+      "lane": "stridhan",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "stridhan",
+          "original_id": "hma-27"
+        }
+      ],
+      "lanes": [
+        "stridhan"
+      ]
+    },
+    {
+      "act": "Bharatiya Nyaya Sanhita, 2023",
+      "court": "Criminal complaint / FIR at the jurisdictional police station (Bengaluru) or a private complaint before the jurisdictional Magistrate; trial before the Magistrate's court. The civil return claim runs in parallel in the Family Court under HMA s.27. The graph picks the forum — never ask the user to pick the court.",
+      "escalate_rule": {
+        "condition": "Escalate to a human lawyer / LLM review when confidence is low or any of the missing facts below is absent; do NOT advise filing an FIR on guessed facts.",
+        "missing_facts": [
+          "Proof of Stridhan — receipts, bills, photographs, gift lists, bank records for the Rs 5 lakh gold and Rs 2 lakh cash",
+          "Itemised list of Stridhan — weight/pieces of gold, cash denominations, who gave each item and when",
+          "Who holds it now — husband, mother-in-law, father-in-law, or another family member; where it is kept",
+          "Any demand made — whether return was demanded, when, in what form (oral / written / legal notice), and the reply or refusal",
+          "Evidence of dishonest intent — refusal, denial of possession, sale/pledge/conversion of the gold, or disposal",
+          "Whether an FIR / complaint has already been filed, and its status"
+        ],
+        "on_missing": "If no demand has been made, the first step is a written demand / legal notice, not an immediate FIR. If proof or the holder is unknown, flag s.316 as 'provisional — entrustment/demand unconfirmed' and escalate rather than asserting criminal breach of trust as established."
+      },
+      "exclusions": [
+        "NOT a civil recovery remedy by itself — the civil/family-court return route is HMA s.27; s.316 is the criminal route and the two must be cited TOGETHER",
+        "NOT for maintenance, custody, or residence — those are BNSS s.144 / HMA ss.24–26 / PWDVA ss.17–20",
+        "NOT for a mere civil dispute with no entrustment and no dishonest intent (e.g. a genuine dispute over who a gift was given to, with no refusal after demand)",
+        "NOT for property gifted to the husband or his family for their own use (no entrustment of the wife's property)",
+        "NOT a substitute for the s.27 return order — a criminal conviction does not by itself order return; the family-court s.27 claim does",
+        "Rajnesh v. Neha must NEVER be cited here — it is maintenance only"
+      ],
+      "id": "bns-316",
+      "keywords": [
+        "criminal breach of trust",
+        "BNS 316",
+        "IPC 406",
+        "misappropriation",
+        "entrustment",
+        "withheld",
+        "FIR",
+        "police complaint"
+      ],
+      "laya_question": {
+        "expected_answer": "entrusted_and_refused",
+        "expected_reason": "Test case: Rs 5 lakh gold + Rs 2 lakh cash held by the husband's family, not returned after 2 years of separation; demand status to be confirmed — if no formal demand has yet been made, answer 'entrusted_no_demand_yet' and route to 'make a written demand / legal notice first', then re-evaluate s.316.",
+        "options": [
+          {
+            "label": "Yes — entrusted to husband's family, demand made / refusal evident",
+            "option": "entrusted_and_refused"
+          },
+          {
+            "label": "Entrusted, but no demand for return has been made yet",
+            "option": "entrusted_no_demand_yet"
+          },
+          {
+            "label": "No — never entrusted to them / property was theirs",
+            "option": "no_entrustment"
+          },
+          {
+            "label": "Returned, or ownership genuinely disputed with no dishonest refusal",
+            "option": "returned_or_disputed_ownership"
+          }
+        ],
+        "question": "Was the wife's Stridhan entrusted to the husband or his family, and have they refused to return it (or used/sold it) after it was demanded?",
+        "type": "choice"
+      },
+      "not_for": [
+        "civil return of property (that is HMA s.27)",
+        "maintenance",
+        "custody",
+        "residence",
+        "genuine gift-ownership disputes with no dishonest refusal"
+      ],
+      "precedent": [
+        {
+          "case": "Pratibha Rani v. Suraj Kumar (1985) 2 SCC 370",
+          "issue": "Stridhan entrusted to the husband / in-laws; refusal to return on demand is criminal breach of trust under IPC s.406 (now BNS s.316). Correct issue: Stridhan entrustment and criminal breach of trust."
+        },
+        {
+          "case": "Rashmi Kumar v. Mahesh Kumar Bhada (1997) 2 SCC 397",
+          "issue": "Refusal to return Stridhan after demand supports criminal breach of trust proceedings. Correct issue: Stridhan return and criminal breach of trust."
+        }
+      ],
+      "precedent_never_to_cite": "Rajnesh v. Neha — maintenance quantum ONLY; never for Stridhan or for criminal breach of trust.",
+      "prerequisites": [
+        "Entrustment — the Stridhan was entrusted to the husband or his family (they took possession as trustees/custodians of the wife's property, per Pratibha Rani v. Suraj Kumar)",
+        "Dishonest misappropriation, conversion to own use, or refusal to return on demand",
+        "A demand for return was made (or refusal is evident from conduct, e.g. denial of possession, sale/pledge of the gold)",
+        "Property is identifiable as the wife's Stridhan (itemised list / proof strengthens the complaint; absence of proof is an escalation trigger, not a reason to drop the section)"
+      ],
+      "related_sections": [
+        {
+          "relationship": "CIVIL ROUTE — the family-court claim for return of the Stridhan; s.316 (criminal) and s.27 (civil) must be cited TOGETHER for the same facts. The retest failure was citing Rajnesh v. Neha instead and never mentioning BNS s.316 at all.",
+          "section": "HMA s.27"
+        },
+        {
+          "relationship": "Protection order can restrain disposal/alienation of the Stridhan while the criminal complaint and s.27 claim are pending",
+          "section": "PWDVA s.18"
+        },
+        {
+          "relationship": "Monetary reliefs can cover the value of Stridhan if it cannot be recovered in specie; coordinate so the same Rs 7 lakh is not double-counted across remedies",
+          "section": "PWDVA s.20"
+        },
+        {
+          "relationship": "Residence order is a separate PWDVA relief for the shared household; unrelated to the criminal breach of trust except that both may be pressed in the same overall case",
+          "section": "PWDVA s.19"
+        }
+      ],
+      "relief": "Criminal prosecution for criminal breach of trust — punishment under BNS s.316 (imprisonment and fine as prescribed) — and, in practice, pressure/lever for return of the Stridhan; the actual return order comes from the parallel HMA s.27 family-court claim. Warn the user: filing an FIR is a criminal step with its own consequences and should be taken on legal advice, alongside (not instead of) the civil claim.",
+      "section": "s.316",
+      "title": "Criminal breach of trust (IPC s.406 equivalent) — Stridhan withheld",
+      "triggers": [
+        "criminal breach of trust",
+        "section 406",
+        "IPC 406",
+        "BNS 316",
+        "misappropriation",
+        "refused to return",
+        "withheld stridhan",
+        "sold my gold",
+        "police complaint",
+        "FIR",
+        "entrusted"
+      ],
+      "when_used": "Stridhan was entrusted to the husband or his family (they received and held the wife's gold/cash as trustees) and, on demand, they dishonestly misappropriate it, convert it to their own use, or refuse to return it. Triggered in the test case by: Rs 5 lakh gold + Rs 2 lakh cash entrusted to / held by the husband's family, not returned despite separation and (to be confirmed) demand.",
+      "lane": "stridhan",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "stridhan",
+          "original_id": "bns-316"
+        }
+      ],
+      "lanes": [
+        "stridhan"
+      ]
+    },
+    {
+      "act": "Protection of Women from Domestic Violence Act, 2005",
+      "court": "Judicial Magistrate First Class (Magistrate) under the PWDVA, on an application under PWDVA s.12. The graph picks this court — never ask the user to pick the court.",
+      "escalate_rule": "Escalate to human/LLM if: confidence is low, OR any of these facts is missing — who owns the house (husband / in-laws / joint family / rented), who currently lives there (wife, daughter, husband, in-laws), whether she has already been thrown out or is only threatened, the nature of the threats (verbal eviction threat vs. physical removal vs. lock-out), or whether any physical violence has occurred. Do NOT guess ownership or occupancy; do NOT answer on an assumed 'tenancy' basis.",
+      "exclusions": [
+        "Does NOT create ownership, title, or a property share in the house — it is a right to reside only",
+        "Does NOT create tenancy rights — NEVER call it 'tenancy rights'; the woman is not a tenant and no landlord-tenant relationship is created",
+        "Does NOT by itself stop violence or award money — that needs PWDVA s.18 (protection) and s.20 (monetary reliefs)",
+        "Does NOT by itself restrain the respondent from entering or order his removal — that needs a residence order under PWDVA s.19",
+        "Not for a woman with no domestic relationship with the respondent, and not for a house that was never a shared household"
+      ],
+      "id": "pwdva-17",
+      "keywords": [
+        "eviction",
+        "shared household",
+        "reside",
+        "dispossession",
+        "stay in the house",
+        "thrown out"
+      ],
+      "laya_question": {
+        "expected_answer_for_test_case": "Yes — she lives there with him/his family and faces eviction threats (wife and 8-year-old daughter live in the house in the husband's name; eviction threatened)",
+        "options": [
+          "Yes — she lives there with him/his family and faces eviction threats",
+          "Yes — she lived there but has already been thrown out",
+          "No — she never lived in that house",
+          "Unclear — who lives there / who owns it is not stated"
+        ],
+        "question": "Does the woman live (or has she lived) in the house with the husband in a domestic relationship, and is she now being threatened with eviction from it?",
+        "scoring_note": "Option 1 or 2 both trigger PWDVA s.17; option 2 additionally strengthens the s.19 claim (restoration of possession). Option 3 excludes s.17. Option 4 escalates for missing facts.",
+        "type": "choice"
+      },
+      "precedent": "Satish Chander Ahuja v. Sneha Ahuja (2020) — shared household / residence ONLY. The Supreme Court held the right to reside in a shared household is not confined to a house owned by the husband; it extends to a house owned by in-laws/joint family where the woman lived in a domestic relationship. Cite ONLY for residence/shared household — never for custody, never for maintenance, never for Stridhan.",
+      "prerequisites": [
+        "Aggrieved person is a woman in a domestic relationship (here: wife in a Hindu marriage since 2012)",
+        "A shared household exists or existed — a household where she lives or has lived with the respondent in a domestic relationship (here: the matrimonial home where she and her daughter live)",
+        "Domestic violence alleged or apprehended (here: eviction threats; economic/emotional abuse in the form of withholding maintenance and threatening homelessness)"
+      ],
+      "related_sections": [
+        "PWDVA s.18 — protection order to stop the threats/violence backing the eviction",
+        "PWDVA s.19 — residence order giving the s.17 right enforceable teeth (restraint on dispossession, removal of respondent, alternative accommodation)",
+        "PWDVA s.20 — monetary reliefs: maintenance and compensation for expenses/losses arising from domestic violence, including rent for alternative accommodation if she cannot stay",
+        "BNSS s.144 (old CrPC s.125) — maintenance for wife and child, parallel to PWDVA s.20",
+        "HMA s.24 — interim maintenance pendente lite",
+        "HMA s.25 — permanent alimony and maintenance",
+        "HMA s.26 — custody of the 8-year-old daughter, who lives in the same shared household",
+        "HMA s.27 — Stridhan/property disposal",
+        "BNS s.316 (IPC s.406 equivalent) — criminal breach of trust for Stridhan withheld by husband's family"
+      ],
+      "relief": "Declaration/recognition of the right to reside in the shared household; the respondent cannot evict, dispossess, or exclude her except in accordance with law. This is the legal foundation — the enforceable orders (restraint on dispossession, removal, alternative accommodation) are obtained under PWDVA s.19.",
+      "section": "17",
+      "title": "Right to reside in a shared household",
+      "triggers": [
+        "eviction threat",
+        "thrown out",
+        "asked to leave the house",
+        "locked out",
+        "house in husband's name",
+        "shared household",
+        "right to stay",
+        "right to reside",
+        "dispossessed",
+        "not allowed to enter"
+      ],
+      "when_used": "The aggrieved woman is being threatened with eviction, dispossession, or exclusion from the household where she lives or has lived in a domestic relationship, OR she needs the legal basis to remain living there. Triggers on the exact test-case facts: wife and 8-year-old daughter live in a house in the husband's name; husband/his family threaten eviction; she seeks to stay. The right exists whether or not she has any title, ownership, or tenancy in the house, and whether or not the house is in the husband's name, a joint-family property, or owned by in-laws.",
+      "lane": "residence",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "residence",
+          "original_id": "PWDVA_17"
+        }
+      ],
+      "lanes": [
+        "residence"
+      ]
+    },
+    {
+      "act": "Protection of Women from Domestic Violence Act, 2005",
+      "court": "Judicial Magistrate First Class (Magistrate) under the PWDVA, on an application under PWDVA s.12. The graph picks this court — never ask the user to pick the court.",
+      "escalate_rule": "Escalate to human/LLM if: confidence is low, OR any of these facts is missing — the nature of the threats (words used, who made them, when), whether any physical violence occurred (what, when, injuries, medical/police record), whether the daughter was threatened or harmed, or whether there is an immediate safety risk requiring urgent/ex parte relief. If immediate danger is indicated, flag urgency — do not delay on a routine track. Do NOT minimise threats as 'only a family dispute'.",
+      "exclusions": [
+        "Does NOT by itself grant a right to stay in the house — that is PWDVA s.17, enforced by s.19",
+        "Does NOT by itself order the respondent out of the house or restrain his entry — that is PWDVA s.19",
+        "Does NOT award money — that is PWDVA s.20 (and BNSS s.144 / HMA ss.24-25 for maintenance)",
+        "Does NOT decide custody — that is HMA s.26 / Guardians and Wards Act / HMGA s.6",
+        "Does NOT decide Stridhan — that is HMA s.27 / BNS s.316",
+        "Not for past violence with no continuing threat or apprehension and no relief sought — the order is forward-looking protection"
+      ],
+      "id": "pwdva-18",
+      "keywords": [
+        "protection order",
+        "domestic violence",
+        "threats",
+        "harassment",
+        "intimidation",
+        "stop the violence"
+      ],
+      "laya_question": {
+        "expected_answer_for_test_case": "Yes — threats/intimidation/violence are happening or credibly threatened (eviction threats against the wife living in the house; ongoing intimidation while maintenance is withheld)",
+        "options": [
+          "Yes — threats/intimidation/violence are happening or credibly threatened",
+          "No — there are no threats or violence, only a property/eviction dispute with no intimidation",
+          "Only past violence, no current threat",
+          "Unclear — the nature of the threats or any violence is not stated"
+        ],
+        "question": "Has the husband (or his family) threatened, harassed, intimidated, or used violence against the woman — including threats to throw her out — and is she afraid it will happen again?",
+        "scoring_note": "Option 1 triggers PWDVA s.18. Option 2 routes to s.17/s.19 only. Option 3 needs the date/nature of past violence before deciding. Option 4 escalates for missing facts.",
+        "type": "choice"
+      },
+      "precedent": "No case-law precedent relied on for this section in this lane. Do NOT cite Rajnesh v. Neha here (maintenance only) and do NOT cite Satish Chander Ahuja here (residence/shared household only).",
+      "prerequisites": [
+        "Aggrieved woman in a domestic relationship with the respondent",
+        "Prima facie domestic violence, or a threat/apprehension of it (eviction threats, harassment, intimidation qualify)",
+        "Application under PWDVA s.12 before the Magistrate, supported by a domestic incident report / affidavit as applicable"
+      ],
+      "related_sections": [
+        "PWDVA s.17 — right to reside in the shared household (the home the protection order defends)",
+        "PWDVA s.19 — residence order (removal/restraint directions that a protection order alone cannot give)",
+        "PWDVA s.20 — monetary reliefs for losses/expenses caused by the violence",
+        "BNSS s.144 (old CrPC s.125) — maintenance",
+        "HMA s.24 — interim maintenance pendente lite",
+        "HMA s.25 — permanent alimony and maintenance",
+        "HMA s.26 — custody of the 8-year-old daughter",
+        "HMA s.27 — Stridhan return",
+        "BNS s.316 (IPC s.406 equivalent) — criminal breach of trust for Stridhan"
+      ],
+      "relief": "Order prohibiting the respondent from committing any act of domestic violence, aiding/abetting it, entering the woman's place of employment or other specified places, communicating with her in specified ways, or committing any other act specified in the order; breach is punishable. It stops the threats; it does not settle residence, money, custody, or property.",
+      "section": "18",
+      "title": "Protection order",
+      "triggers": [
+        "threats",
+        "threatened",
+        "harassment",
+        "intimidation",
+        "violence",
+        "beating",
+        "abuse",
+        "stop him from",
+        "protection",
+        "afraid",
+        "harassing calls or visits"
+      ],
+      "when_used": "The respondent has committed, or threatens to commit, an act of domestic violence — including physical violence, threats, intimidation, harassment, or coercion — and an order is needed prohibiting him from doing it. Test-case trigger: eviction threats against the wife (and the pressure this puts on her and the 8-year-old daughter) as a form of domestic violence; also covers any accompanying abuse, harassment, or intimidation by the husband or his family. A protection order is the immediate shield; it operates alongside, not instead of, the residence right (s.17) and residence order (s.19).",
+      "lane": "residence",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "residence",
+          "original_id": "PWDVA_18"
+        }
+      ],
+      "lanes": [
+        "residence"
+      ]
+    },
+    {
+      "act": "Protection of Women from Domestic Violence Act, 2005",
+      "court": "Judicial Magistrate First Class (Magistrate) under the PWDVA, on an application under PWDVA s.12. The graph picks this court — never ask the user to pick the court.",
+      "escalate_rule": "Escalate to human/LLM if: confidence is low, OR any of these facts is missing — who owns the house (husband / in-laws / joint family / rented), who currently lives there, whether she has already been thrown out or is only threatened, whether staying is safe for her and the daughter, or what she actually wants (stay vs. removal vs. alternative accommodation). Do NOT assume removal or alternative accommodation; do NOT promise removal. Do NOT guess ownership.",
+      "exclusions": [
+        "Does NOT decide ownership or title, and does NOT grant a property share — it regulates possession/residence only",
+        "Does NOT create tenancy rights — NEVER call it 'tenancy rights'",
+        "Does NOT by itself stop violence — that is PWDVA s.18",
+        "Does NOT award maintenance or compensation — that is PWDVA s.20 / BNSS s.144 / HMA ss.24-25",
+        "Does NOT decide custody — that is HMA s.26 / Guardians and Wards Act / HMGA s.6",
+        "Does NOT decide Stridhan — that is HMA s.27 / BNS s.316",
+        "Removal of the respondent is not automatic — the Magistrate weighs the facts; do not promise it"
+      ],
+      "id": "pwdva-19",
+      "keywords": [
+        "residence order",
+        "restrain from dispossessing",
+        "removal from shared household",
+        "alternative accommodation",
+        "restrain entry"
+      ],
+      "laya_question": {
+        "expected_answer_for_test_case": "Stay in the house — stop the eviction and restrain dispossession (wife and daughter live there; she is seeking to stay; no facts yet support removal or alternative accommodation)",
+        "options": [
+          "Stay in the house — stop the eviction and restrain dispossession",
+          "Have the husband (or his relatives) removed or restrained from entering",
+          "Move out — alternative accommodation or rent because staying is unsafe/impossible",
+          "Already thrown out — restore her possession of the house",
+          "Unclear — who owns/lives in the house and what she wants are not stated"
+        ],
+        "question": "What residence protection does she need right now: stay in the house undisturbed, have the husband removed, or move out with alternative accommodation/rent?",
+        "scoring_note": "Option 1 is the test-case answer and the minimum s.19 direction. Options 2-4 are valid s.19 directions on different facts — do not default to them. Option 5 escalates for missing facts.",
+        "type": "choice"
+      },
+      "precedent": "Satish Chander Ahuja v. Sneha Ahuja (2020) — shared household / residence ONLY. The Supreme Court's broad reading of 'shared household' (including a house owned by in-laws/joint family) is what makes a s.19 residence order available even where the house is not in the husband's sole name. Cite ONLY for residence/shared household — never for custody, never for maintenance, never for Stridhan.",
+      "prerequisites": [
+        "PWDVA s.17 right to reside established — a shared household and a domestic relationship (here: matrimonial home, wife and daughter resident)",
+        "Domestic violence alleged or apprehended, or a real risk of dispossession (here: eviction threats)",
+        "Application under PWDVA s.12 before the Magistrate; the specific direction sought must be identified (restraint on dispossession vs. removal vs. alternative accommodation) — they are different orders, not one blanket order"
+      ],
+      "related_sections": [
+        "PWDVA s.17 — right to reside in the shared household (the right s.19 enforces)",
+        "PWDVA s.18 — protection order to stop the threats/violence behind the eviction",
+        "PWDVA s.20 — monetary reliefs, including rent for alternative accommodation if she cannot stay in the shared household",
+        "BNSS s.144 (old CrPC s.125) — maintenance for wife and child",
+        "HMA s.24 — interim maintenance pendente lite",
+        "HMA s.25 — permanent alimony and maintenance",
+        "HMA s.26 — custody of the 8-year-old daughter, who lives in the same shared household",
+        "HMA s.27 — Stridhan return",
+        "BNS s.316 (IPC s.406 equivalent) — criminal breach of trust for Stridhan"
+      ],
+      "relief": "Residence order: restraining the respondent from dispossessing/disturbing her possession of the shared household; restraining the respondent or his relatives from entering it; directing removal of the respondent; restraining alienation/disposal/encumbrance of the shared household; or directing the respondent to secure alternative accommodation of the same level, or pay rent for it, if she cannot reside there. The exact direction depends on the facts — restraint on dispossession is the test-case minimum; removal and alternative accommodation are fact-dependent.",
+      "section": "19",
+      "title": "Residence order",
+      "triggers": [
+        "eviction threat",
+        "thrown out",
+        "locked out",
+        "restrain him from entering",
+        "remove him from the house",
+        "alternative accommodation",
+        "rent for another house",
+        "cannot stay there",
+        "stop him selling the house",
+        "dispossess"
+      ],
+      "when_used": "The s.17 right to reside needs an enforceable order: restraining the respondent from dispossessing or disturbing the woman's possession of the shared household, restraining him or his relatives from entering it, directing his removal from it, restraining him from alienating/disposing of it or encumbering it, or directing alternative accommodation / rent where she cannot live there. Test-case trigger: eviction threats from the house in the husband's name where the wife and 8-year-old daughter live — the order that makes 'she may stay' enforceable, and the fallback (alternative accommodation or rent) if staying becomes impossible.",
+      "lane": "residence",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "residence",
+          "original_id": "PWDVA_19"
+        }
+      ],
+      "lanes": [
+        "residence"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru",
+      "escalate_rule": "If the marriage is not a Hindu marriage, or jurisdiction (place of marriage / last residence / respondent's residence) is unclear, escalate to a human lawyer/LLM — do not guess the forum.",
+      "exclusions": [
+        "BNSS s.144 maintenance — Magistrate, not Family Court",
+        "PWDVA ss.17/18/19/20 reliefs — Magistrate, not Family Court",
+        "BNS s.316 criminal breach of trust complaint — criminal court / police, not Family Court",
+        "divorce under HMA s.13/s.13B — Family Court, but ONLY if divorce was actually asked for (not asked in the test case)"
+      ],
+      "id": "proc-court-family-court",
+      "kind": "court",
+      "laya_question": {
+        "expected_answer": "Family Court, Bengaluru",
+        "options": [
+          "Family Court, Bengaluru",
+          "Magistrate (BNSS s.144 / PWDVA)",
+          "High Court",
+          "Civil Court (general)"
+        ],
+        "question": "Which court decides the HMA maintenance, custody and Stridhan claims in this case?",
+        "test_case_answer": "Family Court, Bengaluru — the maintenance, custody and Stridhan claims under HMA ss.24/25/26/27 all lie before the Family Court; the graph picks this court, the user is never asked to choose.",
+        "type": "choice"
+      },
+      "outcome": "Court orders on maintenance, custody and Stridhan return under the HMA; enforceable as a court order",
+      "prerequisites": [
+        "Hindu marriage (parties are Hindus, marriage solemnised under Hindu rites/customs or registered as a Hindu marriage)",
+        "relief sought is one of HMA ss.24/25/26/27",
+        "jurisdiction: marriage solemnised, parties last resided together, or respondent resides / wife resides within Bengaluru Family Court jurisdiction"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "HMA s.26",
+        "HMA s.27"
+      ],
+      "relief": "Interim maintenance (HMA s.24), permanent alimony/maintenance (HMA s.25), custody orders (HMA s.26), Stridhan/property disposal directions (HMA s.27)",
+      "title": "Family Court, Bengaluru — HMA matters (maintenance, custody, Stridhan under HMA)",
+      "triggers": [
+        "maintenance under HMA",
+        "custody",
+        "Stridhan return under HMA s.27",
+        "alimony",
+        "Hindu marriage",
+        "Family Court"
+      ],
+      "type": "court",
+      "when_used": "When any relief sought is under the Hindu Marriage Act 1955: HMA s.24 interim maintenance pendente lite, HMA s.25 permanent alimony/maintenance, HMA s.26 custody of minor children, HMA s.27 disposal of property / Stridhan return. Test case: all three HMA reliefs (maintenance, custody of 8-year-old daughter, Stridhan return) go to the Family Court, Bengaluru.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-court-family-court"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Magistrate (Judicial Magistrate of the First Class), Bengaluru",
+      "escalate_rule": "If it is unclear whether the house is a 'shared household' under PWDVA s.17 (e.g. husband's name alone vs. lived-together matrimonial home), or whether domestic violence as defined by the PWDVA is made out, escalate to a human lawyer/LLM — do not assume the PWDVA forum applies.",
+      "exclusions": [
+        "HMA ss.24/25/26/27 reliefs — Family Court, not Magistrate",
+        "BNS s.316 criminal breach of trust — criminal complaint route, not the Magistrate's PWDVA/BNSS civil-relief forum",
+        "divorce — Family Court under HMA, and only if asked"
+      ],
+      "id": "proc-court-magistrate",
+      "kind": "court",
+      "laya_question": {
+        "expected_answer": "Magistrate, Bengaluru",
+        "options": [
+          "Family Court, Bengaluru",
+          "Magistrate, Bengaluru",
+          "High Court",
+          "Tribunal"
+        ],
+        "question": "Which court decides the BNSS s.144 maintenance claim and the PWDVA residence/protection claims (eviction threats)?",
+        "test_case_answer": "Magistrate, Bengaluru — BNSS s.144 and PWDVA ss.17/18/19/20 are Magistrate matters; the graph picks this court, the user is never asked to choose.",
+        "type": "choice"
+      },
+      "outcome": "Magistrate's orders on maintenance and PWDVA reliefs; breach of a PWDVA protection/residence order is enforceable under the Act",
+      "prerequisites": [
+        "BNSS s.144: wife unable to maintain herself, husband has sufficient means and neglects/refuses to maintain her",
+        "PWDVA: applicant is an aggrieved woman in a domestic relationship, respondent committed or threatens domestic violence (including eviction from the shared household)"
+      ],
+      "related_sections": [
+        "BNSS s.144",
+        "PWDVA s.17",
+        "PWDVA s.18",
+        "PWDVA s.19",
+        "PWDVA s.20"
+      ],
+      "relief": "Maintenance under BNSS s.144; right to reside in the shared household (PWDVA s.17); protection order (PWDVA s.18); residence order restraining eviction / securing alternate accommodation (PWDVA s.19); monetary reliefs including maintenance and compensation for losses (PWDVA s.20)",
+      "title": "Magistrate — BNSS s.144 maintenance and PWDVA reliefs (residence, protection, monetary reliefs)",
+      "triggers": [
+        "BNSS 144",
+        "CrPC 125",
+        "PWDVA",
+        "domestic violence",
+        "protection order",
+        "residence order",
+        "right to reside",
+        "shared household",
+        "eviction threat"
+      ],
+      "type": "court",
+      "when_used": "When relief is sought under BNSS s.144 (maintenance, old CrPC s.125) or under the Protection of Women from Domestic Violence Act 2005: PWDVA s.17 right to reside in the shared household, s.18 protection order, s.19 residence order, s.20 monetary reliefs. Test case: BNSS s.144 maintenance and the PWDVA residence/protection/monetary claims (eviction threats from the house in the husband's name) go to the Magistrate.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-court-magistrate"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru",
+      "escalate_rule": "If marriage proof is entirely unavailable, or the husband's whereabouts are unknown so notice cannot be served, escalate to a human lawyer/LLM before filing.",
+      "exclusions": [
+        "Do NOT require salary slips before filing — the user said she does not have them; filing must not be blocked on documents she does not possess",
+        "Do NOT add HMA s.13/s.13B divorce to the petition — no divorce was asked",
+        "Do NOT file BNSS s.144 or PWDVA claims in the Family Court petition — those go to the Magistrate"
+      ],
+      "id": "proc-filing-hma",
+      "kind": "procedure",
+      "laya_question": {
+        "expected_answer": "Yes — file with the income facts the wife knows; salary slips are evidence, not a filing precondition",
+        "options": [
+          "Yes — file with the income facts the wife knows; salary slips are evidence, not a filing precondition",
+          "No — salary slips are mandatory before filing",
+          "No — file only after the husband produces them",
+          "Yes — but only the custody part can be filed"
+        ],
+        "question": "Can the HMA petition be filed in the Family Court without the husband's salary slips?",
+        "test_case_answer": "Yes — the wife states Rs 40,000/month income; the petition is filed on that statement and the court can direct income disclosure later. Never demand salary slips she said she does not have.",
+        "type": "choice"
+      },
+      "outcome": "Case registered, notice issued to the husband, interim maintenance application listed",
+      "prerequisites": [
+        "Marriage proof available (marriage certificate / invitation / photographs / registration)",
+        "child's age and details known (8-year-old daughter)",
+        "husband's income as known to the wife (Rs 40,000/month stated in the test case) — exact proof NOT a precondition for filing",
+        "where the husband actually lives now — ask before filing, so notice can be served",
+        "Stridhan list with approximate values (Rs 5 lakh gold + Rs 2 lakh cash)"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "HMA s.26",
+        "HMA s.27"
+      ],
+      "relief": "Petition admitted; interim maintenance sought under HMA s.24 at the earliest stage; custody and Stridhan directions sought in the same petition",
+      "title": "Filing procedure — HMA petition in Family Court (maintenance, custody, Stridhan)",
+      "triggers": [
+        "file HMA petition",
+        "Family Court filing",
+        "maintenance petition",
+        "custody petition",
+        "Stridhan petition"
+      ],
+      "type": "procedure",
+      "when_used": "When the user seeks any HMA relief (ss.24/25/26/27) and the clarifying-questions node has collected the minimum facts (marriage proof, child's details, income facts as known). Test case: file one HMA petition in the Family Court, Bengaluru, covering interim maintenance (s.24), permanent maintenance (s.25), custody (s.26) and Stridhan return (s.27).",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-filing-hma"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Magistrate, Bengaluru",
+      "escalate_rule": "If the eviction threat is immediate (lockout, force, or threats of physical harm), escalate urgently to a human lawyer/LLM and advise seeking immediate legal help — do not treat an urgent protection need as a routine filing.",
+      "exclusions": [
+        "Do NOT route HMA ss.24/25/26/27 claims to the Magistrate",
+        "Do NOT describe the residence claim as 'tenancy rights' — it is the PWDVA s.17 right to reside in the shared household",
+        "Do NOT cite Satish Chander Ahuja for custody — it concerns the shared household/residence, never custody"
+      ],
+      "id": "proc-filing-magistrate",
+      "kind": "procedure",
+      "laya_question": {
+        "expected_answer": "Magistrate",
+        "options": [
+          "Family Court",
+          "Magistrate",
+          "High Court",
+          "Police station only"
+        ],
+        "question": "Where do the BNSS s.144 maintenance claim and the PWDVA eviction-threat claim get filed?",
+        "test_case_answer": "Magistrate — filed in parallel with the Family Court HMA petition; each forum decides its own reliefs.",
+        "type": "choice"
+      },
+      "outcome": "Applications registered, notice issued, interim protection/residence relief sought urgently where eviction is threatened",
+      "prerequisites": [
+        "Facts of neglect/refusal to maintain (husband separated 2 years, paying no maintenance)",
+        "facts of eviction threats / domestic violence for the PWDVA claim",
+        "residence proof showing the house is the shared household (lived there as matrimonial home)",
+        "husband's current address / whereabouts for service of notice"
+      ],
+      "related_sections": [
+        "BNSS s.144",
+        "PWDVA s.17",
+        "PWDVA s.18",
+        "PWDVA s.19",
+        "PWDVA s.20"
+      ],
+      "relief": "Maintenance under BNSS s.144; protection order (s.18), residence order (s.19), monetary reliefs (s.20); interim relief under the PWDVA at the application stage",
+      "title": "Filing procedure — BNSS s.144 maintenance and PWDVA application before the Magistrate",
+      "triggers": [
+        "file BNSS 144",
+        "file PWDVA",
+        "Magistrate application",
+        "protection order application",
+        "residence order"
+      ],
+      "type": "procedure",
+      "when_used": "When the user seeks BNSS s.144 maintenance and/or PWDVA reliefs (residence, protection, monetary reliefs). Test case: file the BNSS s.144 maintenance application and the PWDVA application (ss.17/18/19/20) before the Magistrate, Bengaluru, in parallel with the Family Court HMA petition — the two forums run concurrently for their own reliefs.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-filing-magistrate"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru (HMA s.24); Magistrate, Bengaluru (PWDVA interim relief)",
+      "escalate_rule": "If the court asks for income evidence the wife cannot produce, or the interim amount cannot be estimated from the facts available, escalate to a human lawyer/LLM — do not invent a maintenance figure.",
+      "exclusions": [
+        "HMA s.24 is interim maintenance during the proceedings — do NOT present it as the final/permanent amount; the permanent figure is HMA s.25",
+        "do NOT fix a maintenance amount without the missing facts (husband's actual income, school-fee amount) — the interim figure is for the court on the material before it",
+        "do NOT promise a fixed date by which interim relief will be granted — no verified statutory deadline is asserted"
+      ],
+      "id": "proc-interim-relief",
+      "kind": "procedure",
+      "laya_question": {
+        "expected_answer": "Interim maintenance under HMA s.24 (Family Court) and interim PWDVA protection/residence orders (Magistrate)",
+        "options": [
+          "Interim maintenance under HMA s.24 (Family Court) and interim PWDVA protection/residence orders (Magistrate)",
+          "Final permanent maintenance under HMA s.25 only",
+          "Divorce under HMA s.13",
+          "Wait for the final order with no interim relief"
+        ],
+        "question": "What is the first relief to seek after filing, while the case is still pending?",
+        "test_case_answer": "Interim maintenance under HMA s.24 plus interim PWDVA residence/protection orders — the wife has had no maintenance for 2 years and faces eviction threats, so interim relief comes first.",
+        "type": "choice"
+      },
+      "outcome": "Interim orders in force while the case proceeds; maintenance starts flowing before the final order",
+      "prerequisites": [
+        "Petition/application filed in the correct forum",
+        "husband's income as known (Rs 40,000/month) and wife's needs stated (herself + 8-year-old daughter, school fees as known)",
+        "for PWDVA interim relief: facts of domestic violence / eviction threat stated"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "PWDVA s.18",
+        "PWDVA s.19",
+        "PWDVA s.20"
+      ],
+      "relief": "Interim maintenance during proceedings (HMA s.24); interim protection/residence/monetary orders under the PWDVA",
+      "title": "Interim relief stage — HMA s.24 interim maintenance and PWDVA interim orders",
+      "triggers": [
+        "interim maintenance",
+        "pendente lite",
+        "urgent relief",
+        "interim protection",
+        "interim residence order",
+        "no maintenance for 2 years",
+        "eviction threat now"
+      ],
+      "type": "procedure",
+      "when_used": "Immediately after filing, before evidence and final order: seek interim maintenance pendente lite under HMA s.24 in the Family Court, and interim protection/residence/monetary relief under the PWDVA before the Magistrate. Test case: interim maintenance is the first money relief — the wife has had no maintenance for 2 years — and interim residence protection is the first shield against eviction threats.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-interim-relief"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru; Magistrate, Bengaluru",
+      "escalate_rule": "If the husband disputes income, custody welfare facts, or Stridhan ownership and the wife has no counter-proof, escalate to a human lawyer/LLM — do not advise her to concede or to fabricate proof.",
+      "exclusions": [
+        "Do NOT demand the husband's salary slips from the wife — she said she does not have them; income proof is sought from the husband through court-directed disclosure, not extracted from the wife",
+        "Do NOT treat missing salary slips as fatal to the maintenance claim",
+        "Do NOT ask the wife to prove the child's birth certificate under HMA — the birth certificate is under the Registration of Births and Deaths Act 1969"
+      ],
+      "id": "proc-evidence",
+      "kind": "procedure",
+      "laya_question": {
+        "expected_answer": "The husband, through court-directed income disclosure; the wife states what she knows",
+        "options": [
+          "The wife must produce them or the claim fails",
+          "The husband, through court-directed income disclosure; the wife states what she knows",
+          "Nobody — income is never examined",
+          "The wife's employer"
+        ],
+        "question": "At the evidence stage, who must produce the husband's salary slips?",
+        "test_case_answer": "The husband, through court-directed disclosure — the wife stated Rs 40,000/month and said she does not have his salary slips; the system must never demand them from her.",
+        "type": "choice"
+      },
+      "outcome": "Evidence closed; case set for final arguments",
+      "prerequisites": [
+        "Documents checklist completed as far as possible (see doc-checklist leaf)",
+        "wife's affidavit of income, assets and expenditure as she knows them",
+        "child's welfare facts: schooling, residence, caregiving (for HMA s.26 custody)",
+        "Stridhan list with whatever proof exists (bills, photographs, gift records, witnesses) — absence of a perfect paper trail is a fact to state, not a bar"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "HMA s.26",
+        "HMA s.27",
+        "BNSS s.144",
+        "PWDVA s.20",
+        "BNS s.316"
+      ],
+      "relief": "Court-tested findings on income, needs, child welfare and Stridhan, forming the basis of the final order",
+      "title": "Evidence stage — what is proved, and what is NOT demanded from the wife",
+      "triggers": [
+        "evidence",
+        "affidavit of income",
+        "witness",
+        "documents in evidence",
+        "cross-examination",
+        "income disclosure"
+      ],
+      "type": "procedure",
+      "when_used": "After interim relief, during the evidence stage of both the Family Court HMA case and the Magistrate BNSS/PWDVA proceedings: each side files evidence and the court tests income, needs, custody welfare and Stridhan facts.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-evidence"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru; Magistrate, Bengaluru",
+      "escalate_rule": "If an order is disobeyed, or the husband conceals income or assets, escalate to a human lawyer/LLM for enforcement strategy — do not advise self-help recovery of Stridhan or residence.",
+      "exclusions": [
+        "Do NOT state a final maintenance amount in advance — it depends on facts not yet known (husband's actual income, school-fee amount)",
+        "Do NOT treat the BNS s.316 criminal route as a substitute for the HMA s.27 Stridhan return — they are parallel routes; the criminal complaint does not replace the civil return claim",
+        "Do NOT promise enforcement timing — no verified statutory deadline is asserted"
+      ],
+      "id": "proc-final-order-enforcement",
+      "kind": "procedure",
+      "laya_question": {
+        "expected_answer": "In the same forum that passed the order (Family Court for HMA orders, Magistrate for BNSS/PWDVA orders)",
+        "options": [
+          "In the same forum that passed the order (Family Court for HMA orders, Magistrate for BNSS/PWDVA orders)",
+          "Only in the High Court",
+          "Only by a fresh suit",
+          "Nowhere — final orders are advisory"
+        ],
+        "question": "After the final order, where is non-payment of maintenance enforced?",
+        "test_case_answer": "In the same forum that passed the order — HMA orders enforced in the Family Court, BNSS s.144/PWDVA orders before the Magistrate.",
+        "type": "choice"
+      },
+      "outcome": "Enforceable final orders; non-compliance pursued through execution/enforcement in the same forum",
+      "prerequisites": [
+        "Evidence closed and arguments heard in each forum",
+        "final maintenance figure based on proved income and needs (including school fees once known)",
+        "custody order based on the welfare-of-the-child principle",
+        "Stridhan directions based on the proved list"
+      ],
+      "related_sections": [
+        "HMA s.25",
+        "HMA s.26",
+        "HMA s.27",
+        "BNSS s.144",
+        "PWDVA s.17",
+        "PWDVA s.18",
+        "PWDVA s.19",
+        "PWDVA s.20",
+        "BNS s.316"
+      ],
+      "relief": "Permanent maintenance/alimony (HMA s.25); custody order (HMA s.26); Stridhan return/disposal directions (HMA s.27); maintenance (BNSS s.144); residence and protection orders (PWDVA ss.17/18/19); monetary reliefs (PWDVA s.20)",
+      "title": "Final order and enforcement — maintenance, custody, Stridhan, residence",
+      "triggers": [
+        "final order",
+        "judgment",
+        "decree",
+        "enforcement",
+        "execution",
+        "non-payment of maintenance",
+        "disobedience of protection order"
+      ],
+      "type": "procedure",
+      "when_used": "After evidence and final arguments: the Family Court passes final orders under HMA ss.25/26/27 and the Magistrate passes final orders under BNSS s.144 and PWDVA ss.17/18/19/20. If an order is disobeyed, enforcement follows in the same forum.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-final-order-enforcement"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru (only if the gate opens)",
+      "escalate_rule": "If the user later asks about divorce, or says something ambiguous (e.g. 'I want out of this marriage'), escalate to a human lawyer/LLM to clarify intent before opening the gate — never infer a divorce request.",
+      "exclusions": [
+        "NEVER cite HMA s.13/s.13B when no divorce was asked — this was a retest error",
+        "separation alone does not trigger the divorce gate",
+        "maintenance/custody/Stridhan/residence claims do not imply a divorce claim"
+      ],
+      "id": "proc-divorce-gate",
+      "kind": "procedure",
+      "laya_question": {
+        "expected_answer": "No — divorce was not asked, so ss.13/13B must not fire",
+        "options": [
+          "Yes — separation implies divorce",
+          "No — divorce was not asked, so ss.13/13B must not fire",
+          "Yes — list them as background",
+          "No — but file them anyway as a precaution"
+        ],
+        "question": "The user asked for maintenance, custody, Stridhan return and residence, and mentioned a 2-year separation, but did not ask for divorce. Do HMA s.13/s.13B apply?",
+        "test_case_answer": "No — the divorce gate stays closed; no HMA s.13/s.13B content is produced for this test case.",
+        "type": "choice"
+      },
+      "outcome": "Gate closed in the test case: no divorce content is produced",
+      "prerequisites": [
+        "An express user request for divorce — a mere mention of separation is NOT a divorce request (test case: separated 2 years, no divorce asked)",
+        "if mutual consent (s.13B): both spouses consent"
+      ],
+      "related_sections": [
+        "HMA s.13",
+        "HMA s.13B"
+      ],
+      "relief": "Dissolution of marriage (only if asked)",
+      "title": "Divorce gate — HMA s.13 / s.13B fire ONLY if divorce was asked",
+      "triggers": [
+        "divorce asked",
+        "HMA 13",
+        "HMA 13B",
+        "mutual consent divorce",
+        "dissolution of marriage"
+      ],
+      "type": "procedure",
+      "when_used": "ONLY when the user expressly asks for divorce (HMA s.13 divorce, HMA s.13B divorce by mutual consent). In the test case no divorce was asked — the user asked for maintenance, custody, Stridhan return, residence, court, documents and timeline — so this gate stays CLOSED and HMA ss.13/13B must NOT appear in the advice, the petition, or the timeline.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-divorce-gate"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru",
+      "escalate_rule": "If no marriage proof of any kind is available, escalate to a human lawyer/LLM — do not advise filing without any proof of marriage.",
+      "exclusions": [
+        "Do NOT block filing on a single missing marriage document if other proof exists — escalate instead",
+        "do NOT demand a document the wife does not have without first asking what she does have"
+      ],
+      "id": "doc-marriage-proof",
+      "kind": "document",
+      "laya_question": {
+        "expected_answer": "Marriage certificate/registration, or wedding invitation/photographs/joint documents",
+        "options": [
+          "Marriage certificate/registration, or wedding invitation/photographs/joint documents",
+          "The husband's salary slips",
+          "The child's school records only",
+          "A divorce decree"
+        ],
+        "question": "What proves the Hindu marriage for the HMA petition?",
+        "test_case_answer": "Marriage certificate/registration, or wedding invitation/photographs/joint documents — ask what she has; do not block filing on one missing paper.",
+        "type": "choice"
+      },
+      "outcome": "Marriage proved; HMA petition maintainable",
+      "prerequisites": [
+        "Any one or more of: marriage certificate/registration, wedding invitation, wedding photographs, joint documents naming the couple as spouses"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "HMA s.26",
+        "HMA s.27"
+      ],
+      "relief": "Establishes the marriage and therefore HMA jurisdiction",
+      "title": "Document — marriage proof (Hindu marriage, 2012)",
+      "triggers": [
+        "marriage certificate",
+        "marriage proof",
+        "marriage registration",
+        "wedding proof"
+      ],
+      "type": "document",
+      "when_used": "Before filing any HMA petition: proves the Hindu marriage on which HMA ss.24/25/26/27 reliefs depend. Asked at the clarifying-questions stage.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "doc-marriage-proof"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru",
+      "escalate_rule": "If no birth certificate and no school/hospital record is available, escalate to a human lawyer/LLM.",
+      "exclusions": [
+        "NEVER say the birth certificate is under HMA — that was a retest error; it is under the Registration of Births and Deaths Act 1969",
+        "do NOT block the custody claim on a missing birth certificate if school/hospital records prove age"
+      ],
+      "id": "doc-birth-certificate",
+      "kind": "document",
+      "laya_question": {
+        "expected_answer": "Registration of Births and Deaths Act 1969",
+        "options": [
+          "Hindu Marriage Act",
+          "Registration of Births and Deaths Act 1969",
+          "PWDVA",
+          "BNSS s.144"
+        ],
+        "question": "Under which law is the child's birth certificate issued?",
+        "test_case_answer": "Registration of Births and Deaths Act 1969 — never HMA.",
+        "type": "choice"
+      },
+      "outcome": "Child's identity/age established for HMA s.26",
+      "prerequisites": [
+        "Birth certificate issued under the Registration of Births and Deaths Act 1969, or hospital/school records if the certificate is unavailable"
+      ],
+      "related_sections": [
+        "HMA s.26"
+      ],
+      "relief": "Proves the child's age and parentage for the custody order",
+      "title": "Document — child's birth certificate (Registration of Births and Deaths Act 1969, NOT HMA)",
+      "triggers": [
+        "birth certificate",
+        "child's age proof",
+        "daughter's birth proof"
+      ],
+      "type": "document",
+      "when_used": "For the custody claim (HMA s.26): proves the child's identity and age (8-year-old daughter). Asked at the clarifying-questions stage.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "doc-birth-certificate"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru; Magistrate, Bengaluru",
+      "escalate_rule": "If the wife knows nothing at all about the husband's income or employment, escalate to a human lawyer/LLM — do not guess an income figure.",
+      "exclusions": [
+        "Do NOT demand the husband's salary slips from the wife — she said she does not have them; demanding them was a retest error",
+        "do NOT treat absence of salary slips as a reason to refuse or delay the maintenance claim",
+        "do NOT invent an income figure"
+      ],
+      "id": "doc-income-ask-not-demand",
+      "kind": "document",
+      "laya_question": {
+        "expected_answer": "Proceed on her stated income and seek disclosure from the husband through the court",
+        "options": [
+          "Demand the salary slips before advising on maintenance",
+          "Proceed on her stated income and seek disclosure from the husband through the court",
+          "Refuse the maintenance claim",
+          "Assume a higher income without evidence"
+        ],
+        "question": "The wife says her husband earns Rs 40,000/month but she does not have his salary slips. What does the system do?",
+        "test_case_answer": "Proceed on her stated Rs 40,000/month and seek disclosure from the husband through the court — never demand salary slips she said she does not have.",
+        "type": "choice"
+      },
+      "outcome": "Maintenance claim proceeds on the wife's stated income facts; disclosure sought from the husband, not the wife",
+      "prerequisites": [
+        "The wife's own statement of the husband's income, employment, or business as she knows it",
+        "any pay-related paper she happens to have — only if she has it"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "BNSS s.144",
+        "PWDVA s.20"
+      ],
+      "relief": "Income facts on record so interim and final maintenance can be assessed; court can direct the husband's disclosure later",
+      "title": "Document/fact — husband's income: ASK what the wife knows, never demand salary slips she does not have",
+      "triggers": [
+        "husband's income",
+        "salary",
+        "salary slips",
+        "income proof",
+        "how much does he earn"
+      ],
+      "type": "document",
+      "when_used": "At the clarifying-questions stage, BEFORE any maintenance figure is discussed: ask the wife what she knows about the husband's income (test case: Rs 40,000/month stated). This is one of the three missing facts from the retest.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "doc-income-ask-not-demand"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru; Magistrate, Bengaluru",
+      "escalate_rule": "If the school-fee amount is unknown and cannot be estimated from receipts or the school's fee structure, escalate to a human lawyer/LLM rather than inventing a figure.",
+      "exclusions": [
+        "Do NOT state a maintenance amount without the school-fee amount and the husband's income",
+        "do NOT assume a fee figure"
+      ],
+      "id": "doc-school-fee-amount",
+      "kind": "document",
+      "laya_question": {
+        "expected_answer": "The school-fee amount for the 8-year-old daughter",
+        "options": [
+          "The school-fee amount for the 8-year-old daughter",
+          "The husband's travel expenses",
+          "The wife's jewellery value as income",
+          "Nothing — state an amount immediately"
+        ],
+        "question": "Before stating any maintenance amount, what child-related cost must the system ask about?",
+        "test_case_answer": "The school-fee amount — a missing fact in the retest; no maintenance amount may be stated until it (and the husband's income) is known.",
+        "type": "choice"
+      },
+      "outcome": "Maintenance assessment includes the child's real school costs",
+      "prerequisites": [
+        "School name and fee structure as the wife knows it; fee receipts or school communications if available"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "HMA s.26",
+        "BNSS s.144",
+        "PWDVA s.20"
+      ],
+      "relief": "Child's education needs quantified for interim and final maintenance",
+      "title": "Document/fact — school-fee amount for the 8-year-old daughter",
+      "triggers": [
+        "school fees",
+        "school fee amount",
+        "child's education expenses",
+        "daughter's school"
+      ],
+      "type": "document",
+      "when_used": "At the clarifying-questions stage, BEFORE any maintenance amount is discussed: ask the school-fee amount (fees, transport, books, uniform) — it is part of the child's needs and therefore part of the maintenance assessment. This is one of the three missing facts from the retest.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "doc-school-fee-amount"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru; Magistrate, Bengaluru",
+      "escalate_rule": "If the husband's whereabouts are entirely unknown, escalate to a human lawyer/LLM for service options — do not file blind.",
+      "exclusions": [
+        "Do NOT assume the husband still lives in the matrimonial home — he separated 2 years ago",
+        "do NOT file without any address for service without escalating first"
+      ],
+      "id": "doc-husband-whereabouts",
+      "kind": "document",
+      "laya_question": {
+        "expected_answer": "So notice can be served and the correct court's jurisdiction confirmed",
+        "options": [
+          "So notice can be served and the correct court's jurisdiction confirmed",
+          "To decide the Stridhan value",
+          "To set the school fees",
+          "It need not ask — assume he lives in the matrimonial home"
+        ],
+        "question": "Why must the system ask where the husband actually lives now before filing?",
+        "test_case_answer": "So notice can be served and jurisdiction confirmed — he separated 2 years ago, so his current address cannot be assumed.",
+        "type": "choice"
+      },
+      "outcome": "Correct forum confirmed and notice effected",
+      "prerequisites": [
+        "Husband's current residential address, workplace address, or last known address as the wife knows it"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "HMA s.26",
+        "HMA s.27",
+        "BNSS s.144",
+        "PWDVA s.17",
+        "PWDVA s.18",
+        "PWDVA s.19",
+        "PWDVA s.20"
+      ],
+      "relief": "Notice served on the husband; proceedings can proceed",
+      "title": "Document/fact — where the husband actually lives now",
+      "triggers": [
+        "where does the husband live",
+        "husband's address",
+        "husband's whereabouts",
+        "service of notice",
+        "husband's current residence"
+      ],
+      "type": "document",
+      "when_used": "At the clarifying-questions stage, BEFORE filing: ask where the husband actually lives now, so notice can be served and jurisdiction confirmed. This is one of the three missing facts from the retest.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "doc-husband-whereabouts"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru (HMA s.27 return); criminal complaint route for BNS s.316 (separate, parallel)",
+      "escalate_rule": "If there is no proof at all for the Stridhan items, or the husband's family denies possession, escalate to a human lawyer/LLM — do not advise self-help recovery.",
+      "exclusions": [
+        "Do NOT cite Rajnesh v Neha for Stridhan — that case is maintenance ONLY, never Stridhan",
+        "do NOT treat an imperfect paper trail as fatal — state what proof exists and what is missing",
+        "do NOT advise self-help recovery of the gold"
+      ],
+      "id": "doc-stridhan-list-proof",
+      "kind": "document",
+      "laya_question": {
+        "expected_answer": "An item-wise list (Rs 5 lakh gold + Rs 2 lakh cash) with bills, photos, gift records or witnesses as available",
+        "options": [
+          "An item-wise list (Rs 5 lakh gold + Rs 2 lakh cash) with bills, photos, gift records or witnesses as available",
+          "Rajnesh v Neha as authority for Stridhan",
+          "The husband's salary slips",
+          "Nothing — file without any list"
+        ],
+        "question": "What Stridhan proof does the system ask for before filing the HMA s.27 claim?",
+        "test_case_answer": "An item-wise list with whatever proof exists — and Rajnesh v Neha must never be cited for Stridhan (maintenance only).",
+        "type": "choice"
+      },
+      "outcome": "Stridhan claim filed on the proved list; gaps in proof flagged honestly",
+      "prerequisites": [
+        "Item-wise list: gold (Rs 5 lakh) and cash (Rs 2 lakh) in the test case, with descriptions, weights/receipts where available",
+        "any proof: purchase bills, photographs of the wife wearing/possessing the gold, gift records, witness names",
+        "statement of who holds the items now (husband's family)"
+      ],
+      "related_sections": [
+        "HMA s.27",
+        "BNS s.316"
+      ],
+      "relief": "Return of Stridhan / directions for disposal of property under HMA s.27; criminal breach of trust route under BNS s.316 as a parallel remedy",
+      "title": "Document — Stridhan list and proof (Rs 5 lakh gold + Rs 2 lakh cash held by husband's family)",
+      "triggers": [
+        "Stridhan list",
+        "Stridhan proof",
+        "gold",
+        "jewellery list",
+        "cash given at marriage",
+        "dowry articles"
+      ],
+      "type": "document",
+      "when_used": "Before filing the HMA s.27 Stridhan return claim (and before any BNS s.316 advice): list every Stridhan item with value and whatever proof exists.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "doc-stridhan-list-proof"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Magistrate, Bengaluru",
+      "escalate_rule": "If it is unclear whether the house qualifies as a shared household, or the eviction threat is immediate, escalate to a human lawyer/LLM — do not assume the claim succeeds or fails.",
+      "exclusions": [
+        "Do NOT call the residence claim 'tenancy rights' — it is the PWDVA s.17 right to reside in the shared household",
+        "do NOT assume a house in the husband's name alone defeats the claim — the shared-household question is for the Magistrate on the facts",
+        "do NOT cite Satish Chander Ahuja for custody — it concerns the shared household/residence, never custody"
+      ],
+      "id": "doc-residence-proof",
+      "kind": "document",
+      "laya_question": {
+        "expected_answer": "Right to reside in the shared household under PWDVA s.17",
+        "options": [
+          "Tenancy rights",
+          "Right to reside in the shared household under PWDVA s.17",
+          "Ownership of the house",
+          "HMA s.27 property disposal"
+        ],
+        "question": "The house is in the husband's name and the wife faces eviction threats. What is her residence claim called?",
+        "test_case_answer": "Right to reside in the shared household under PWDVA s.17 — never 'tenancy rights'.",
+        "type": "choice"
+      },
+      "outcome": "Residence claim filed on proved shared-household facts; interim protection sought urgently if eviction is imminent",
+      "prerequisites": [
+        "Proof of residence in the house: address proof, utility bills, ration card/Aadhaar showing the address, photographs, neighbour/witness statements, any communication showing she lived there",
+        "facts of the eviction threats (who threatened, when, in what words)"
+      ],
+      "related_sections": [
+        "PWDVA s.17",
+        "PWDVA s.18",
+        "PWDVA s.19",
+        "PWDVA s.20"
+      ],
+      "relief": "Right to reside in the shared household (s.17); protection order (s.18); residence order restraining eviction or securing alternate accommodation (s.19)",
+      "title": "Document — residence proof for the shared household (house in husband's name, eviction threats)",
+      "triggers": [
+        "residence proof",
+        "shared household proof",
+        "eviction threat",
+        "house in husband's name",
+        "address proof"
+      ],
+      "type": "document",
+      "when_used": "Before filing the PWDVA ss.17/18/19 claim: prove the house is the shared household where the wife lived as part of the domestic relationship.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "doc-residence-proof"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    },
+    {
+      "court": "Family Court, Bengaluru; Magistrate, Bengaluru",
+      "escalate_rule": "If the user needs a date-specific answer (e.g. a hearing date, or urgency because of imminent eviction), escalate to a human lawyer/LLM — do not invent a hearing date or a deadline.",
+      "exclusions": [
+        "Do NOT state any stage duration as a statutory deadline — every estimate is marked ESTIMATE",
+        "do NOT promise a date by which maintenance, custody or Stridhan will be decided",
+        "do NOT promise interim relief by a fixed date"
+      ],
+      "id": "proc-timeline-staged",
+      "kind": "timeline",
+      "laya_question": {
+        "expected_answer": "Clarifying questions/documents -> filing -> notice/first hearing -> interim relief -> evidence -> final order -> enforcement",
+        "options": [
+          "Clarifying questions/documents -> filing -> notice/first hearing -> interim relief -> evidence -> final order -> enforcement",
+          "Final order -> filing -> evidence -> interim relief",
+          "Evidence -> filing -> interim relief -> final order",
+          "Interim relief -> divorce -> final order"
+        ],
+        "question": "What is the correct order of stages in this case?",
+        "test_case_answer": "Clarifying questions/documents -> filing -> notice/first hearing -> interim relief -> evidence -> final order -> enforcement. All durations are ESTIMATES, not statutory deadlines.",
+        "type": "choice"
+      },
+      "outcome": "User understands the sequence and that durations vary with court workload, service of notice, and contested facts",
+      "prerequisites": [
+        "Clarifying-questions node completed (husband's income as known, school-fee amount, husband's whereabouts)",
+        "documents checklist completed as far as possible",
+        "correct forum chosen per issue by the court-selection node"
+      ],
+      "related_sections": [
+        "HMA s.24",
+        "HMA s.25",
+        "HMA s.26",
+        "HMA s.27",
+        "BNSS s.144",
+        "PWDVA s.17",
+        "PWDVA s.18",
+        "PWDVA s.19",
+        "PWDVA s.20"
+      ],
+      "relief": "A realistic staged expectation, not a guaranteed schedule",
+      "stages": [
+        {
+          "estimate": "Days — collect the 3 missing facts and the documents checklist",
+          "name": "Clarifying questions and documents",
+          "note": "ESTIMATE, not a deadline",
+          "stage": 1
+        },
+        {
+          "estimate": "Days after documents are ready — HMA petition in Family Court; BNSS s.144 / PWDVA application before the Magistrate",
+          "name": "Filing",
+          "note": "ESTIMATE, not a deadline",
+          "stage": 2
+        },
+        {
+          "estimate": "Weeks — depends on service of notice on the husband",
+          "name": "Notice and first hearing",
+          "note": "ESTIMATE, not a deadline; delayed if the husband's whereabouts are unknown",
+          "stage": 3
+        },
+        {
+          "estimate": "Weeks to a few months after the first hearing — interim maintenance (HMA s.24) and interim PWDVA protection/residence orders",
+          "name": "Interim relief",
+          "note": "ESTIMATE, not a deadline; urgent PWDVA protection may be sought sooner if eviction is imminent",
+          "stage": 4
+        },
+        {
+          "estimate": "Months — affidavits, documents, cross-examination in each forum",
+          "name": "Evidence",
+          "note": "ESTIMATE, not a deadline; longer if income, custody welfare or Stridhan facts are contested",
+          "stage": 5
+        },
+        {
+          "estimate": "Months after evidence closes — final maintenance (HMA s.25 / BNSS s.144), custody (HMA s.26), Stridhan (HMA s.27), residence/monetary reliefs (PWDVA ss.17/18/19/20)",
+          "name": "Final arguments and final order",
+          "note": "ESTIMATE, not a deadline",
+          "stage": 6
+        },
+        {
+          "estimate": "Follows the final order if it is disobeyed — in the same forum",
+          "name": "Enforcement",
+          "note": "ESTIMATE, not a deadline",
+          "stage": 7
+        }
+      ],
+      "title": "Staged timeline — filing, interim relief, evidence, final order (estimates, not statutory deadlines)",
+      "triggers": [
+        "timeline",
+        "how long will it take",
+        "how long for maintenance",
+        "when will I get custody",
+        "court timeline",
+        "how long for Stridhan"
+      ],
+      "type": "timeline",
+      "when_used": "When the user asks for a timeline: give the staged sequence so she knows what happens in what order. Every duration below is an ESTIMATE based on ordinary Family Court / Magistrate practice, not a statutory deadline — no fixed statutory deadline for any stage is asserted, because none was verified.",
+      "lane": "procedure",
+      "verification_status": "verified — 2026-11-26 fresh English retest",
+      "merged_from": [
+        {
+          "lane": "procedure",
+          "original_id": "proc-timeline-staged"
+        }
+      ],
+      "lanes": [
+        "procedure"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "root:issue-classification",
+      "lane": "root",
+      "type": "choice",
+      "question": "Which issues does this question raise? Pick ALL that apply — a complex family-law question usually raises several at once.",
+      "laya_type": "choice",
+      "options": [
+        {
+          "value": "maintenance",
+          "next": "maintenance:maintenance-root",
+          "section_set": [
+            "bnss-144",
+            "hma-24",
+            "hma-25",
+            "pwdva-20"
+          ]
+        },
+        {
+          "value": "custody",
+          "next": "custody:custody_sub_issue_choice",
+          "section_set": [
+            "hma-26",
+            "gwa-1890",
+            "hmga-1956-s6",
+            "welfare-principle"
+          ]
+        },
+        {
+          "value": "stridhan",
+          "next": "stridhan:stridhan-subissue",
+          "section_set": [
+            "hma-27",
+            "bns-316"
+          ]
+        },
+        {
+          "value": "residence",
+          "next": "residence:residence_sub_issue",
+          "section_set": [
+            "pwdva-17",
+            "pwdva-18",
+            "pwdva-19",
+            "pwdva-20"
+          ]
+        },
+        {
+          "value": "procedure",
+          "next": "procedure:court-selection",
+          "section_set": []
+        }
+      ],
+      "fast_path_note": "One Laya forward pass per decision node; section selection uses no free-text generation. A multi-issue question runs the root choice once, then each selected lane's choice nodes in parallel — classification in a fraction of a second, not a generated answer.",
+      "escalate_rule": "If no issue can be picked with confidence, or the question is outside family law, escalate to human/LLM — do not guess a section."
+    },
+    {
+      "next": {
+        "full maintenance picture (all routes together)": "maintenance-section-set",
+        "immediate maintenance now, no HMA case filed": "bnss-144-leaf",
+        "interim maintenance during a pending HMA proceeding": "interim-vs-permanent",
+        "monetary reliefs for expenses and child costs (domestic violence / economic abuse)": "pwdva-20-leaf",
+        "permanent alimony at/after an HMA decree": "interim-vs-permanent"
+      },
+      "node_id": "maintenance:maintenance-root",
+      "options": [
+        "immediate maintenance now, no HMA case filed",
+        "interim maintenance during a pending HMA proceeding",
+        "permanent alimony at/after an HMA decree",
+        "monetary reliefs for expenses and child costs (domestic violence / economic abuse)",
+        "full maintenance picture (all routes together)"
+      ],
+      "question": "Which maintenance sub-issue does the user need? (Woman, 35, Hindu marriage 2012, separated 2 years, husband paying NO maintenance, 8yo daughter, wife earns Rs 40,000/month.)",
+      "section_ids": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20"
+      ],
+      "type": "choice",
+      "lane": "maintenance",
+      "original_node_id": "maintenance-root"
+    },
+    {
+      "next": {
+        "HMA decree being passed or already passed — permanent alimony needed": "hma-25-leaf",
+        "HMA proceeding pending — interim maintenance needed now": "hma-24-leaf",
+        "No HMA proceeding and no decree — maintenance during subsistence of marriage": "bnss-144-leaf"
+      },
+      "node_id": "maintenance:interim-vs-permanent",
+      "options": [
+        "HMA proceeding pending — interim maintenance needed now",
+        "HMA decree being passed or already passed — permanent alimony needed",
+        "No HMA proceeding and no decree — maintenance during subsistence of marriage"
+      ],
+      "question": "Is an HMA proceeding pending (interim stage) or is a decree being passed / already passed (permanent stage)?",
+      "section_ids": [
+        "hma-24",
+        "hma-25",
+        "bnss-144"
+      ],
+      "type": "choice",
+      "lane": "maintenance",
+      "original_node_id": "interim-vs-permanent"
+    },
+    {
+      "next": {
+        "BNSS s.144 + HMA s.24 + HMA s.25 + PWDVA s.20": "bnss-144-leaf"
+      },
+      "node_id": "maintenance:maintenance-section-set",
+      "options": [
+        "BNSS s.144 + HMA s.24 + HMA s.25 + PWDVA s.20"
+      ],
+      "question": "Return the complete maintenance section set for this test case.",
+      "section_ids": [
+        "bnss-144",
+        "hma-24",
+        "hma-25",
+        "pwdva-20"
+      ],
+      "section_set_note": "For the test case the full set is returned together: BNSS s.144 is the live immediate remedy; HMA s.24 is conditional on an HMA proceeding being filed; HMA s.25 is the decree-stage permanent route (no divorce asked for, so named as future route only, with NO HMA ss.13/13B cited); PWDVA s.20 covers monetary reliefs including school fees. Amounts across routes are set off, never double-counted.",
+      "type": "section_set",
+      "lane": "maintenance",
+      "original_node_id": "maintenance-section-set"
+    },
+    {
+      "next": {
+        "apply BNSS s.144": "maintenance-section-set"
+      },
+      "node_id": "maintenance:bnss-144-leaf",
+      "options": [
+        "apply BNSS s.144"
+      ],
+      "question": "BNSS s.144 — order for maintenance of wives, children and parents (old CrPC s.125).",
+      "section_ids": [
+        "bnss-144"
+      ],
+      "type": "leaf",
+      "lane": "maintenance",
+      "original_node_id": "bnss-144-leaf"
+    },
+    {
+      "next": {
+        "apply HMA s.24": "maintenance-section-set"
+      },
+      "node_id": "maintenance:hma-24-leaf",
+      "options": [
+        "apply HMA s.24"
+      ],
+      "question": "HMA s.24 — interim maintenance pendente lite during a pending HMA proceeding.",
+      "section_ids": [
+        "hma-24"
+      ],
+      "type": "leaf",
+      "lane": "maintenance",
+      "original_node_id": "hma-24-leaf"
+    },
+    {
+      "next": {
+        "apply HMA s.25": "maintenance-section-set"
+      },
+      "node_id": "maintenance:hma-25-leaf",
+      "options": [
+        "apply HMA s.25"
+      ],
+      "question": "HMA s.25 — permanent alimony/maintenance at or after an HMA decree.",
+      "section_ids": [
+        "hma-25"
+      ],
+      "type": "leaf",
+      "lane": "maintenance",
+      "original_node_id": "hma-25-leaf"
+    },
+    {
+      "next": {
+        "apply PWDVA s.20": "maintenance-section-set"
+      },
+      "node_id": "maintenance:pwdva-20-leaf",
+      "options": [
+        "apply PWDVA s.20"
+      ],
+      "question": "PWDVA s.20 — monetary reliefs (maintenance, school fees, medical, loss of earnings, rent). Shared with Lane 4 (Residence).",
+      "section_ids": [
+        "pwdva-20"
+      ],
+      "type": "leaf",
+      "lane": "maintenance",
+      "original_node_id": "pwdva-20-leaf"
+    },
+    {
+      "next": {
+        "A": "custody_section_set",
+        "B": "custody_section_set",
+        "C": "custody_section_set",
+        "D": "custody_section_set"
+      },
+      "node_id": "custody:custody_sub_issue_choice",
+      "options": [
+        "A: Custody inside a matrimonial proceeding (HMA s.26)",
+        "B: Standalone custody/guardianship, no HMA proceeding (Guardians and Wards Act 1890)",
+        "C: Natural guardian status of a Hindu minor (HMGA s.6)",
+        "D: Welfare-of-the-child assessment (paramount principle, applies to all routes)"
+      ],
+      "question": "What is the custody sub-issue? (a) custody inside a matrimonial proceeding, (b) standalone custody/guardianship with no HMA proceeding, (c) who is the natural guardian, (d) welfare assessment of the child.",
+      "section_ids": [
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "type": "choice",
+      "lane": "custody",
+      "original_node_id": "custody_sub_issue_choice"
+    },
+    {
+      "next": {
+        "A": "custody_leaf",
+        "B": "escalate_human_llm"
+      },
+      "node_id": "custody:custody_section_set",
+      "options": [
+        "A: Return the full custody set (all four)",
+        "B: Escalate — missing facts or low confidence (ask: child's age/school, where child lives now, husband's whereabouts)"
+      ],
+      "question": "Return the custody section set together: HMA s.26 (custody in matrimonial proceedings) + Guardians and Wards Act 1890 (standalone guardianship/custody) + HMGA s.6 (natural guardian) + welfare-of-the-child principle (paramount, overrides all). All four apply to the test case; the welfare principle governs the final custody decision.",
+      "section_ids": [
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "type": "section_set",
+      "lane": "custody",
+      "original_node_id": "custody_section_set"
+    },
+    {
+      "next": {
+        "A": null
+      },
+      "node_id": "custody:custody_leaf",
+      "options": [
+        "A: Deliver the custody answer with the full section set"
+      ],
+      "question": "Custody answer for the test case: mother seeks custody of her 8yo daughter (Hindu marriage, separated 2 years, Bengaluru). Cite HMA s.26 + Guardians and Wards Act 1890 + HMGA s.6 together, apply the welfare principle as paramount (welfare provisionally favours the mother; father is natural guardian in law for a child above five, but welfare overrides that default), claim child maintenance alongside (BNSS s.144 / HMA ss.24-25), and secure the home if needed (PWDVA ss.17-19). Do NOT cite Satish Chander Ahuja for custody — it is residence only.",
+      "section_ids": [
+        "hma-26",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "type": "leaf",
+      "lane": "custody",
+      "original_node_id": "custody_leaf"
+    },
+    {
+      "next": {
+        "A": null
+      },
+      "node_id": "custody:escalate_human_llm",
+      "options": [
+        "A: Escalate with the missing-facts list"
+      ],
+      "question": "Escalate to a human lawyer / LLM review: low confidence or missing facts. Ask the user: child's age and school; where the child lives now and with whom; husband's whereabouts and current address; whether any matrimonial or custody case is already filed and in which court.",
+      "section_ids": [],
+      "type": "leaf",
+      "lane": "custody",
+      "original_node_id": "escalate_human_llm"
+    },
+    {
+      "next": {
+        "already_returned": "not-stridhan-leaf",
+        "not_stridhan_gift_to_family": "not-stridhan-leaf",
+        "stridhan_held_not_returned": "civil-vs-criminal",
+        "stridhan_no_proof": "escalate-proof"
+      },
+      "node_id": "stridhan:stridhan-subissue",
+      "options": [
+        "stridhan_held_not_returned",
+        "stridhan_no_proof",
+        "not_stridhan_gift_to_family",
+        "already_returned"
+      ],
+      "question": "What is the Stridhan issue? Is the wife's own Stridhan (gold/cash/gifts given to HER at or around marriage) held by the husband or his family and not returned?",
+      "section_ids": [
+        "hma-27",
+        "bns-316"
+      ],
+      "type": "choice",
+      "lane": "stridhan",
+      "original_node_id": "stridhan-subissue"
+    },
+    {
+      "next": {
+        "both_civil_and_criminal": "stridhan-section-set",
+        "civil_only_s27": "hma-27-leaf",
+        "criminal_only_s316": "bns-316-leaf"
+      },
+      "node_id": "stridhan:civil-vs-criminal",
+      "options": [
+        "both_civil_and_criminal",
+        "civil_only_s27",
+        "criminal_only_s316"
+      ],
+      "question": "Both routes apply to the same facts. Which route(s) should be pursued for the withheld Stridhan (Rs 5 lakh gold + Rs 2 lakh cash)?",
+      "section_ids": [
+        "hma-27",
+        "bns-316"
+      ],
+      "type": "choice",
+      "lane": "stridhan",
+      "original_node_id": "civil-vs-criminal"
+    },
+    {
+      "next": {
+        "hma-27 + bns-316": "stridhan-section-set-leaf"
+      },
+      "node_id": "stridhan:stridhan-section-set",
+      "options": [
+        "hma-27 + bns-316"
+      ],
+      "question": "Return the Stridhan section set: the civil return route and the criminal route together.",
+      "section_ids": [
+        "hma-27",
+        "bns-316"
+      ],
+      "type": "section_set",
+      "lane": "stridhan",
+      "original_node_id": "stridhan-section-set"
+    },
+    {
+      "next": {},
+      "node_id": "stridhan:stridhan-section-set-leaf",
+      "options": [],
+      "question": "Stridhan — cite HMA s.27 (Family Court, Bengaluru: return of Rs 5 lakh gold + Rs 2 lakh cash in specie or value) TOGETHER WITH BNS s.316 (criminal breach of trust — FIR / complaint). Never cite Rajnesh v. Neha for Stridhan.",
+      "section_ids": [
+        "hma-27",
+        "bns-316"
+      ],
+      "type": "leaf",
+      "lane": "stridhan",
+      "original_node_id": "stridhan-section-set-leaf"
+    },
+    {
+      "next": {},
+      "node_id": "stridhan:hma-27-leaf",
+      "options": [],
+      "question": "Civil route only (not recommended alone): HMA s.27, Family Court, Bengaluru — return of the Rs 7 lakh Stridhan. Note: the criminal route (BNS s.316) should normally be cited alongside; record why it was not pursued.",
+      "section_ids": [
+        "hma-27"
+      ],
+      "type": "leaf",
+      "lane": "stridhan",
+      "original_node_id": "hma-27-leaf"
+    },
+    {
+      "next": {},
+      "node_id": "stridhan:bns-316-leaf",
+      "options": [],
+      "question": "Criminal route only (not recommended alone): BNS s.316 (IPC s.406 equivalent) — FIR / private complaint for criminal breach of trust over the withheld Stridhan. Note: a conviction does not by itself order return; the HMA s.27 family-court claim is needed for the return order.",
+      "section_ids": [
+        "bns-316"
+      ],
+      "type": "leaf",
+      "lane": "stridhan",
+      "original_node_id": "bns-316-leaf"
+    },
+    {
+      "next": {},
+      "node_id": "stridhan:escalate-proof",
+      "options": [],
+      "question": "Escalate: Stridhan claimed but proof missing. Missing facts — proof of Stridhan (receipts/bills/photos/gift list), itemised list of items, who holds them now, any demand made. Ask once for the missing facts; if still missing, flag both sections provisional and escalate to a human lawyer / LLM review. Do not guess the items, the holder, or whether a demand was made.",
+      "section_ids": [
+        "hma-27",
+        "bns-316"
+      ],
+      "type": "leaf",
+      "lane": "stridhan",
+      "original_node_id": "escalate-proof"
+    },
+    {
+      "next": {},
+      "node_id": "stridhan:not-stridhan-leaf",
+      "options": [],
+      "question": "Not a Stridhan claim on these facts (property was gifted to the husband/family for their use, or already returned). Do not cite HMA s.27 or BNS s.316. Re-route to the correct lane if another issue (maintenance / custody / residence) applies.",
+      "section_ids": [],
+      "type": "leaf",
+      "lane": "stridhan",
+      "original_node_id": "not-stridhan-leaf"
+    },
+    {
+      "next": {
+        "Already thrown out / locked out": "residence_section_set",
+        "Combination — eviction threats plus violence plus no money": "residence_section_set",
+        "Money cut off / needs rent or alternative accommodation": "residence_section_set",
+        "Threatened with eviction, still living in the house": "residence_section_set",
+        "Violence, threats, or harassment to stop": "protection_vs_residence"
+      },
+      "node_id": "residence:residence_sub_issue",
+      "options": [
+        "Threatened with eviction, still living in the house",
+        "Already thrown out / locked out",
+        "Violence, threats, or harassment to stop",
+        "Money cut off / needs rent or alternative accommodation",
+        "Combination — eviction threats plus violence plus no money"
+      ],
+      "question": "What is the residence problem: threatened with eviction while still living there, already thrown out, violence/threats to stop, or money cut off so she cannot stay?",
+      "section_ids": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "type": "choice",
+      "lane": "residence",
+      "original_node_id": "residence_sub_issue"
+    },
+    {
+      "next": {
+        "Both — protection order plus residence right and residence order": "residence_section_set",
+        "Money only — monetary reliefs, no protection or residence order needed": "leaf_PWDVA_20",
+        "Secure the right to stay — residence right and residence order": "residence_section_set",
+        "Stop the violence/threats first — protection order": "leaf_PWDVA_18"
+      },
+      "node_id": "residence:protection_vs_residence",
+      "options": [
+        "Stop the violence/threats first — protection order",
+        "Secure the right to stay — residence right and residence order",
+        "Both — protection order plus residence right and residence order",
+        "Money only — monetary reliefs, no protection or residence order needed"
+      ],
+      "question": "Is the immediate need to stop the violence/threats, to secure the right to stay in the house, or both?",
+      "section_ids": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "type": "choice",
+      "lane": "residence",
+      "original_node_id": "protection_vs_residence"
+    },
+    {
+      "next": {
+        "Escalate — missing facts (ownership, occupancy, nature of threats, any violence)": "escalate_human",
+        "PWDVA s.18 only (protection, no residence claim)": "leaf_PWDVA_18",
+        "PWDVA s.20 only (money, no residence claim)": "leaf_PWDVA_20",
+        "PWDVA ss.17+18+19+20 together": "leaf_PWDVA_17",
+        "PWDVA ss.17+19 only (residence, no protection or money)": "leaf_PWDVA_17"
+      },
+      "node_id": "residence:residence_section_set",
+      "options": [
+        "PWDVA ss.17+18+19+20 together",
+        "PWDVA ss.17+19 only (residence, no protection or money)",
+        "PWDVA s.18 only (protection, no residence claim)",
+        "PWDVA s.20 only (money, no residence claim)",
+        "Escalate — missing facts (ownership, occupancy, nature of threats, any violence)"
+      ],
+      "question": "Residence claim for the test case — which sections apply together?",
+      "section_ids": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "type": "section_set",
+      "lane": "residence",
+      "original_node_id": "residence_section_set"
+    },
+    {
+      "next": {
+        "Apply PWDVA s.17": "leaf_PWDVA_19",
+        "Escalate — missing facts": "escalate_human"
+      },
+      "node_id": "residence:leaf_PWDVA_17",
+      "options": [
+        "Apply PWDVA s.17",
+        "Escalate — missing facts"
+      ],
+      "question": "PWDVA s.17 — right to reside in the shared household. Applies on the test case: wife and 8-year-old daughter live in the house in the husband's name; eviction threatened. Residence is a right to reside — NEVER 'tenancy rights'.",
+      "section_ids": [
+        "pwdva-17"
+      ],
+      "type": "leaf",
+      "lane": "residence",
+      "original_node_id": "leaf_PWDVA_17"
+    },
+    {
+      "next": {
+        "Apply PWDVA s.18": "leaf_PWDVA_19",
+        "Escalate — missing facts": "escalate_human"
+      },
+      "node_id": "residence:leaf_PWDVA_18",
+      "options": [
+        "Apply PWDVA s.18",
+        "Escalate — missing facts"
+      ],
+      "question": "PWDVA s.18 — protection order prohibiting domestic violence, threats, harassment, and intimidation. Applies on the test case: eviction threats and intimidation while maintenance is withheld.",
+      "section_ids": [
+        "pwdva-18"
+      ],
+      "type": "leaf",
+      "lane": "residence",
+      "original_node_id": "leaf_PWDVA_18"
+    },
+    {
+      "next": {
+        "Apply PWDVA s.19 (restraint on dispossession)": "leaf_PWDVA_20",
+        "Escalate — missing facts": "escalate_human"
+      },
+      "node_id": "residence:leaf_PWDVA_19",
+      "options": [
+        "Apply PWDVA s.19 (restraint on dispossession)",
+        "Escalate — missing facts"
+      ],
+      "question": "PWDVA s.19 — residence order. Test-case direction: restrain the respondent from dispossessing/disturbing her possession of the shared household so she and her daughter can stay. Removal and alternative accommodation are fact-dependent — do not assume them.",
+      "section_ids": [
+        "pwdva-19"
+      ],
+      "type": "leaf",
+      "lane": "residence",
+      "original_node_id": "leaf_PWDVA_19"
+    },
+    {
+      "next": {
+        "Apply PWDVA s.20 and cross-link to Lane 1": "residence_done",
+        "Escalate — missing facts": "escalate_human"
+      },
+      "node_id": "residence:leaf_PWDVA_20",
+      "options": [
+        "Apply PWDVA s.20 and cross-link to Lane 1",
+        "Escalate — missing facts"
+      ],
+      "question": "PWDVA s.20 — monetary reliefs (residence/monetary face; shared with Lane 1). Test case: husband earns Rs 40,000/month and pays nothing; relief covers maintenance for wife and child and rent if she cannot stay. Cross-link to Lane 1 for the maintenance figure — do not invent an amount or double-count.",
+      "section_ids": [
+        "pwdva-20"
+      ],
+      "type": "leaf",
+      "lane": "residence",
+      "original_node_id": "leaf_PWDVA_20"
+    },
+    {
+      "next": {
+        "Done": "residence_done"
+      },
+      "node_id": "residence:residence_done",
+      "options": [
+        "Done"
+      ],
+      "question": "Residence lane complete for the test case: PWDVA ss.17+18+19+20 cited as a set before the Magistrate under PWDVA s.12. Cross-links noted: maintenance BNSS s.144 / HMA ss.24-25 (Lane 1), custody HMA s.26 (Lane 2), Stridhan HMA s.27 / BNS s.316 (Lane 3).",
+      "section_ids": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19",
+        "pwdva-20"
+      ],
+      "type": "leaf",
+      "lane": "residence",
+      "original_node_id": "residence_done"
+    },
+    {
+      "next": {
+        "Escalated": "escalate_human"
+      },
+      "node_id": "residence:escalate_human",
+      "options": [
+        "Escalated"
+      ],
+      "question": "Escalate to human/LLM — low confidence or missing facts: who owns the house, who lives there, nature of threats, any violence. Do not guess ownership, occupancy, or a 'tenancy' basis.",
+      "section_ids": [],
+      "type": "leaf",
+      "lane": "residence",
+      "original_node_id": "escalate_human"
+    },
+    {
+      "next": "clarifying-questions",
+      "node_id": "procedure:court-selection",
+      "options": [
+        "HMA reliefs (maintenance ss.24/25, custody s.26, Stridhan s.27) -> Family Court, Bengaluru",
+        "BNSS s.144 maintenance and PWDVA ss.17/18/19/20 reliefs -> Magistrate, Bengaluru",
+        "BNS s.316 criminal breach of trust (Stridhan) -> criminal complaint route, parallel to HMA s.27"
+      ],
+      "question": "For each relief the user seeks, which court decides it? The graph picks the court — never ask the user to pick.",
+      "section_ids": [
+        "proc-court-family-court",
+        "proc-court-magistrate"
+      ],
+      "type": "choice",
+      "lane": "procedure",
+      "original_node_id": "court-selection"
+    },
+    {
+      "next": "documents-checklist",
+      "node_id": "procedure:clarifying-questions",
+      "options": [
+        "All 3 facts known -> proceed to documents-checklist",
+        "Income unknown -> ask what she knows; if nothing known, escalate to human/LLM, do not invent a figure",
+        "School-fee amount unknown -> ask for receipts/fee structure; if unknowable, escalate, do not invent a figure",
+        "Husband's whereabouts unknown -> escalate to human/LLM for service options, do not file blind"
+      ],
+      "question": "Before any maintenance amount or filing: what are the 3 missing facts? (1) husband's income as the wife knows it — ask, never demand salary slips she does not have; (2) school-fee amount for the 8-year-old daughter; (3) where the husband actually lives now (for notice and jurisdiction). Also confirm marriage proof and the child's birth certificate.",
+      "section_ids": [
+        "doc-income-ask-not-demand",
+        "doc-school-fee-amount",
+        "doc-husband-whereabouts",
+        "doc-marriage-proof",
+        "doc-birth-certificate"
+      ],
+      "type": "choice",
+      "lane": "procedure",
+      "original_node_id": "clarifying-questions"
+    },
+    {
+      "next": "filing",
+      "node_id": "procedure:documents-checklist",
+      "options": [
+        "Checklist complete as far as possible -> proceed to filing (Family Court HMA petition + Magistrate BNSS/PWDVA applications)",
+        "A document is missing -> note the gap honestly and proceed on what exists, or escalate to human/LLM if the gap is fatal (no marriage proof at all, no address for service)"
+      ],
+      "question": "Documents checklist — collect as far as possible, never block filing on a document the wife does not have: marriage proof; child's birth certificate (Registration of Births and Deaths Act 1969, NOT HMA); husband's income as known (no salary-slip demand); school-fee amount/receipts; husband's current address; Stridhan list with proof (Rs 5 lakh gold + Rs 2 lakh cash); residence proof for the shared household and facts of eviction threats.",
+      "section_ids": [
+        "doc-marriage-proof",
+        "doc-birth-certificate",
+        "doc-income-ask-not-demand",
+        "doc-school-fee-amount",
+        "doc-husband-whereabouts",
+        "doc-stridhan-list-proof",
+        "doc-residence-proof"
+      ],
+      "type": "leaf",
+      "lane": "procedure",
+      "original_node_id": "documents-checklist"
+    },
+    {
+      "next": "filing",
+      "node_id": "procedure:divorce-gate",
+      "options": [
+        "No divorce asked (test case) -> gate closed, proceed without ss.13/13B",
+        "Divorce expressly asked -> open gate, Family Court under HMA s.13/s.13B",
+        "Ambiguous -> escalate to human/LLM, do not infer a divorce request"
+      ],
+      "question": "Did the user expressly ask for divorce? If no, HMA s.13/s.13B stay closed and no divorce content is produced. If yes, or if ambiguous, escalate to a human lawyer/LLM to clarify intent before opening the gate.",
+      "section_ids": [
+        "proc-divorce-gate"
+      ],
+      "type": "choice",
+      "lane": "procedure",
+      "original_node_id": "divorce-gate"
+    },
+    {
+      "next": "interim-relief",
+      "node_id": "procedure:filing",
+      "options": [
+        "File HMA petition in Family Court",
+        "File BNSS s.144 / PWDVA applications before the Magistrate"
+      ],
+      "question": "File in the correct forums: HMA petition (ss.24/25/26/27) in the Family Court, Bengaluru; BNSS s.144 maintenance and PWDVA (ss.17/18/19/20) applications before the Magistrate, Bengaluru. The two forums run in parallel for their own reliefs.",
+      "section_ids": [
+        "proc-filing-hma",
+        "proc-filing-magistrate"
+      ],
+      "type": "section_set",
+      "lane": "procedure",
+      "original_node_id": "filing"
+    },
+    {
+      "next": "evidence",
+      "node_id": "procedure:interim-relief",
+      "options": [
+        "Seek HMA s.24 interim maintenance",
+        "Seek interim PWDVA protection/residence orders"
+      ],
+      "question": "Seek interim relief first: interim maintenance under HMA s.24 in the Family Court, and interim PWDVA protection/residence/monetary orders before the Magistrate.",
+      "section_ids": [
+        "proc-interim-relief"
+      ],
+      "type": "section_set",
+      "lane": "procedure",
+      "original_node_id": "interim-relief"
+    },
+    {
+      "next": "final-order",
+      "node_id": "procedure:evidence",
+      "options": [
+        "Proceed to evidence in both forums"
+      ],
+      "question": "Evidence stage: income tested by court-directed disclosure from the husband (never by demanding salary slips from the wife); child welfare for custody; Stridhan list tested on whatever proof exists.",
+      "section_ids": [
+        "proc-evidence"
+      ],
+      "type": "section_set",
+      "lane": "procedure",
+      "original_node_id": "evidence"
+    },
+    {
+      "next": "timeline",
+      "node_id": "procedure:final-order",
+      "options": [
+        "Final orders in each forum",
+        "Enforcement in the same forum if disobeyed"
+      ],
+      "question": "Final order and enforcement: HMA s.25 permanent maintenance, HMA s.26 custody, HMA s.27 Stridhan directions (Family Court); BNSS s.144 maintenance and PWDVA ss.17/18/19/20 final orders (Magistrate); enforcement in the same forum if disobeyed.",
+      "section_ids": [
+        "proc-final-order-enforcement"
+      ],
+      "type": "section_set",
+      "lane": "procedure",
+      "original_node_id": "final-order"
+    },
+    {
+      "next": null,
+      "node_id": "procedure:timeline",
+      "options": [
+        "Present the staged timeline with every duration marked ESTIMATE"
+      ],
+      "question": "Staged timeline (all durations ESTIMATES, not statutory deadlines): clarifying questions/documents -> filing -> notice/first hearing -> interim relief -> evidence -> final order -> enforcement. No fixed date is promised for any stage.",
+      "section_ids": [
+        "proc-timeline-staged"
+      ],
+      "type": "leaf",
+      "lane": "procedure",
+      "original_node_id": "timeline"
+    }
+  ],
+  "edges": [
+    {
+      "condition": "user asks for interim maintenance during a pending HMA proceeding OR permanent alimony at/after a decree",
+      "from": "maintenance:maintenance-root",
+      "to": "maintenance:interim-vs-permanent",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "user asks for immediate maintenance now with no HMA case filed (test case default)",
+      "from": "maintenance:maintenance-root",
+      "to": "maintenance:bnss-144-leaf",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "user asks for monetary reliefs for expenses/child costs arising from domestic violence or economic abuse",
+      "from": "maintenance:maintenance-root",
+      "to": "maintenance:pwdva-20-leaf",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "user asks for the full maintenance picture, or the test case is being answered in full",
+      "from": "maintenance:maintenance-root",
+      "to": "maintenance:maintenance-section-set",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "HMA proceeding is pending — interim stage",
+      "from": "maintenance:interim-vs-permanent",
+      "to": "maintenance:hma-24-leaf",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "HMA decree is being passed or has already been passed — permanent stage",
+      "from": "maintenance:interim-vs-permanent",
+      "to": "maintenance:hma-25-leaf",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "no HMA proceeding and no decree — maintenance during subsistence of marriage",
+      "from": "maintenance:interim-vs-permanent",
+      "to": "maintenance:bnss-144-leaf",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "always — BNSS s.144 must be cited alongside HMA s.24/s.25 and PWDVA s.20, never alone as the only maintenance section",
+      "from": "maintenance:bnss-144-leaf",
+      "to": "maintenance:maintenance-section-set",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "always — HMA s.24 (interim) must be presented with HMA s.25 (permanent) and BNSS s.144 so the stage distinction is explicit",
+      "from": "maintenance:hma-24-leaf",
+      "to": "maintenance:maintenance-section-set",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "always — HMA s.25 (permanent) must be presented with HMA s.24 (interim) and BNSS s.144; in the test case as the future decree-stage route only, with no HMA ss.13/13B cited",
+      "from": "maintenance:hma-25-leaf",
+      "to": "maintenance:maintenance-section-set",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "always — PWDVA s.20 monetary reliefs are set off against BNSS s.144 amounts (no double recovery) and cross-link to Lane 4 (Residence) ss.17-19",
+      "from": "maintenance:pwdva-20-leaf",
+      "to": "maintenance:maintenance-section-set",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "section_set traversal starts at the live immediate remedy, BNSS s.144",
+      "from": "maintenance:maintenance-section-set",
+      "to": "maintenance:bnss-144-leaf",
+      "lane": "maintenance"
+    },
+    {
+      "condition": "any option A/B/C/D chosen — all custody sub-issues resolve to the full custody section set",
+      "from": "custody:custody_sub_issue_choice",
+      "to": "custody:custody_section_set",
+      "lane": "custody"
+    },
+    {
+      "condition": "option A — facts sufficient, return the full custody set",
+      "from": "custody:custody_section_set",
+      "to": "custody:custody_leaf",
+      "lane": "custody"
+    },
+    {
+      "condition": "option B — low confidence or missing facts (child's age/school, where child lives now, husband's whereabouts)",
+      "from": "custody:custody_section_set",
+      "to": "custody:escalate_human_llm",
+      "lane": "custody"
+    },
+    {
+      "condition": "cannot determine the custody sub-issue from the user's facts",
+      "from": "custody:custody_sub_issue_choice",
+      "to": "custody:escalate_human_llm",
+      "lane": "custody"
+    },
+    {
+      "condition": "stridhan_held_not_returned",
+      "from": "stridhan:stridhan-subissue",
+      "to": "stridhan:civil-vs-criminal",
+      "lane": "stridhan"
+    },
+    {
+      "condition": "stridhan_no_proof",
+      "from": "stridhan:stridhan-subissue",
+      "to": "stridhan:escalate-proof",
+      "lane": "stridhan"
+    },
+    {
+      "condition": "not_stridhan_gift_to_family OR already_returned",
+      "from": "stridhan:stridhan-subissue",
+      "to": "stridhan:not-stridhan-leaf",
+      "lane": "stridhan"
+    },
+    {
+      "condition": "both_civil_and_criminal",
+      "from": "stridhan:civil-vs-criminal",
+      "to": "stridhan:stridhan-section-set",
+      "lane": "stridhan"
+    },
+    {
+      "condition": "civil_only_s27",
+      "from": "stridhan:civil-vs-criminal",
+      "to": "stridhan:hma-27-leaf",
+      "lane": "stridhan"
+    },
+    {
+      "condition": "criminal_only_s316",
+      "from": "stridhan:civil-vs-criminal",
+      "to": "stridhan:bns-316-leaf",
+      "lane": "stridhan"
+    },
+    {
+      "condition": "hma-27 + bns-316",
+      "from": "stridhan:stridhan-section-set",
+      "to": "stridhan:stridhan-section-set-leaf",
+      "lane": "stridhan"
+    },
+    {
+      "condition": "missing facts supplied — re-evaluate the Stridhan sub-issue choice",
+      "from": "stridhan:escalate-proof",
+      "to": "stridhan:stridhan-subissue",
+      "lane": "stridhan"
+    },
+    {
+      "condition": "eviction threatened while still living there",
+      "from": "residence:residence_sub_issue",
+      "to": "residence:residence_section_set",
+      "lane": "residence"
+    },
+    {
+      "condition": "already thrown out / locked out",
+      "from": "residence:residence_sub_issue",
+      "to": "residence:residence_section_set",
+      "lane": "residence"
+    },
+    {
+      "condition": "primary need is stopping violence/threats",
+      "from": "residence:residence_sub_issue",
+      "to": "residence:protection_vs_residence",
+      "lane": "residence"
+    },
+    {
+      "condition": "money cut off / rent or alternative accommodation needed",
+      "from": "residence:residence_sub_issue",
+      "to": "residence:residence_section_set",
+      "lane": "residence"
+    },
+    {
+      "condition": "combination: eviction threats + violence + no money (test case)",
+      "from": "residence:residence_sub_issue",
+      "to": "residence:residence_section_set",
+      "lane": "residence"
+    },
+    {
+      "condition": "protection order only",
+      "from": "residence:protection_vs_residence",
+      "to": "residence:leaf_PWDVA_18",
+      "lane": "residence"
+    },
+    {
+      "condition": "residence right/order needed (with or without protection)",
+      "from": "residence:protection_vs_residence",
+      "to": "residence:residence_section_set",
+      "lane": "residence"
+    },
+    {
+      "condition": "money only",
+      "from": "residence:protection_vs_residence",
+      "to": "residence:leaf_PWDVA_20",
+      "lane": "residence"
+    },
+    {
+      "condition": "PWDVA ss.17+18+19+20 together (test case) or ss.17+19 only",
+      "from": "residence:residence_section_set",
+      "to": "residence:leaf_PWDVA_17",
+      "lane": "residence"
+    },
+    {
+      "condition": "PWDVA s.18 only",
+      "from": "residence:residence_section_set",
+      "to": "residence:leaf_PWDVA_18",
+      "lane": "residence"
+    },
+    {
+      "condition": "PWDVA s.20 only",
+      "from": "residence:residence_section_set",
+      "to": "residence:leaf_PWDVA_20",
+      "lane": "residence"
+    },
+    {
+      "condition": "missing facts: ownership, occupancy, nature of threats, any violence",
+      "from": "residence:residence_section_set",
+      "to": "residence:escalate_human",
+      "lane": "residence"
+    },
+    {
+      "condition": "s.17 right established — enforce it with a s.19 residence order",
+      "from": "residence:leaf_PWDVA_17",
+      "to": "residence:leaf_PWDVA_19",
+      "lane": "residence"
+    },
+    {
+      "condition": "missing facts",
+      "from": "residence:leaf_PWDVA_17",
+      "to": "residence:escalate_human",
+      "lane": "residence"
+    },
+    {
+      "condition": "threats addressed — now secure residence",
+      "from": "residence:leaf_PWDVA_18",
+      "to": "residence:leaf_PWDVA_19",
+      "lane": "residence"
+    },
+    {
+      "condition": "missing facts",
+      "from": "residence:leaf_PWDVA_18",
+      "to": "residence:escalate_human",
+      "lane": "residence"
+    },
+    {
+      "condition": "residence order in place — add monetary reliefs (rent fallback / maintenance)",
+      "from": "residence:leaf_PWDVA_19",
+      "to": "residence:leaf_PWDVA_20",
+      "lane": "residence"
+    },
+    {
+      "condition": "missing facts",
+      "from": "residence:leaf_PWDVA_19",
+      "to": "residence:escalate_human",
+      "lane": "residence"
+    },
+    {
+      "condition": "s.20 applied; cross-link to Lane 1 for the maintenance figure",
+      "from": "residence:leaf_PWDVA_20",
+      "to": "residence:residence_done",
+      "lane": "residence"
+    },
+    {
+      "condition": "missing facts",
+      "from": "residence:leaf_PWDVA_20",
+      "to": "residence:escalate_human",
+      "lane": "residence"
+    },
+    {
+      "condition": "lane complete: PWDVA ss.17+18+19+20 cited as a set",
+      "from": "residence:leaf_PWDVA_20",
+      "to": "residence:residence_done",
+      "lane": "residence"
+    },
+    {
+      "condition": "court picked per issue by the graph (Family Court for HMA reliefs, Magistrate for BNSS s.144 / PWDVA reliefs); user never asked to pick",
+      "from": "procedure:court-selection",
+      "to": "procedure:clarifying-questions",
+      "lane": "procedure"
+    },
+    {
+      "condition": "divorce-gate checked in parallel: closed unless divorce expressly asked",
+      "from": "procedure:court-selection",
+      "to": "procedure:divorce-gate",
+      "lane": "procedure"
+    },
+    {
+      "condition": "gate closed (no divorce asked, test case) — proceed without HMA ss.13/13B",
+      "from": "procedure:divorce-gate",
+      "to": "procedure:filing",
+      "lane": "procedure"
+    },
+    {
+      "condition": "gate open (divorce expressly asked) — include HMA s.13/s.13B in the Family Court petition",
+      "from": "procedure:divorce-gate",
+      "to": "procedure:filing",
+      "lane": "procedure"
+    },
+    {
+      "condition": "all 3 missing facts collected or gaps escalated to human/LLM",
+      "from": "procedure:clarifying-questions",
+      "to": "procedure:documents-checklist",
+      "lane": "procedure"
+    },
+    {
+      "condition": "a missing fact is still unknown and not yet escalated — keep asking, do not invent a figure",
+      "from": "procedure:clarifying-questions",
+      "to": "procedure:clarifying-questions",
+      "lane": "procedure"
+    },
+    {
+      "condition": "checklist complete as far as possible; missing documents noted honestly, filing not blocked on documents the wife does not have",
+      "from": "procedure:documents-checklist",
+      "to": "procedure:filing",
+      "lane": "procedure"
+    },
+    {
+      "condition": "petitions/applications admitted and notice issued in each forum",
+      "from": "procedure:filing",
+      "to": "procedure:interim-relief",
+      "lane": "procedure"
+    },
+    {
+      "condition": "interim orders sought; case proceeds to evidence",
+      "from": "procedure:interim-relief",
+      "to": "procedure:evidence",
+      "lane": "procedure"
+    },
+    {
+      "condition": "evidence closed and final arguments heard",
+      "from": "procedure:evidence",
+      "to": "procedure:final-order",
+      "lane": "procedure"
+    },
+    {
+      "condition": "final orders passed; enforcement follows in the same forum if disobeyed",
+      "from": "procedure:final-order",
+      "to": "procedure:timeline",
+      "lane": "procedure"
+    },
+    {
+      "condition": "user asks for a timeline at any point — present staged timeline with all durations marked ESTIMATE",
+      "from": "procedure:court-selection",
+      "to": "procedure:timeline",
+      "lane": "procedure"
+    },
+    {
+      "from": "root:issue-classification",
+      "to": "maintenance:maintenance-root",
+      "condition": "issue includes maintenance",
+      "lane": "root"
+    },
+    {
+      "from": "root:issue-classification",
+      "to": "custody:custody_sub_issue_choice",
+      "condition": "issue includes custody",
+      "lane": "root"
+    },
+    {
+      "from": "root:issue-classification",
+      "to": "stridhan:stridhan-subissue",
+      "condition": "issue includes stridhan",
+      "lane": "root"
+    },
+    {
+      "from": "root:issue-classification",
+      "to": "residence:residence_sub_issue",
+      "condition": "issue includes residence",
+      "lane": "root"
+    },
+    {
+      "from": "root:issue-classification",
+      "to": "procedure:court-selection",
+      "condition": "issue includes procedure",
+      "lane": "root"
+    },
+    {
+      "from": "maintenance:maintenance-section-set",
+      "to": "procedure:court-selection",
+      "condition": "section set picked; graph now picks court and documents",
+      "lane": "root"
+    },
+    {
+      "from": "custody:custody_section_set",
+      "to": "procedure:court-selection",
+      "condition": "section set picked; graph now picks court and documents",
+      "lane": "root"
+    },
+    {
+      "from": "stridhan:stridhan-section-set",
+      "to": "procedure:court-selection",
+      "condition": "section set picked; graph now picks court and documents",
+      "lane": "root"
+    },
+    {
+      "from": "residence:residence_section_set",
+      "to": "procedure:court-selection",
+      "condition": "section set picked; graph now picks court and documents",
+      "lane": "root"
+    }
+  ],
+  "section_sets_for_test_case": {
+    "maintenance": [
+      "bnss-144",
+      "hma-24",
+      "hma-25",
+      "pwdva-20"
+    ],
+    "custody": [
+      "hma-26",
+      "gwa-1890",
+      "hmga-1956-s6",
+      "welfare-principle"
+    ],
+    "stridhan": [
+      "hma-27",
+      "bns-316"
+    ],
+    "residence": [
+      "pwdva-17",
+      "pwdva-18",
+      "pwdva-19",
+      "pwdva-20"
+    ],
+    "divorce": [],
+    "note": "Divorce set is EMPTY for the test case — HMA s.13/s.13B do not fire because no divorce was asked."
+  },
+  "unverified_excluded": [
+    {
+      "item": "Any BNS section other than BNS s.316",
+      "verification_status": "unverified — do not use as fact",
+      "reason": "Not in the verified retest list; no BNS section beyond s.316 was verified in this build."
+    },
+    {
+      "item": "Any CrPC/BNSS section other than BNSS s.144 (old CrPC s.125)",
+      "verification_status": "unverified — do not use as fact",
+      "reason": "Not in the verified retest list."
+    },
+    {
+      "item": "HMA s.13 / s.13B as a default citation",
+      "verification_status": "unverified for this test case — do not use as fact",
+      "reason": "Divorce-only gate; no divorce was asked."
+    },
+    {
+      "item": "Maintenance quantum / amount for the test case",
+      "verification_status": "unverified — do not use as fact",
+      "reason": "Husband's income, school fees and whereabouts unknown; quantum must be escalated, not invented."
+    },
+    {
+      "item": "Timeline durations",
+      "verification_status": "estimate only, not a statutory deadline",
+      "reason": "Lane 5 marks every duration ESTIMATE."
+    },
+    {
+      "item": "Pratibha Rani v. Suraj Kumar (1985) and Rashmi Kumar v. Mahesh Kumar Bhada (1997) as Stridhan precedents",
+      "verification_status": "lane-supplied, not retest-verified — check against the judgment text before citing in a live answer",
+      "reason": "Supplied by Lane 3; correct issue (Stridhan ownership/entrustment) but not part of the 2026-11-26 retest evidence."
+    }
+  ],
+  "open_questions_from_lanes": [
+    "Stridhan: test case does not state whether a demand for return was made — BNS s.316 expected answer is 'entrusted_and_refused', fallback 'entrusted_no_demand_yet' (demand first, then re-evaluate).",
+    "Stridhan/HMA 24: whether a matrimonial proceeding is already pending is unconfirmed — HMA s.27 needs a proceeding, HMA s.24 is conditional on one.",
+    "Residence: s.19 default is restraint-on-dispossession (stay in the house); removal of respondent / alternative accommodation is fact-dependent — confirm whether to ask the woman's preference first.",
+    "Maintenance quantum: no amount can be stated without husband's income; jurisdiction for BNSS s.144 also needs where the husband lives now.",
+    "Procedure timeline 'stages' field: kept as supplied by Lane 5 (extra field inside proc-timeline-staged)."
+  ]
+}

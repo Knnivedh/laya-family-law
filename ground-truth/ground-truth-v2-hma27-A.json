@@ -1,0 +1,561 @@
+{
+  "header": {
+    "version": "v2",
+    "date": "2026-11-27",
+    "decision": "D1 Option A (user decision 2026-11-27 ~09:46 IST): remove HMA 27 from K0/H3/H10/H15 ground truth, no replacement label. Option C (FCA 7(1) Expl. (c) / CPC 151 replacement label) was rejected by the user; no FCA label is introduced.",
+    "v1_source": "Cell 6 of live-laya-colab-test-v5-precision.ipynb (~/workspace/goals/english-family-law-chatbot-retest/files/laya-graph/live-laya-colab-test-v5-precision.ipynb); v1 GT copied verbatim from backtest-laya-vs-llama8b.md §3. Cell 6 source sha256: bb6acfc5ef0a90c5a68b0b0be76a62e3c5c8ca5c55ceed7aabf0f6ae9bcbdad7",
+    "v1_total_sections": 57,
+    "total_sections": 53,
+    "removed": [
+      {
+        "section": "HMA 27",
+        "from_questions": [
+          "K0",
+          "H3",
+          "H10",
+          "H15"
+        ],
+        "count": 4
+      }
+    ],
+    "changes": "Only the four HMA 27 removals above. Every other question, section label, court, escalate expectation, fact annotation and question wording is byte-identical to v1. Section-label strings use the frozen v1 normalisation (LABEL_BY_ID in Cell 6).",
+    "corrected_rule": "HMA s.27 fires only when a matrimonial proceeding under the HMA (ss. 9-13/13B) is pending, or is being filed together with the property claim, and the s.27 application is made before that proceeding is decided. A freestanding s.27 application with no HMA proceeding is not maintainable. A Family Court case under another Act (BNSS s.144, PWDVA, GWA 1890) is not an HMA proceeding for this purpose. \"Being filed\" means the user states they are filing, will file, or have instructed the filing of an HMA petition; wanting a divorce or wanting the property back, without more, does not count. (v6 Lane 3 §1.4, adopted under D1-A/D2 pairing.)",
+    "authority": "Astha Thakur v. Dhananjay Kanwar, FAO (FC) No. 29 of 2022, Himachal Pradesh High Court (DB: Vivek Singh Thakur and Romesh Verma, JJ.), decided 31.12.2025, neutral citation 2025:HHC:46178 (also 2025 NCHHC 46178). Verified by the rater 2026-11-27 from the Indian Kanoon fragment (paras 2, 14, 18, 20, 21) and the LiveLaw report; paras 3-13, 15-17, 19 were NOT read in full. See erratum for exactly what it supports and what it does not. The other authorities (Balkrishna, Babulal Full Bench, Krishna Kumar Gupta) are as recorded in v4 and were NOT re-verified by this rater.",
+    "escalation_kinds_note": "gt_escalation_kinds are the rater's GT expectation kinds under the v6 Lane 2 typed-escalation design (scoring set: quantum, court, demand, custody, residence, recovery, procedure). 'fact' is informational only and is deliberately NOT a scoring kind, so it never appears here; the named fact-ask is recorded in gt_notes instead. H7/H15 kinds are rater-confirmed (D3/D4, 2026-11-27). H2/H4 kinds (custody/residence) are recorded per the Lane 2 design; D5 formal rater confirmation is still outstanding.",
+    "consequence": "Gate §6.1: this GT change invalidates ALL prior runs on the current 16 (v1/v3/v4r live runs and the v5 prediction, all computed under the 57-section GT). They must be re-run and re-filed under this corrected 53-section GT. The D2 gate (HMA 27 dropped in Stage 2 when no proceeding is pending/being filed) must ship in the same logged change as this GT file, or no run scored under v2 can reach 16/16.",
+    "frozen_by": "Rater lane (independent of the tuning lanes), 2026-11-27. No Colab run, no live model, no change to the sealed fresh-20/Kannada-8 sets, no change to the v1 ground-truth file.",
+    "erratum": "ground-truth-v2-erratum.md (same directory)"
+  },
+  "questions": [
+    {
+      "id": "K0",
+      "question": "My husband left us two years ago and gives no money. I earn forty thousand a month, it is not enough for me and my eight year old daughter. My gold worth five lakh and two lakh cash my parents gave me is with my husband's family and they will not return it. They are throwing me out of the house which is in my husband's name. Who will get my daughter, how do I get my gold back, and which court do I go to?",
+      "gt_sections": [
+        "BNSS 144",
+        "PWDVA 20",
+        "GWA 1890",
+        "HMGA s.6",
+        "WELFARE",
+        "BNS 316",
+        "PWDVA 17",
+        "PWDVA 18",
+        "PWDVA 19"
+      ],
+      "gt_ids": [
+        "bnss-144",
+        "pwdva-20",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "bns-316",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "gt_court": [
+        "Family Court",
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "custody",
+        "residence",
+        "recovery"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": true,
+        "violence": false,
+        "residence_claim": true,
+        "money_fact": true,
+        "gold_fact": true
+      },
+      "gt_notes": "D1-A: 'HMA 27' REMOVED from v1 GT (was 10 sections, now 9). No HMA proceeding pending or being filed (proceeding_pending=false; question asks the route, mentions no petition). BNS 316 kept (criminal route). Civil recovery route is the Family Court under FCA s.7(1) Expl. (c) / CPC s.151, which is NOT a label in this set (Option C rejected by the user 2026-11-27; no replacement label). Court unchanged [Family Court, Magistrate]: Family Court retains the property dispute under FCA s.7 (Astha Thakur). Kinds: quantum (amount unknown), custody (GWA kept), residence (thrown out; residence_claim=true), recovery (BNS 316 kept, demand_made=true). NOTE: the Lane 2 'recovery' text still names HMA s.27 as the civil route — that text must be amended by the coordinator before any run scores H15/K0 recovery, or it re-introduces the removed label in prose."
+    },
+    {
+      "id": "H1",
+      "question": "My husband has not given me any money for three months. I earn fifteen thousand a month and I have two small children and no case filed anywhere.",
+      "gt_sections": [
+        "BNSS 144",
+        "PWDVA 20"
+      ],
+      "gt_ids": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": [
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": true,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. Kinds: quantum (husband's income / amount unknown)."
+    },
+    {
+      "id": "H2",
+      "question": "Who will get my six year old son? My husband says as the father he will take him away from me.",
+      "gt_sections": [
+        "GWA 1890",
+        "HMGA s.6",
+        "WELFARE"
+      ],
+      "gt_ids": [
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "gt_court": [
+        "Family Court"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": false,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. Kinds: custody (GWA 1890 kept; who-gets-the-child is a Family Court welfare decision). D5 formal rater confirmation of the custody kind is still outstanding — kind recorded per v6 Lane 2 design, not yet rater-confirmed."
+    },
+    {
+      "id": "H3",
+      "question": "My mother gave me gold at my wedding and my in-laws kept it. I have never asked them to return it.",
+      "gt_sections": [
+        "BNS 316"
+      ],
+      "gt_ids": [
+        "bns-316"
+      ],
+      "gt_court": [
+        "Family Court",
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "demand"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": false,
+        "gold_fact": true
+      },
+      "gt_notes": "D1-A: 'HMA 27' REMOVED from v1 GT (was [HMA 27, BNS 316], now [BNS 316]). No HMA proceeding pending or being filed (proceeding_pending=false; demand_made=false; question states no filing intention). BNS 316 kept via the demand-first fallback (make a written demand first, then re-evaluate). Court unchanged [Family Court, Magistrate]. Kinds: demand (demand not yet made)."
+    },
+    {
+      "id": "H4",
+      "question": "They changed the lock and I cannot enter my house. The house is in my husband's name.",
+      "gt_sections": [
+        "PWDVA 17",
+        "PWDVA 18",
+        "PWDVA 19"
+      ],
+      "gt_ids": [
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "gt_court": [
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "residence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": true,
+        "money_fact": false,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. H4 excludes PWDVA 20 (D7, confirm-as-is — still outstanding at freeze time; no money/rent claimed). Kinds: residence (only a Magistrate's residence order restores entry). D5 formal rater confirmation of the residence kind is still outstanding — kind recorded per v6 Lane 2 design, not yet rater-confirmed."
+    },
+    {
+      "id": "H5",
+      "question": "I want a divorce from my husband. He beats me, I need money every month and I want my daughter to stay with me.",
+      "gt_sections": [
+        "HMA 13",
+        "BNSS 144",
+        "PWDVA 20",
+        "PWDVA 18",
+        "GWA 1890",
+        "HMGA s.6",
+        "WELFARE"
+      ],
+      "gt_ids": [
+        "hma-13",
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-18",
+        "gwa-1890",
+        "hmga-1956-s6",
+        "welfare-principle"
+      ],
+      "gt_court": [
+        "Family Court",
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": true,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": true,
+        "residence_claim": false,
+        "money_fact": true,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. Kinds: quantum (amount unknown), custody (GWA kept). Residence kind correctly does NOT fire: PWDVA 18 here is the violence-only branch (protection order), not a residence order; residence_claim=false."
+    },
+    {
+      "id": "H6",
+      "question": "I do not want a divorce. I just want money every month from my husband and to stay in the house with my daughter.",
+      "gt_sections": [
+        "BNSS 144",
+        "PWDVA 20",
+        "PWDVA 17",
+        "PWDVA 18",
+        "PWDVA 19"
+      ],
+      "gt_ids": [
+        "bnss-144",
+        "pwdva-20",
+        "pwdva-17",
+        "pwdva-18",
+        "pwdva-19"
+      ],
+      "gt_court": [
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "residence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": true,
+        "money_fact": true,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. Kinds: quantum (amount unknown), residence (stay-in-house claim; residence_claim=true). Custody kind correctly does NOT fire: custody is gated out (no custody in GT)."
+    },
+    {
+      "id": "H7",
+      "question": "How do I get my daughter's birth certificate? The hospital did not give us one.",
+      "gt_sections": [
+        "Births and Deaths Act 1969"
+      ],
+      "gt_ids": [
+        "births-deaths-act-1969"
+      ],
+      "gt_court": [
+        "Registrar"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "procedure"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": false,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1 (sections, court, escalate_expected all unchanged). D3 CONFIRMED 2026-11-27 (rater): escalate_expected KEEP True, re-grounded on named fact-ask, NOT on quantum — see erratum §D3. Kinds: procedure (Births and Deaths Act 1969 kept; route turns on DOB/age, place of birth, whether the birth was ever registered — RBD Act s.13 delay tiers). Court stays Registrar."
+    },
+    {
+      "id": "H8",
+      "question": "I need maintenance but I do not have my husband's salary slips and I do not know what he earns.",
+      "gt_sections": [
+        "BNSS 144",
+        "PWDVA 20"
+      ],
+      "gt_ids": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": [
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": true,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. Kinds: quantum (income unknown — the clearest quantum case)."
+    },
+    {
+      "id": "H9",
+      "question": "How much money can I get every month from my husband?",
+      "gt_sections": [
+        "BNSS 144",
+        "PWDVA 20"
+      ],
+      "gt_ids": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": [
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": true,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. Kinds: quantum (amount explicitly asked; must not be invented)."
+    },
+    {
+      "id": "H10",
+      "question": "My husband has my gold and I have not asked for it back yet, and he gives no money for me and my child.",
+      "gt_sections": [
+        "BNS 316",
+        "BNSS 144",
+        "PWDVA 20"
+      ],
+      "gt_ids": [
+        "bns-316",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": [
+        "Family Court",
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "demand",
+        "quantum"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": false,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": true,
+        "gold_fact": true
+      },
+      "gt_notes": "D1-A: 'HMA 27' REMOVED from v1 GT (was [HMA 27, BNS 316, BNSS 144, PWDVA 20], now [BNS 316, BNSS 144, PWDVA 20]). No HMA proceeding pending or being filed (proceeding_pending=false; demand_made=false). BNS 316 kept via the demand-first fallback. Court unchanged [Family Court, Magistrate]. Kinds: demand (demand not yet made), quantum (amount unknown)."
+    },
+    {
+      "id": "H11",
+      "question": "I need money while my case is going on, but I have not filed any case yet.",
+      "gt_sections": [
+        "BNSS 144",
+        "PWDVA 20"
+      ],
+      "gt_ids": [
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": [
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": true,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. Kinds: quantum (amount unknown). No-proceeding point (HMA 24 unavailable) is a section matter, not an escalation matter."
+    },
+    {
+      "id": "H12",
+      "question": "My brother and I are fighting over our father's ancestral house. Who owns it and can I stop him selling it?",
+      "gt_sections": [],
+      "gt_ids": [],
+      "gt_court": [],
+      "gt_escalates": false,
+      "gt_escalation_kinds": [],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": false,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1 (empty GT, empty court, escalate False). Kinds: none — guard: no kind may ever fire on empty kept."
+    },
+    {
+      "id": "H13",
+      "question": "He beats me, throws me out of the house and gives no money for my son's school fees.",
+      "gt_sections": [
+        "PWDVA 18",
+        "PWDVA 17",
+        "PWDVA 19",
+        "PWDVA 20",
+        "BNSS 144"
+      ],
+      "gt_ids": [
+        "pwdva-18",
+        "pwdva-17",
+        "pwdva-19",
+        "pwdva-20",
+        "bnss-144"
+      ],
+      "gt_court": [
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "residence"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": null,
+        "violence": true,
+        "residence_claim": true,
+        "money_fact": true,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. Kinds: quantum (school-fee amount + husband's income unknown), residence (thrown out; residence_claim=true)."
+    },
+    {
+      "id": "H14",
+      "question": "My divorce case is already going on in the Family Court. I want my son to stay with me and money for his school fees while the case goes on.",
+      "gt_sections": [
+        "HMA 13",
+        "HMA 26",
+        "HMGA s.6",
+        "WELFARE",
+        "HMA 24",
+        "BNSS 144",
+        "PWDVA 20"
+      ],
+      "gt_ids": [
+        "hma-13",
+        "hma-26",
+        "hmga-1956-s6",
+        "welfare-principle",
+        "hma-24",
+        "bnss-144",
+        "pwdva-20"
+      ],
+      "gt_court": [
+        "Family Court",
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "quantum",
+        "custody"
+      ],
+      "facts": {
+        "divorce_asked": true,
+        "proceeding_pending": true,
+        "decree": false,
+        "demand_made": null,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": true,
+        "gold_fact": false
+      },
+      "gt_notes": "Unchanged from v1. H14 keeps HMA 13 (D6, rater confirm-as-is — still outstanding at freeze time; governing-section reading). proceeding_pending=true — the ONLY question in the set with a pending HMA proceeding, and the only one where HMA 24/HMA 26 correctly fire. Kinds: quantum (interim / school-fee amount unknown), custody (HMA 26 kept — proceeding pending)."
+    },
+    {
+      "id": "H15",
+      "question": "He sold my gold without asking me. The gold was given to me by my parents at my wedding.",
+      "gt_sections": [
+        "BNS 316"
+      ],
+      "gt_ids": [
+        "bns-316"
+      ],
+      "gt_court": [
+        "Family Court",
+        "Magistrate"
+      ],
+      "gt_escalates": true,
+      "gt_escalation_kinds": [
+        "recovery"
+      ],
+      "facts": {
+        "divorce_asked": false,
+        "proceeding_pending": false,
+        "decree": false,
+        "demand_made": true,
+        "violence": false,
+        "residence_claim": false,
+        "money_fact": false,
+        "gold_fact": true
+      },
+      "gt_notes": "D1-A: 'HMA 27' REMOVED from v1 GT (was [BNS 316, HMA 27], now [BNS 316]). No HMA proceeding pending or being filed (proceeding_pending=false; question states no filing intention). BNS 316 kept (demand_made=true — sale = refusal evident from conduct; D11 confirm still outstanding at freeze time). Court unchanged [Family Court, Magistrate]. D4 CONFIRMED 2026-11-27 (rater): escalate_expected KEEP True, re-grounded on fact/proof kind, NOT on demand — see erratum §D4. Kinds: recovery (BNS 316 kept, demand_made=true; sold gold needs valuation, BNS 316 complaint, civil recovery). NOTE: the Lane 2 'recovery' text still names HMA s.27 as the civil route — that text must be amended by the coordinator before any run scores H15 recovery, or it re-introduces the removed label in prose."
+    }
+  ]
+}
