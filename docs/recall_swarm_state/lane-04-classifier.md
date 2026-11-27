@@ -1,5 +1,20 @@
 # Lane 04 — Classifier Training Prep — STATUS
 
+> **LANE B AMENDMENT (2026-11-27, implementation swarm — this note only;
+> Lane 04's record below is untouched).** The 5,000-corpus pin, the
+> ModernBERT-large default, micro-batch 4, max_seq_len 192, 5 epochs and
+> inverse-frequency `--class-weights` in this file are SUPERSEDED by the
+> FALLBACK-2 + GPT-RERUN amendments: 8,000 corpus (7,500 train / 500
+> validation — already landed in `data/synthetic_v7_1/`), mmBERT-base
+> default (MuRIL / XLM-R equals in the A4 benchmark, no predetermined
+> winner), 1-pass span pooling, max_seq_len 320, max 4 epochs, micro-batch
+> 8 / grad-accum 2, bf16, weighted-CE baseline / focal-CE challenger (ASL
+> removed), effective-number class weights, separate encoder/head LRs
+> (2e-5 / 1e-4), and OOF calibration on Train-7500 only. Full detail:
+> `docs/impl_laneB_classifier_changes.md`. Lane 04's PC-2 vocab pin,
+> loader span-shape fix, LoRA NameError fix, early stopping and harness
+> hook all still stand unchanged.
+
 - Lane: 04 (recall swarm; V71-P1-3 training prep)
 - Files owned (only these touched): `src/laya_v7_classifier.py`,
   `scripts/train_v71_classifier.py`, `docs/rtx-recall-training-commands.md`
