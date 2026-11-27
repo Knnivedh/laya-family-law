@@ -1,0 +1,99 @@
+{
+ "n": 8,
+ "cosine_threshold": 0.9,
+ "n_eval": 28,
+ "n_study": 16,
+ "n_train": 7500,
+ "n_validation": 500,
+ "A_eval_vs_train_val": {
+  "shared_8grams": 0,
+  "pairs": {}
+ },
+ "B_eval_vs_study": {
+  "shared_8grams": 0,
+  "shared_questions": [],
+  "shared_ids": [],
+  "pairs": {}
+ },
+ "C_study_vs_train_val_info_only": {
+  "shared_8grams": 18,
+  "pairs": {
+   "KAN-S16": [
+    [
+     "SYN-TR-0233",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ],
+    [
+     "SYN-TR-0869",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ],
+    [
+     "SYN-TR-1872",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ],
+    [
+     "SYN-TR-3175",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ],
+    [
+     "SYN-TR-4004",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ],
+    [
+     "SYN-TR-4535",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ],
+    [
+     "SYN-TR-4865",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ],
+    [
+     "SYN-TR-7299",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ],
+    [
+     "SYN-TR-7480",
+     [
+      "2eba2750e1a12aa231c8674a386aebfc7897b6e22d63a7bc4507348843f0f34b",
+      "bc82df6c83e390a83ce0736f674ec059c36af9cef3f28c33ce27017d718b2051"
+     ]
+    ]
+   ]
+  }
+ },
+ "D_max_cosine_eval_vs_train_val": {
+  "cosine": 0.6614,
+  "eval_id": "KAN-E17",
+  "train_id": "SYN-TR-7085"
+ },
+ "D_max_cosine_eval_vs_study": {
+  "cosine": 0.6454,
+  "eval_id": "KAN-E27",
+  "study_id": "KAN-S05"
+ },
+ "verdict": "PASS"
+}
