@@ -1,0 +1,122 @@
+# LAYA v7.1 CI (V71-P7-4, 10x plan §7.4)
+#
+# Runs on every push / pull request. Every job below is a hard gate: a
+# failing job blocks the merge. Blocked gates (a dependency that has not
+# landed yet, e.g. Lane 02's leakage script or Lane 08's student ONNX
+# artifact) must fail loudly in CI — never silently pass. The local
+# triage flag `scripts/ci_gate.py --allow-blocked` is NOT used here.
+#
+# Torch note: the unit / backtest jobs need torch. The CI runner must
+# provide it (pip install torch, CPU wheel, or the RTX runner). If torch
+# is absent, ci_gate.py reports those gates BLOCKED and the job fails.
+# The frozen-SHA, prose and license gates are CPU-only and run anywhere.
+name: laya-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  frozen-sha-graph:
+    name: Frozen SHA-256 + graph integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Frozen SHA-256 + graph integrity gate
+        run: python -m tests.test_graph_v4
+
+  unit-permutation:
+    name: Full unit + batch permutation invariance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Full unit, runtime + batch permutation invariance gate
+        # test_v7_rules.py covers mode="laya" and mode="student_onnx"
+        # batch-permutation invariance (forward vs reversed vs shuffled
+        # batches return identical kept_ids / court / kinds / prose /
+        # probabilities within 1e-4); test_laya_family.py covers the
+        # Codex maintenance tests; multi-turn SessionState tests included.
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
+  prose-safety:
+    name: Prose safety gate (Fp=0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Prose safety gate (EN + KN templates, adversarial mutants, Fp=0)
+        run: python -m tests.test_prose_renderer_v2
+
+  leakage:
+    name: 8-gram overlap + leakage gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 8-gram overlap + leakage gate (Lane 02, V71-P1-2)
+        # 0 8-gram overlap between any training/prompt/phrasebook file and
+        # any held-out/sealed test bank.
+        run: python -m scripts.check_ngram_leakage --strict
+
+  license:
+    name: License allowlist gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: License allowlist gate (zero CC-BY-NC model IDs in default config)
+        run: python scripts/ci_gate.py --gate license
+
+  latency-determinism:
+    name: CPU latency + determinism gate (G14-CPU + G15)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install torch onnxruntime --index-url https://download.pytorch.org/whl/cpu
+      - name: CPU latency + determinism gate (G14-CPU + G15)
+        # Deterministic 16-Q smoke via student_int8.onnx on CI CPU:
+        # mean < 0.5s/Q, max <= 1.0s/Q, Run 1 == Run 2 byte-identical
+        # outcome SHA-256. Underlying command (run twice, compare):
+        #   python -m tests.v7_backtest --suite 16q --mode student_onnx --device cpu --misses 0
+        run: python scripts/ci_gate.py --gate latency-determinism
+
+  ci-gate-summary:
+    name: CI gate summary (all gates)
+    runs-on: ubuntu-latest
+    needs: [frozen-sha-graph, unit-permutation, prose-safety, leakage, license, latency-determinism]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install torch onnxruntime --index-url https://download.pytorch.org/whl/cpu
+      - name: Run every gate and print the summary
+        run: python scripts/ci_gate.py --all
