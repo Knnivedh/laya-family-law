@@ -241,5 +241,229 @@ class V7RulesTests(unittest.TestCase):
             self.assertEqual(b_fwd[idx]["prose"], rev_row["prose"])
 
 
+class V7EvidenceAnchorTests(unittest.TestCase):
+    """Lane 03 (recall swarm, C4): regression tests for the hardened
+    evidence anchors in src/laya_v7_evidence.py. Fact-level checks use
+    extract_grounded_v7 directly; a few end-to-end checks use assess_v7
+    (mode="evidence") to pin the graph-visible behaviour, including the
+    H13 guard: "money for my son's school fees" with NO exclusivity
+    signal must NOT set child_maintenance_only (that would gate out
+    pwdva-20 monetary relief for the wife)."""
+
+    def _fact(self, text, key):
+        from src.laya_v7_evidence import extract_grounded_v7
+
+        return extract_grounded_v7(text)["facts"][key].status
+
+    def _issue(self, text, key):
+        from src.laya_v7_evidence import extract_grounded_v7
+
+        return extract_grounded_v7(text)["issues"][key].intent
+
+    def test_lockout_and_residence_story_forms(self):
+        self.assertEqual(self._issue("He locked the door and would not let me in.", "residence"), "requested")
+        self.assertEqual(self._fact("He locked the door and would not let me in.", "coercive_eviction_or_lockout"), "supported")
+        self.assertEqual(
+            self._issue("My mother-in-law asked me to leave my matrimony house and I was not taken back.", "residence"),
+            "requested",
+        )
+
+    def test_dv_compensation_and_its_negation(self):
+        self.assertEqual(
+            self._issue(
+                "He keeps beating me and fractured my hand. I want compensation for this mental harassment.",
+                "dv_compensation",
+            ),
+            "requested",
+        )
+        # Explicitly declined compensation must not mint the claim, even
+        # though "violence" is present in the same sentence.
+        self.assertEqual(
+            self._issue("I am not asking for compensation. I only want the violence at home to stop.", "dv_compensation"),
+            "uncertain",
+        )
+        self.assertEqual(
+            self._issue("I am not asking for compensation. I only want the violence at home to stop.", "violence"),
+            "requested",
+        )
+        # Bare "violence" (not just "violent") is a violence signal.
+        self.assertEqual(self._issue("I only want the violence at home to stop.", "violence"), "requested")
+
+    def test_explicit_residence_order(self):
+        self.assertEqual(
+            self._fact("The court passed an order saying I can live in the house.", "explicit_residence_order_only"),
+            "supported",
+        )
+
+    def test_stridhan_held_safe_and_refusal(self):
+        self.assertEqual(self._issue("He will not give the gold back.", "stridhan"), "requested")
+        # Gold safe with her parents = no claim (issue negated by design).
+        self.assertEqual(self._issue("My stridhan is kept with my parents for safety.", "stridhan"), "denied")
+        self.assertEqual(
+            self._fact("My stridhan is kept with my parents for safety.", "stridhan_safe_in_own_possession"),
+            "supported",
+        )
+        # An explicit refusal beats a possession statement in the same text.
+        self.assertEqual(
+            self._issue("He will not give the gold back. My stridhan is with my parents for safety.", "stridhan"),
+            "requested",
+        )
+        # "Still with them" is held, even with no demand yet made.
+        self.assertEqual(
+            self._fact("Please help me. My gold is still with them, but I have never demanded it.", "stridhan_claim"),
+            "supported",
+        )
+
+    def test_restitution_not_custody(self):
+        self.assertEqual(
+            self._issue("I want my husband to return home and live with me as husband and wife.", "restitution"),
+            "requested",
+        )
+        self.assertEqual(
+            self._issue("I want my husband to return home and live with me as husband and wife.", "custody"),
+            "uncertain",
+        )
+
+    def test_decree_forms(self):
+        self.assertEqual(self._fact("The court gave the divorce decree.", "decree"), "supported")
+
+    def test_child_only_decimal_age_minor_speaker_and_nothing_for_myself(self):
+        self.assertEqual(
+            self._fact("I want maintenance only for my 2.5 yrs old son.", "child_maintenance_only"),
+            "supported",
+        )
+        self.assertEqual(
+            self._fact("I am 15 years old. Can I ask for support for myself?", "child_maintenance_only"),
+            "supported",
+        )
+        self.assertEqual(
+            self._fact("I am a 4-year-old child, and my father gives nothing for my studies. I need maintenance for my education.", "child_maintenance_only"),
+            "supported",
+        )
+        # "nothing for myself" is a child-only signal, not a self-ask.
+        self.assertEqual(
+            self._fact("I want maintenance only for my child's education, nothing for myself.", "child_maintenance_only"),
+            "supported",
+        )
+        # ...while a plain self-ask is not child-only.
+        self.assertEqual(
+            self._fact("I want maintenance for myself, not for my child.", "child_maintenance_only"),
+            "denied",
+        )
+
+    def test_judicial_separation_paraphrase(self):
+        self.assertEqual(
+            self._fact(
+                "We have been living apart for two years under a court order, but I do not want a divorce.",
+                "judicial_separation_only",
+            ),
+            "supported",
+        )
+        self.assertEqual(
+            self._issue(
+                "We have been living apart for two years under a court order, but I do not want a divorce.",
+                "divorce",
+            ),
+            "denied",
+        )
+
+    def test_nobody_negation_masks(self):
+        # Coordinated denial: neither violence nor coercive lockout may fire.
+        self.assertEqual(self._issue("Nobody has hit me or locked me out.", "violence"), "denied")
+        self.assertEqual(
+            self._fact("Nobody has hit me or locked me out.", "coercive_eviction_or_lockout"),
+            "denied",
+        )
+
+    def test_mutual_and_divorce_soft_negations(self):
+        self.assertEqual(self._fact("He refuses to agree to a mutual divorce.", "mutual_consent"), "denied")
+        self.assertEqual(self._issue("She is not agreeing for the divorce.", "divorce"), "denied")
+        self.assertEqual(
+            self._issue("She will not agree to end the marriage, so a divorce is not possible now.", "divorce"),
+            "denied",
+        )
+
+    def test_oos_override_and_rescue(self):
+        self.assertEqual(self._fact("My wife's manager harasses her at work.", "in_scope"), "denied")
+        self.assertEqual(
+            self._fact(
+                "My husband beats me and will not give my stridhan back. My husband's landlord also threatens us.",
+                "in_scope",
+            ),
+            "supported",
+        )
+
+    def test_procedure_issue(self):
+        self.assertEqual(
+            self._issue("How do I proceed legally? What is the time limit to appeal?", "procedure"),
+            "requested",
+        )
+        self.assertEqual(
+            self._fact("What papers do I need to file a case for maintenance?", "procedure_how_to_asked"),
+            "supported",
+        )
+
+    def test_h13_no_exclusivity_no_child_only(self):
+        # Regression guard (16-Q H13): "money for my son's school fees"
+        # with no "only" anywhere is a complaint about unpaid child
+        # expenses, NOT a child-only claim. child_only=True here gates out
+        # pwdva-20 for the wife (14/16 -> 13/16 on 2026-11-27).
+        self.assertEqual(
+            self._fact(
+                "He beats me, throws me out of the house and gives no money for my son's school fees.",
+                "child_maintenance_only",
+            ),
+            "denied",
+        )
+
+    def test_school_fees_pending_existing_order_interim(self):
+        self.assertEqual(
+            self._fact(
+                "He is only paying her school fees excluding school bus transport, school dress.",
+                "school_fees_fact",
+            ),
+            "supported",
+        )
+        self.assertEqual(self._fact("My divorce case goes on.", "proceeding_pending_hma"), "supported")
+        self.assertEqual(
+            self._fact(
+                "The court ordered my husband to pay maintenance but he has not paid since January.",
+                "existing_order_enforcement",
+            ),
+            "supported",
+        )
+        self.assertEqual(self._fact("What support can I get during the case?", "interim_asked"), "supported")
+
+    def test_joint_name_and_final_settlement_and_kaanoon_custody(self):
+        self.assertEqual(self._issue("Our flat is in joint name.", "joint_property"), "requested")
+        self.assertEqual(
+            self._issue("My husband agreed to pay 14 lakh final settlement to end the litigations.", "divorce"),
+            "requested",
+        )
+        self.assertEqual(self._issue("He is not ready to give me my son.", "custody"), "requested")
+
+    def test_end_to_end_h13_keeps_pwdva20(self):
+        from src.laya_v7 import assess_v7
+
+        r = assess_v7(
+            "He beats me, throws me out of the house and gives no money for my son's school fees.",
+            mode="evidence",
+        )
+        self.assertEqual(
+            set(r["kept_ids"]), {"bnss-144", "pwdva-17", "pwdva-18", "pwdva-19", "pwdva-20"}
+        )
+
+    def test_end_to_end_lockout_and_child_only_father(self):
+        from src.laya_v7 import assess_v7
+
+        r = assess_v7("He locked the door and would not let me in.", mode="evidence")
+        self.assertEqual(set(r["kept_ids"]), {"pwdva-17", "pwdva-18", "pwdva-19"})
+        r = assess_v7(
+            "My wife earns well and refuses to pay for our minor daughter's school fees.",
+            mode="evidence",
+        )
+        self.assertEqual(set(r["kept_ids"]), {"bnss-144"})
+
+
 if __name__ == "__main__":
     unittest.main()
