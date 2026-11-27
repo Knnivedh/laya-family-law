@@ -11,6 +11,13 @@ import sys
 import unicodedata
 from collections.abc import Callable, Mapping, Sequence
 
+from .laya_family_evidence import (
+    grounded_beneficiaries,
+    procedural_evidence,
+    requested_procedural_actions,
+    separate_support_requested,
+)
+
 
 BNSS = "https://www.indiacode.nic.in/bitstream/123456789/20340/1/bnss%2C_2023.pdf"
 HMA = "https://www.indiacode.nic.in/bitstream/123456789/1560/1/A1955-25Eng.pdf"
@@ -62,7 +69,11 @@ def parse_confirmations(values: Sequence[str]) -> dict[str, bool]:
     return facts
 
 
-def _interpret(scores: Mapping[str, float], confirmed: Mapping[str, bool]) -> dict:
+def _interpret(
+    scores: Mapping[str, float | str],
+    confirmed: Mapping[str, bool],
+    evidence: Mapping[str, dict],
+) -> dict:
     if set(scores) - QUESTIONS.keys():
         raise ValueError("The extractor returned an unknown field.")
     if set(confirmed) - QUESTIONS.keys() or any(type(value) is not bool for value in confirmed.values()):
@@ -71,14 +82,20 @@ def _interpret(scores: Mapping[str, float], confirmed: Mapping[str, bool]) -> di
     facts = {}
     for field in QUESTIONS:
         score = scores.get(field)
-        if field in scores and (
-            type(score) not in {float, int} or not math.isfinite(score) or not 0 <= score <= 1
-        ):
-            raise ValueError(f"Invalid extractor score for {field}.")
+        if field in scores:
+            valid_label = isinstance(score, str) and score in {"yes", "no", "unknown"}
+            valid_number = type(score) in {float, int} and math.isfinite(score) and 0 <= score <= 1
+            if not (valid_label or valid_number):
+                raise ValueError(f"Invalid extractor score for {field}.")
         if field in confirmed:
             facts[field] = {"value": "yes" if confirmed[field] else "no", "source": "user_confirmation"}
+        elif field in evidence:
+            facts[field] = evidence[field]
         elif score is None:
             facts[field] = {"value": "unknown", "source": "unresolved"}
+        elif isinstance(score, str):
+            value = "unknown" if field in PROCEDURAL_FACTS else score
+            facts[field] = {"value": value, "source": "model_suggestion"}
         else:
             value = "unknown"
             if field not in PROCEDURAL_FACTS:
@@ -101,7 +118,7 @@ def _route(rule_id: str, provision: str, url: str, facts: list[str], requirement
 
 def assess(
     question: str,
-    extract: Callable[[str], Mapping[str, float]],
+    extract: Callable[[str], Mapping[str, float | str]],
     confirmed: Mapping[str, bool] | None = None,
 ) -> dict:
     question = question.strip()
@@ -116,7 +133,13 @@ def assess(
         result["notes"].append("Share one maintenance issue at a time, including the relevant order or case details.")
         return result
 
-    facts = _interpret(extract(question), {} if confirmed is None else confirmed)
+    requested = requested_procedural_actions(question)
+    evidence = procedural_evidence(question) | requested
+    facts = _interpret(extract(question), {} if confirmed is None else confirmed, evidence)
+    if any(item["value"] == "yes" for item in requested.values()):
+        for purpose in PURPOSES[1:]:
+            if facts[purpose]["value"] == "yes" and facts[purpose]["source"] == "model_suggestion":
+                facts[purpose] = {"value": "unknown", "source": "unsubstantiated_secondary_request"}
     result["facts"] = facts
 
     def is_yes(field: str) -> bool:
@@ -170,8 +193,28 @@ def assess(
         routes.append(_route(rule_id, name, HMA, [purpose, stage], [requirement],
                              "Start with the court handling the Hindu Marriage Act proceeding or decree."))
 
-    roles = [field for field in BENEFICIARIES if is_yes(field)]
+    if (
+        is_yes("new_support")
+        and facts["new_support"]["source"] != "user_confirmation"
+        and any(is_yes(field) for field in PURPOSES if field != "new_support")
+        and not separate_support_requested(question)
+    ):
+        facts["new_support"] = {"value": "unknown", "source": "ambiguous_request"}
+        ask("new_support")
+
     if is_yes("new_support"):
+        role_evidence = grounded_beneficiaries(question)
+        for field in BENEFICIARIES:
+            if facts[field]["source"] == "user_confirmation":
+                continue
+            if is_yes(field):
+                facts[field] = role_evidence.get(field, {"value": "unknown", "source": "unverified_beneficiary"})
+        roles = [field for field in BENEFICIARIES if is_yes(field)]
+        if not roles and len(role_evidence) == 1:
+            field, observed = next(iter(role_evidence.items()))
+            if facts[field]["source"] != "user_confirmation":
+                facts[field] = observed
+                roles.append(field)
         if roles:
             routes.append(_route(
                 "bnss-144", "BNSS, 2023, section 144", BNSS, ["new_support", *roles],
@@ -197,7 +240,8 @@ def assess(
             "relevance": "Disclose earlier maintenance proceedings and orders so the court can consider adjustments.",
         }]
     elif not result["questions"]:
-        ask(*PURPOSES)
+        if not any(is_yes(field) for field in PURPOSES):
+            ask(*PURPOSES)
         if not result["questions"]:
             result["status"] = "review_needed"
     result["notes"].append("The court decides eligibility, venue and relief. This assessment covers the maintenance issue.")
@@ -206,7 +250,7 @@ def assess(
 
 def guided_assessment(
     question: str,
-    extract: Callable[[str], Mapping[str, float]],
+    extract: Callable[[str], Mapping[str, float | str]],
     confirmed: Mapping[str, bool],
     prompt: Callable[[str], str],
     tell: Callable[[str], None],
@@ -237,7 +281,10 @@ def _show(result: dict) -> None:
         print(f"- {route['provision']}")
         for field in route["because"]:
             fact = result["facts"][field]
-            evidence = "You confirmed" if fact["source"] == "user_confirmation" else "Your question suggests"
+            evidence = {
+                "user_confirmation": "You confirmed",
+                "user_text": "You stated",
+            }.get(fact["source"], "Your question suggests")
             print(f"  {evidence} that {REASONS[field]}.")
         for requirement in route["requirements"]:
             print(f"  {requirement}")
@@ -254,28 +301,45 @@ def _show(result: dict) -> None:
         print(result["questions"][0]["question"])
 
 
+def _extractor(name: str, device: str | None):
+    from . import laya_family_model, laya_family_structured
+
+    if name == "structured" or (
+        name == "auto" and device != "cpu" and laya_family_structured.available_on_cuda()
+    ):
+        return "structured", laya_family_structured.extract_facts
+    return "laya", laya_family_model.extract_facts
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--question", help="Read the English question from this argument. Standard input is the default.")
     parser.add_argument("--confirm", action="append", default=[], metavar="FIELD=YES_OR_NO")
     parser.add_argument("--device", choices=("cuda", "cpu"), help="Use this device for the local model.")
     parser.add_argument("--interactive", action="store_true", help="Ask follow-up questions and show the answer in plain text.")
+    parser.add_argument("--extractor", choices=("auto", "structured", "laya"), default="auto",
+                        help="Auto prefers the local structured model on a GPU with sufficient memory.")
     args = parser.parse_args()
     try:
-        from .laya_family_model import extract_facts
+        active_extractor = None
         confirmed = parse_confirmations(args.confirm)
         question = args.question
         if question is None:
             question = input("Describe your maintenance question in your own words. ") if args.interactive else sys.stdin.read()
 
-        def extract(text: str) -> Mapping[str, float]:
+        def extract(text: str) -> Mapping[str, float | str]:
+            nonlocal active_extractor
             with redirect_stdout(sys.stderr):
-                return extract_facts(text, device=args.device)
+                active_extractor, classify = _extractor(args.extractor, args.device)
+                return classify(text, device=args.device)
 
         if args.interactive:
-            _show(guided_assessment(question, extract, confirmed, input, print))
+            result = guided_assessment(question, extract, confirmed, input, print)
+            _show(result)
         else:
-            print(json.dumps(assess(question, extract, confirmed), ensure_ascii=True, indent=2))
+            result = assess(question, extract, confirmed)
+            result["extractor"] = active_extractor
+            print(json.dumps(result, ensure_ascii=True, indent=2))
     except (EOFError, ImportError, OSError, RuntimeError, ValueError) as error:
         parser.exit(2, f"Family-law assessment unavailable. {error}\n")
 

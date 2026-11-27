@@ -1,7 +1,7 @@
 # LAYA family-law runtime
 
 The first end-to-end release area is maintenance under Indian family law. An
-English layperson's question enters a local LAYA model. The model suggests
+English layperson's question enters a local text extractor. It suggests
 facts, and the decision rules return potential provisions, their requirements,
 qualified forum information, and the next fact needed. The user can correct a
 model suggestion using information from their papers or situation.
@@ -9,11 +9,17 @@ model suggestion using information from their papers or situation.
 ## Run the intake
 
 From the repository root, using the environment that has `laya` and the
-cached PIXMELT checkpoint:
+cached checkpoints:
 
 ```powershell
 python -m src.laya_family --interactive
 ```
+
+On a CUDA GPU with at least 5 GiB free and a complete local Qwen snapshot,
+the default command uses the structured extractor. Use `--extractor structured`
+to select it explicitly or `--extractor laya` for the smaller legacy extractor.
+JSON output identifies which extractor ran. The structured extractor runs
+offline once its pinned checkpoint is cached.
 
 Describe the maintenance issue in plain English. The program asks about
 unresolved facts and shows the possible provisions, why they were selected,
@@ -41,14 +47,32 @@ sources. Press Enter to leave a fact unresolved.
   and HMA §25 for permanent maintenance at or after an identified HMA decree.
   The statute, proceeding type and stage need to be supported independently of
   whether the user wants financial relief. The intake asks users to verify the
-  pending proceeding, decree or order statute from their papers.
+  pending proceeding, decree or order statute from their papers when the
+  question does not establish it. An explicit statement about the user's own
+  case can provide that evidence directly. Cite only the law tied to the
+  actual order or proceeding.
 - BNSS §144(3) for recovery under an identified BNSS order and §146 for variation
   of that order. For an unclear or older order, collect its governing law and
   route to review before applying the BNSS provisions.
 - Other family-law remedies remain unresolved in this runtime. The legacy
   research notebook is separate.
 
-## Local RTX 5050 smoke evidence
+## Raw-text regression
+
+The [accuracy plan](laya-maintenance-accuracy-plan.md) records the frozen
+development and verification method. Run the development suite on the new
+extractor from the repository root:
+
+```powershell
+python -B -m tests.laya_maintenance_backtest --split development --extractor structured --strict
+```
+
+Use `--split verification` for the second bank. Both report raw exact
+provision sets, extra provisions, required clarifications, structural source
+audits, runtime errors and outcome hashes. The banks contain authored
+maintenance scenarios and include one unsupported-script case apiece.
+
+## Historical guided smoke evidence
 
 Run `python -m unittest discover -s tests -p test_laya_family.py` for
 deterministic tests. With the model installed, run the authored live cases
@@ -68,6 +92,9 @@ regression check for maintenance. Independent reviewers and a fresh test
 bank are needed to establish broader legal accuracy.
 
 ## Primary authorities
+
+- [BNSS commencement notification S.O. 848(E)](https://www.mha.gov.in/files/whats_new_documents/BharatiyaNagarikSurakshaSanhita_24022024.pdf)
+
 
 - [Bharatiya Nagarik Suraksha Sanhita, 2023](https://www.indiacode.nic.in/bitstream/123456789/20340/1/bnss%2C_2023.pdf)
 - [Hindu Marriage Act, 1955](https://www.indiacode.nic.in/bitstream/123456789/1560/1/A1955-25Eng.pdf)
