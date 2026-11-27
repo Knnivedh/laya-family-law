@@ -163,11 +163,18 @@ def _render_custody(kept: set, facts: Dict[str, Any]) -> str:
     if "hmga-1956-s6" in kept:
         parts.append("Section 6 of the Hindu Minority and Guardianship Act, 1956 is also relevant to guardianship of a Hindu child.")
     if "hma-26" in kept:
-        parts.append(
-            "Because your case under the Hindu Marriage Act, 1955 is already going on, "
-            "the Family Court can also pass orders about the child under Section 26 of the Hindu Marriage Act, 1955 "
-            "while that case is pending."
-        )
+        is_pending = bool(facts.get("proceeding_pending_hma", facts.get("proceeding_pending")))
+        if is_pending:
+            parts.append(
+                "Because your case under the Hindu Marriage Act, 1955 is already going on, "
+                "the Family Court can also pass orders about the child under Section 26 of the Hindu Marriage Act, 1955 "
+                "while that case is pending."
+            )
+        else:
+            parts.append(
+                "Where a proceeding under the Hindu Marriage Act, 1955 is being filed alongside this claim, "
+                "the Family Court can pass orders about the child under Section 26 of the Hindu Marriage Act, 1955."
+            )
     return _join_clauses(parts)
 
 
@@ -340,18 +347,30 @@ def _render_escalation_lines(kinds: Sequence[str], kept: set, facts: Dict[str, A
                 "Before going to court, make a written demand for the return of your property and keep a copy of it."
             )
         elif k == "recovery":
-            # D1-A safe: cite HMA s.27 ONLY if hma-27 is in kept!
-            if "hma-27" in kept:
+            # D1-A / item 7 safe: cite BNS s.316 ONLY if 'bns-316' in kept, HMA s.27 ONLY if 'hma-27' in kept!
+            has_316 = "bns-316" in kept
+            has_27 = "hma-27" in kept
+            if has_316 and has_27:
                 lines.append(
                     "Recovering or valuing sold or withheld property requires a human lawyer to assist with "
                     "valuation, a police complaint under Section 316 of the Bharatiya Nyaya Sanhita, 2023, "
                     "and civil recovery under Section 27 of the Hindu Marriage Act, 1955."
                 )
-            else:
+            elif has_316:
                 lines.append(
                     "Recovering or valuing sold or withheld property requires a human lawyer to assist with "
                     "valuation, a police complaint under Section 316 of the Bharatiya Nyaya Sanhita, 2023, "
                     "and civil recovery before the Family Court."
+                )
+            elif has_27:
+                lines.append(
+                    "Recovering or valuing sold or withheld property requires a human lawyer to assist with "
+                    "valuation and civil recovery under Section 27 of the Hindu Marriage Act, 1955."
+                )
+            else:
+                lines.append(
+                    "Recovering or valuing sold or withheld property requires a human lawyer to assist with "
+                    "valuation and civil property recovery."
                 )
         elif k == "custody":
             lines.append(
@@ -387,12 +406,68 @@ def _render_escalation_lines(kinds: Sequence[str], kept: set, facts: Dict[str, A
     return lines
 
 
+KNOWN_ESCALATION_KINDS = frozenset({
+    "quantum",
+    "court",
+    "demand",
+    "recovery",
+    "custody",
+    "residence",
+    "safety",
+    "procedure",
+    "fact",
+})
+
+INVALID_RECORD_HANDOFF = (
+    "This system could not validate the automated classification record cleanly, so no statutory "
+    "provisions or court routing are stated here. Please have a human adviser or lawyer review your question."
+)
+
+
+def _normalize_prose_facts(raw_facts: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """Project typed FactEvidence/tri-state strings to plain native bool/str values.
+
+    Guarantees strings like 'unknown' or FactEvidence(status='unknown') NEVER act truthy.
+    """
+    out: Dict[str, Any] = {}
+    for k, v in (raw_facts or {}).items():
+        if hasattr(v, "status") and hasattr(v, "value"):
+            st = getattr(v, "status")
+            inner = getattr(v, "value")
+            if st == "supported":
+                out[k] = True if inner is None else inner
+            elif st == "denied":
+                out[k] = False if inner in (None, True) else inner
+            else:
+                out[k] = False if k not in {"claimant_sex", "claimant_role"} else "unknown"
+        elif isinstance(v, dict) and "status" in v:
+            st = v.get("status")
+            inner = v.get("value")
+            if st == "supported":
+                out[k] = True if inner is None else inner
+            elif st == "denied":
+                out[k] = False if inner in (None, True) else inner
+            else:
+                out[k] = False if k not in {"claimant_sex", "claimant_role"} else "unknown"
+        elif isinstance(v, str) and k not in {"claimant_sex", "claimant_role"}:
+            low = v.strip().lower()
+            if low in {"true", "yes", "1", "supported"}:
+                out[k] = True
+            elif low in {"false", "no", "0", "denied", "unknown", "none", "null", "unclear", "conflicting", ""}:
+                out[k] = False
+            else:
+                out[k] = v
+        else:
+            out[k] = v
+    return out
+
+
 def render_prose(rec: Dict[str, Any], facts: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Render deterministic user-facing prose strictly from kept_ids, court_live,
     escalation_kinds, and structured facts. NEVER reads question text.
     """
     t0 = time.perf_counter()
-    facts = facts if facts is not None else (rec.get("facts") or {})
+    facts = _normalize_prose_facts(facts if facts is not None else (rec.get("facts") or {}))
     kept_list = list(rec.get("kept_ids") or [])
     kept = set(kept_list)
     in_scope = bool(rec.get("in_scope", True))
@@ -407,16 +482,25 @@ def render_prose(rec: Dict[str, Any], facts: Optional[Dict[str, Any]] = None) ->
             if k not in kinds:
                 kinds.append(k)
 
-    # Check for unknown section IDs -> fail-safe escalation
+    # Check for unknown section IDs or unknown escalation enums -> fail-safe handoff
     unknown_ids = sorted(kept - KNOWN_SECTIONS)
-    if unknown_ids and "court" not in kinds:
-        kinds.append("court")
+    unknown_kinds = sorted(k for k in kinds if k not in KNOWN_ESCALATION_KINDS)
+    if unknown_ids or unknown_kinds:
+        ms = round((time.perf_counter() - t0) * 1000.0, 3)
+        return {
+            "prose": INVALID_RECORD_HANDOFF,
+            "prose_render_ms": ms,
+            "prose_template_version": TEMPLATE_VERSION,
+            "unknown_ids": unknown_ids,
+            "unknown_kinds": unknown_kinds,
+            "status": "error",
+        }
 
-    # Out-of-scope branch
-    if not kept and not in_scope:
+    # Out-of-scope branch (checked BEFORE kept so stale sections never render on OOS)
+    if not in_scope:
         prose = OUT_OF_SCOPE_LINE
         ms = round((time.perf_counter() - t0) * 1000.0, 3)
-        return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids}
+        return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids, "status": "ok"}
 
     # Empty kept but in scope -> no-dispute informational line OR escalation + closing
     if not kept and in_scope:
@@ -426,13 +510,13 @@ def render_prose(rec: Dict[str, Any], facts: Optional[Dict[str, Any]] = None) ->
                 "so no statutory section is triggered here. If any dispute arises later, consult a lawyer."
             )
             ms = round((time.perf_counter() - t0) * 1000.0, 3)
-            return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids}
+            return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids, "status": "ok"}
         if "court" not in kinds and "procedure" not in kinds:
             kinds.append("court")
         paras = _render_escalation_lines(kinds, kept, facts) + [CLOSING_LINE]
         prose = "\n\n".join(p for p in paras if p)
         ms = round((time.perf_counter() - t0) * 1000.0, 3)
-        return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids}
+        return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids, "status": "ok"}
 
     paras: List[str] = [INTRO_LINE]
 
@@ -516,6 +600,7 @@ def prose_forbidden_check(
     fp_hits map strictly to the 9 frozen Fp items (gate §5).
     quality_flags catch structural/template bugs (Additions A-E).
     """
+    facts = _normalize_prose_facts(facts)
     hits: List[Dict[str, Any]] = []
     flags: List[Dict[str, Any]] = []
     kept = set(kept_ids or [])
