@@ -1,0 +1,387 @@
+[
+  {
+    "id": "001",
+    "family": "new_expenses",
+    "kind": "new",
+    "question": "I've moved out of our shared place. My husband has a steady job and refuses to cover even my medicines. I am his wife and cannot meet my costs. Where can I seek monthly help?",
+    "expected": [
+      "bnss-144"
+    ]
+  },
+  {
+    "id": "002",
+    "family": "former_spouse",
+    "kind": "new",
+    "question": "I'm divorced and haven't remarried. The man I used to be married to won't contribute to my living expenses. I am asking about starting my own support claim.",
+    "expected": [
+      "bnss-144"
+    ]
+  },
+  {
+    "id": "003",
+    "family": "support_child",
+    "kind": "new",
+    "question": "Who handles a request for cash to care for our little boy? He is four, and his father leaves me to cover everything. I am applying for the child.",
+    "expected": [
+      "bnss-144"
+    ]
+  },
+  {
+    "id": "004",
+    "family": "support_child",
+    "kind": "new",
+    "question": "Am their dad. I pay all the expenses of our twins, both eleven. Their mum has income but won't assist. How do I seek financial contribution for the twins?",
+    "expected": [
+      "bnss-144"
+    ]
+  },
+  {
+    "id": "005",
+    "family": "support_parent",
+    "kind": "new",
+    "question": "My son is employed and I'm his father. I have no means to look after myself and he refuses to help me with essentials. Is there a way to get court-ordered support?",
+    "expected": [
+      "bnss-144"
+    ]
+  },
+  {
+    "id": "006",
+    "family": "support_parent",
+    "kind": "new",
+    "question": "Can my financially comfortable adult daughter be made to support me? I am her ageing mother, and I can't meet my basic living expenses.",
+    "expected": [
+      "bnss-144"
+    ]
+  },
+  {
+    "id": "007",
+    "family": "support_wrong_role",
+    "kind": "boundary",
+    "question": "My wife has a better salary than I have. I am the husband and I want the court to tell her to send me a personal allowance. There is no ongoing marriage case.",
+    "expected": []
+  },
+  {
+    "id": "008",
+    "family": "child_age_unknown",
+    "kind": "boundary",
+    "question": "I need money for my daughter from her mother. What provision can I use? I haven't said how old my daughter is.",
+    "expected": []
+  },
+  {
+    "id": "009",
+    "family": "adult_child",
+    "kind": "boundary",
+    "question": "My son is 24, has no disability, and is doing a postgraduate course. Can his mother be made to put money towards his living expenses?",
+    "expected": []
+  },
+  {
+    "id": "010",
+    "family": "unclear_spouse",
+    "kind": "boundary",
+    "question": "Can I have a court tell my spouse to send me money? I need it for my own living costs.",
+    "expected": []
+  },
+  {
+    "id": "011",
+    "family": "in_case_support",
+    "kind": "order",
+    "question": "I have a petition under the Hindu Marriage Act before the judge, with the next hearing in January. I am the spouse who cannot afford my lawyer or living costs. Can I ask for support until judgment?",
+    "expected": [
+      "hma-24"
+    ]
+  },
+  {
+    "id": "012",
+    "family": "in_case_support",
+    "kind": "order",
+    "question": "My wife filed a Hindu Marriage Act proceeding that is still going on. As the husband with no independent income, how do I get expenses paid for defending the current case?",
+    "expected": [
+      "hma-24"
+    ]
+  },
+  {
+    "id": "013",
+    "family": "in_case_support",
+    "kind": "order",
+    "question": "The HMA judicial separation petition regarding my marriage has not concluded. I am the wife and need interim financial support now.",
+    "expected": [
+      "hma-24"
+    ]
+  },
+  {
+    "id": "014",
+    "family": "future_filing",
+    "kind": "boundary",
+    "question": "No petition has been lodged yet. Supposing I do file a case under the Hindu Marriage Act, what about paying my fees while it is open?",
+    "expected": []
+  },
+  {
+    "id": "015",
+    "family": "authority_unknown",
+    "kind": "boundary",
+    "question": "I need litigation money from my spouse while our matrimonial case is ongoing. I can't tell from memory what Act our petition is under.",
+    "expected": [],
+    "must_ask": [
+      "hma_pending"
+    ]
+  },
+  {
+    "id": "016",
+    "family": "alternative_act",
+    "kind": "boundary",
+    "question": "I married under the Special Marriage Act and my divorce petition under that Act is pending. Can the court order some temporary help with expenses?",
+    "expected": []
+  },
+  {
+    "id": "017",
+    "family": "post_decree",
+    "kind": "order",
+    "question": "A Hindu Marriage Act decree ended my marriage last spring. I am the former husband and I want to apply for permanent financial support after that decree.",
+    "expected": [
+      "hma-25"
+    ]
+  },
+  {
+    "id": "018",
+    "family": "post_decree",
+    "kind": "order",
+    "question": "My marriage has already been ended by a decree under the HMA. As the former wife, I want a one-time permanent alimony order in connection with that decree.",
+    "expected": [
+      "hma-25"
+    ]
+  },
+  {
+    "id": "019",
+    "family": "post_decree",
+    "kind": "order",
+    "question": "The court granted me judicial separation under the Hindu Marriage Act last year. I now wish to request permanent alimony linked to that decree as the wife.",
+    "expected": [
+      "hma-25"
+    ]
+  },
+  {
+    "id": "020",
+    "family": "decree_missing",
+    "kind": "boundary",
+    "question": "I want the judge to grant me a permanent allowance. I have an old divorce decree but I can't find the law cited on the decree.",
+    "expected": [],
+    "must_ask": [
+      "hma_decree"
+    ]
+  },
+  {
+    "id": "021",
+    "family": "decree_sought",
+    "kind": "boundary",
+    "question": "My lawyer says the Hindu Marriage Act case might end next year. We don't have a decree. I'd like a permanent lump sum now.",
+    "expected": []
+  },
+  {
+    "id": "022",
+    "family": "case_recovery",
+    "kind": "order",
+    "question": "The paper says the judge granted maintenance under the Bharatiya Nagarik Suraksha Sanhita, section 144. Payment has fallen behind every month. How can I get the outstanding balance recovered?",
+    "expected": [
+      "bnss-144-3"
+    ]
+  },
+  {
+    "id": "023",
+    "family": "case_recovery",
+    "kind": "order",
+    "question": "A court made my maintenance order under s 144 BNSS. The payer sent only part of each instalment. Can the court collect the remaining sums?",
+    "expected": [
+      "bnss-144-3"
+    ]
+  },
+  {
+    "id": "024",
+    "family": "case_recovery",
+    "kind": "order",
+    "question": "I don't seek an increase. Under my existing maintenance order made under Section 144 of the BNSS I am still owed the last three instalments. How do I claim those?",
+    "expected": [
+      "bnss-144-3"
+    ]
+  },
+  {
+    "id": "025",
+    "family": "case_change",
+    "kind": "order",
+    "question": "I am the payer in an order under Section 144 BNSS. Because my business closed, I need to ask the court to reduce the existing amount.",
+    "expected": [
+      "bnss-146"
+    ]
+  },
+  {
+    "id": "026",
+    "family": "case_change",
+    "kind": "order",
+    "question": "An order under the Bharatiya Nagarik Suraksha Sanhita's section 144 already fixes my maintenance. My medical costs have changed. Could I have the amount raised?",
+    "expected": [
+      "bnss-146"
+    ]
+  },
+  {
+    "id": "027",
+    "family": "case_change",
+    "kind": "order",
+    "question": "Is there a way to vary the allowance the court set in my BNSS 144 order after our circumstances changed?",
+    "expected": [
+      "bnss-146"
+    ]
+  },
+  {
+    "id": "028",
+    "family": "old_recovery",
+    "kind": "boundary",
+    "question": "The document is a maintenance order under the old Criminal Procedure Code, section 125. It is unpaid. Someone on a forum mentioned section 144 BNSS.",
+    "expected": []
+  },
+  {
+    "id": "029",
+    "family": "unidentified_change",
+    "kind": "boundary",
+    "question": "A magistrate fixed the amount of family support years ago. I need a change and have no idea what section is on the order.",
+    "expected": [],
+    "must_ask": [
+      "bnss_order"
+    ]
+  },
+  {
+    "id": "030",
+    "family": "unidentified_collect",
+    "kind": "boundary",
+    "question": "Can I recover what has not been paid under the maintenance order? The order exists, but its governing law is unclear to me.",
+    "expected": [],
+    "must_ask": [
+      "bnss_order"
+    ]
+  },
+  {
+    "id": "031",
+    "family": "false_quotation",
+    "kind": "negative",
+    "question": "A textbook describes a husband saying, “my BNSS section 144 order is overdue.” I'm asking about that sentence, not about any order of mine.",
+    "expected": []
+  },
+  {
+    "id": "032",
+    "family": "third_person",
+    "kind": "boundary",
+    "question": "My neighbour's HMA divorce petition is pending. My own marriage case has already been disposed of under another law. Can I ask for help with the costs of my case?",
+    "expected": []
+  },
+  {
+    "id": "033",
+    "family": "mixed_orders",
+    "kind": "order",
+    "question": "Collecting the balance from past months and changing the amount going forward are both goals. My court maintenance order was made under BNSS, section 144.",
+    "expected": [
+      "bnss-144-3",
+      "bnss-146"
+    ]
+  },
+  {
+    "id": "034",
+    "family": "mixed_focus",
+    "kind": "new",
+    "question": "My first concern is money from the other parent for my six-year-old's care. The second concern is seeing the child on Sundays. Can I get a child-support order?",
+    "expected": [
+      "bnss-144"
+    ]
+  },
+  {
+    "id": "035",
+    "family": "explicit_negative",
+    "kind": "negative",
+    "question": "Money for myself is exactly what I do not want. My application would only be to visit the children.",
+    "expected": []
+  },
+  {
+    "id": "036",
+    "family": "property_only",
+    "kind": "negative",
+    "question": "I want my possessions from the wedding returned. I have no request for monthly payments from anyone.",
+    "expected": []
+  },
+  {
+    "id": "037",
+    "family": "salary_only",
+    "kind": "negative",
+    "question": "My former employer owes me wages. How do I recover the unpaid amount quickly?",
+    "expected": []
+  },
+  {
+    "id": "038",
+    "family": "refund_only",
+    "kind": "negative",
+    "question": "I paid online for a refrigerator that was never delivered. Can I make the seller give my money back?",
+    "expected": []
+  },
+  {
+    "id": "039",
+    "family": "legal_citation_only",
+    "kind": "negative",
+    "question": "What is BNSS section 144? I'm reading for an exam and have no family dispute.",
+    "expected": []
+  },
+  {
+    "id": "040",
+    "family": "conditional_order",
+    "kind": "boundary",
+    "question": "If the court ever issues a maintenance order under BNSS section 144, could I later try to collect missed payments? I don't have any order right now.",
+    "expected": []
+  },
+  {
+    "id": "041",
+    "family": "contested_law",
+    "kind": "boundary",
+    "question": "I think my order might be under BNSS section 144, but I cannot confirm it. How do I recover the arrears from an order of uncertain statutory origin?",
+    "expected": [],
+    "must_ask": [
+      "bnss_order"
+    ]
+  },
+  {
+    "id": "042",
+    "family": "emotional_grammar",
+    "kind": "new",
+    "question": "i work a bit but not enough for basics. married woman here, my husband wont send anything. what do i file to have him help pay for me",
+    "expected": [
+      "bnss-144"
+    ]
+  },
+  {
+    "id": "043",
+    "family": "spousal_vs_child",
+    "kind": "negative",
+    "question": "My eleven-year-old has all of his expenses paid already. I am the husband asking for maintenance only for myself and have no case pending.",
+    "expected": []
+  },
+  {
+    "id": "044",
+    "family": "mixed_parallel",
+    "kind": "order",
+    "question": "My HMA marriage petition is still pending and I need interim expenses for myself as the wife. I also want a separate maintenance order for my twelve-year-old from her other parent.",
+    "expected": [
+      "bnss-144",
+      "hma-24"
+    ]
+  },
+  {
+    "id": "045",
+    "family": "pending_recent",
+    "kind": "order",
+    "question": "I am the wife, lacking income. My petition under the Hindu Marriage Act is listed for its next hearing. How can I have support and legal expenses during this proceeding?",
+    "expected": [
+      "hma-24"
+    ]
+  },
+  {
+    "id": "046",
+    "family": "different_language",
+    "kind": "negative",
+    "question": "ನನ್ನ ಮಗುವಿನ ಖರ್ಚುಗಳಿಗೆ ಹಣ ಬೇಕು",
+    "expected": []
+  }
+]
