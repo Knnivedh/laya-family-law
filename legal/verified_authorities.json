@@ -1,0 +1,307 @@
+{
+ "authorities": [
+  {
+   "allowed_scopes": [
+    "hma-25_nullity_decree",
+    "hma-24_nullity_pending"
+   ],
+   "bench": "3-Judge Bench — Abhay S. Oka, Ahsanuddin Amanullah, Augustine George Masih JJ. (author: Oka J.)",
+   "case": "Sukhdev Singh v. Sukhbir Kaur",
+   "case_numbers": "Civil Appeal Nos. 2536 & 5726 of 2019",
+   "citations": [
+    "[2025] 2 SCR 1569",
+    "2025 INSC 197",
+    "2025 LiveLaw (SC) 195"
+   ],
+   "court": "Supreme Court of India",
+   "decided": "2025-02-12",
+   "evidence_note": "Verification recorded in docs/legal-decisions-v4.md §Q3 (2026-11-26), corroborated there against the SCR text (2025 INSC 197) itself: headnote question, bench, dates and holding all match. Plan §4.2 promotes it from UNVERIFIED to verified_primary on that record. Lane 07 did not re-fetch the SCR PDF in this pass; the promotion rests on the cited v4 record, and the full judgment PDF URL is preserved below for any re-check.",
+   "forbidden_scopes": [
+    "stridhan",
+    "custody",
+    "residence",
+    "general_alimony_quantum",
+    "hma-25_without_decree"
+   ],
+   "graph_sections": [
+    "hma-25",
+    "hma-24"
+   ],
+   "holding": "A spouse of a marriage declared void under HMA s.11 is entitled to SEEK permanent alimony under HMA s.25 ('any decree' in s.25 includes a decree declaring a marriage void) and interim maintenance under HMA s.24 during s.11 proceedings. Grant is discretionary and depends on the facts of each case and the conduct of the parties.",
+   "id": "sukhdev-singh-v-sukhbir-kaur-2025",
+   "limits": [
+    "Entitlement to seek, not entitlement to receive: relief is discretionary.",
+    "Does NOT remove the decree requirement for s.25: s.25 still operates 'at the time of passing any decree or at any time subsequent thereto'. Gives NO support to 'HMA 25 with no decree' fires — those remain forbidden.",
+    "Reference answered on law only; the matters were remitted to an appropriate Bench for decision on the merits. The eventual merits outcome is irrelevant to Laya's use.",
+    "Distinguishes CrPC s.125 / HAMA s.18 authorities (Yamunabai Adhav, Savitaben Bhatiya) as different remedial fields — do not extend the holding there."
+   ],
+   "sources": [
+    "https://indian-supreme-court-judgments.s3.ap-south-1.amazonaws.com/data/pdf/year=2025/english/2025_2_1569_1587_EN.pdf",
+    "https://livelaw-nludelhi.refread.com/pdf_upload/2025-livelaw-sc-195-sukhdev-singh-v-sukhbir-kaur-12-feb-2025-623293.pdf",
+    "https://lawfoyer.in/sukhdev-singh-v-sukhbir-kaur-2025-2-s-c-r-1569-2025-insc-197/",
+    "https://www.telegraphindia.com/india/supreme-court-rules-spouses-can-seek-alimony-even-if-marriage-is-declared-void/cid/2083207"
+   ],
+   "status": "verified_primary",
+   "verified_by": "docs/legal-decisions-v4.md §Q3 (2026-11-26), adopted by docs/10x_plane.md §4.2",
+   "verified_date": "2026-11-26"
+  },
+  {
+   "case": "Balkrishna Ramchandra Kadam v. Sangeeta Balkrishna Kadam",
+   "citations": [
+    "(1997) 7 SCC 500",
+    "1997 INSC 641"
+   ],
+   "claimed_proposition": "HMA s.27 is ancillary: the Matrimonial Court may make provision in the decree for property presented 'at or about the time of marriage' belonging jointly to husband and wife; recovery is 'by including it in the decree in the matrimonial proceedings'. Also reads 'at or about the time of marriage' broadly (property need not be given only at the wedding itself).",
+   "court": "Supreme Court of India",
+   "decided": "1997-09-04",
+   "graph_sections": [
+    "hma-27"
+   ],
+   "id": "balkrishna-ramchandra-kadam-v-sangeeta-balkrishna-kadam-1997",
+   "plan_ref": "P2.4 — docs/10x_plane.md §4.2",
+   "sources": [
+    "https://api.sci.gov.in/jonew/judis/13804.pdf",
+    "https://voxjuris.org/judgment/1997-insc-641/balkrishna-ramchandra-kadam-v-sangeeta-balkrishna-kadam"
+   ],
+   "status": "unverified",
+   "verification_required": "Read the full primary judgment (1997 INSC 641, SCI PDF) and confirm: (1) the quoted 'plain reading' passage and the 'by including it in the decree' mechanism; (2) the broad 'at or about the time of marriage' holding and whether the wife's jewellery given by her father was held within s.27 (tension with Babulal's narrow reading on exclusive Stridhan — record which reading the rater adopts). Do NOT mark verified on the docs/legal-decisions-v4.md §Q1 quotation alone."
+  },
+  {
+   "case": "Babulal Yadav v. Sonu Yadav",
+   "case_numbers": "FA (MAT) No. 40 of 2022",
+   "citations": [
+    "2023 SCC OnLine Chh 2815"
+   ],
+   "claimed_proposition": "HMA s.27 is ancillary: there must be a matrimonial proceeding pending under the Act and the s.27 application must be made before that proceeding is decided (para 18, principle (ii)); exclusive Stridhan (property given separately to one spouse) is outside s.27 (paras 20-21); a freestanding Stridhan claim is maintainable instead as a CPC s.151 application before the Family Court under Family Courts Act s.7(1) Expl. (c) (paras 25-29); Devika Joshi overruled in part.",
+   "court": "Chhattisgarh High Court (Full Bench, 3 judges)",
+   "decided": "2023-07-04",
+   "graph_sections": [
+    "hma-27"
+   ],
+   "id": "babulal-yadav-v-sonu-yadav-2023",
+   "plan_ref": "P2.4 — docs/10x_plane.md §4.2",
+   "sources": [
+    "https://www.courtkutchehry.com/judgements/1169390/babulal-yadav-vs-sonu-yadav/"
+   ],
+   "status": "unverified",
+   "verification_required": "Read the full primary judgment (SCC OnLine Chh 2815) and confirm paras 17-18 (ancillary + before-decision timing), paras 20-21 (exclusive Stridhan outside s.27), and paras 25-29 (CPC s.151 / FCA s.7(1) Expl. (c) route + Devika Joshi treatment). Note: a High Court Full Bench does not bind outside Chhattisgarh; record its jurisdictional weight when citing."
+  },
+  {
+   "case": "Krishna Kumar Gupta v. Priti Gupta",
+   "case_numbers": "First Appeal No. 1116 of 2024",
+   "citations": [
+    "reported 2025-05-31 (LiveLaw / SCC OnLine report)"
+   ],
+   "claimed_proposition": "Return of Stridhan must be determined at trial in a proceeding under the HMA, not independently on a s.27 application; a freestanding s.27 order (Rs. 10,54,364 in lieu of Stridhan, made outside the divorce decree) was set aside. Contrasts s.25, which expressly allows a post-decree application, with s.27, which contains no such language.",
+   "court": "Allahabad High Court",
+   "decided": "2025-05-31",
+   "graph_sections": [
+    "hma-27"
+   ],
+   "id": "krishna-kumar-gupta-v-priti-gupta-2025",
+   "plan_ref": "P2.4 — docs/10x_plane.md §4.2",
+   "sources": [
+    "https://www.livelaw.in/amp/high-court/allahabad-high-court/streedha-section-27-hindu-marriage-act-proceedings-not-separate-293934",
+    "https://www.scconline.com/blog/post/2025/06/03/stridhan-recovery-must-be-under-hindu-marriage-act-allahabad-hc/"
+   ],
+   "status": "unverified",
+   "verification_required": "Read the full primary judgment (Allahabad HC FA 1116/2024), not the LiveLaw/SCC OnLine news reports, and confirm the holding, the set-aside order, and the s.25 contrast passage. Record whether the judgment is reported with a neutral citation."
+  },
+  {
+   "case": "Pratibha Rani v. Suraj Kumar",
+   "citations": [
+    "(1985) 2 SCC 370"
+   ],
+   "claimed_proposition": "Stridhan is the wife's absolute property; the husband (or his family) holding it is a custodian/trustee, so refusal to return it supports criminal breach of trust (now BNS s.316(2), formerly IPC s.406). Used in the graph as the Stridhan authority for hma-27 and bns-316.",
+   "court": "Supreme Court of India",
+   "decided": "1985",
+   "graph_sections": [
+    "hma-27",
+    "bns-316"
+   ],
+   "id": "pratibha-rani-v-suraj-kumar-1985",
+   "plan_ref": "P2.4 — docs/10x_plane.md §4.2",
+   "sources": [],
+   "status": "unverified",
+   "verification_required": "Read the full primary judgment ((1985) 2 SCC 370) and confirm: (1) absolute-ownership proposition; (2) custodian/trustee characterisation; (3) that it supports a criminal-breach-of-trust route for withheld Stridhan. The graph itself records this authority as 'lane-supplied, not retest-verified — check against the judgment text before citing in a live answer' (graph v4 unverified_excluded). Do NOT mark verified on the graph's say-so."
+  },
+  {
+   "case": "Rashmi Kumar v. Mahesh Kumar Bhada",
+   "citations": [
+    "(1997) 2 SCC 397"
+   ],
+   "claimed_proposition": "Co-cited with Pratibha Rani in the graph as a Stridhan precedent (entrustment / return of Stridhan) for hma-27 and bns-316.",
+   "court": "Supreme Court of India",
+   "decided": "1997",
+   "graph_sections": [
+    "hma-27",
+    "bns-316"
+   ],
+   "id": "rashmi-kumar-v-mahesh-kumar-bhada-1997",
+   "plan_ref": "Graph v4 precedent field (hma-27, bns-316); graph unverified_excluded",
+   "sources": [],
+   "status": "unverified",
+   "verification_required": "Read the full primary judgment ((1997) 2 SCC 397) and confirm the exact proposition it supports for Stridhan entrustment/return, and whether it adds anything beyond Pratibha Rani. The graph records it identically as 'lane-supplied, not retest-verified'. Not listed by name in plan §4.2 P2.4, but present in the graph's precedent fields for hma-27/bns-316, so it is registered here rather than silently left in the graph."
+  },
+  {
+   "case": "Satish Chander Ahuja v. Sneha Ahuja",
+   "citations": [
+    "(2020) — full SCC citation to be confirmed on verification"
+   ],
+   "claimed_proposition": "PWDVA ss.17/19 shared-household scope: the right to reside in a shared household is not confined to a house owned by the husband; it extends to a house owned by in-laws / joint family where the woman lived in a domestic relationship. Residence / shared-household ONLY — never a custody, guardianship, maintenance or Stridhan precedent.",
+   "court": "Supreme Court of India",
+   "decided": "2020",
+   "graph_sections": [
+    "pwdva-17",
+    "pwdva-19",
+    "hma-26",
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle"
+   ],
+   "id": "satish-chander-ahuja-v-sneha-ahuja-2020",
+   "plan_ref": "P2.4 — docs/10x_plane.md §4.2",
+   "sources": [],
+   "status": "unverified",
+   "verification_required": "Read the full primary judgment and confirm: (1) the exact SCC citation (year/volume/page — currently only '(2020)' in the graph); (2) the shared-household holding and its wording; (3) the scope limit (residence only). Plan §4.2 notes it is currently 'only checked via prose forbidden list' — that is not verification."
+  },
+  {
+   "case": "Rajnesh v. Neha",
+   "citations": [
+    "(2021) 2 SCC 324"
+   ],
+   "claimed_proposition": "Maintenance ONLY: quantum criteria for fixing maintenance and the mandatory affidavit of assets and liabilities both parties must file; final directions on overlapping maintenance proceedings (disclose earlier proceedings/orders so the court can adjust). NEVER for Stridhan, custody, residence or divorce.",
+   "court": "Supreme Court of India",
+   "decided": "2020-11-04",
+   "graph_sections": [
+    "bnss-144",
+    "hma-24",
+    "hma-25",
+    "pwdva-20"
+   ],
+   "id": "rajnesh-v-neha-2020",
+   "plan_ref": "P2.4 — docs/10x_plane.md §4.2",
+   "sources": [
+    "https://api.sci.gov.in/supremecourt/2018/37875/37875_2018_39_1501_24602_Judgement_04-Nov-2020.pdf"
+   ],
+   "status": "unverified",
+   "verification_required": "Read the full primary judgment (SCI PDF already linked in src/laya_family.py:26 as RAJNESH) and confirm: (1) the exact citation metadata — (2021) 2 SCC 324, decided 4 Nov 2020; (2) the quantum-criteria + affidavit directions; (3) the overlapping-proceedings direction used at src/laya_family.py:257-261 (practice_authorities: 'Disclose earlier maintenance proceedings and orders so the court can consider adjustments') — confirm that use is maintenance-only and that laya_family.py never attaches it to a non-maintenance issue. The link's existence in code is not verification of the holding."
+  },
+  {
+   "case": "Astha Thakur v. Dhananjay Kanwar",
+   "case_numbers": "FAO (FC) No. 29 of 2022",
+   "citations": [
+    "2025:HHC:46178",
+    "2025 NCHHC 46178"
+   ],
+   "claimed_proposition": "Family Court retains jurisdiction over Stridhan/property claims even after a divorce decree; an application labelled s.27 must still be adjudicated by the Family Court under FCA s.7(1) Expl. (c) to avoid multiplicity of litigation; a post-decree property order is treated as part of the divorce decree already granted. Does NOT decide a freestanding s.27 application where no HMA proceeding was ever filed.",
+   "court": "Himachal Pradesh High Court (Division Bench — Vivek Singh Thakur and Romesh Verma, JJ.)",
+   "decided": "2025-12-31",
+   "graph_sections": [
+    "hma-27"
+   ],
+   "id": "astha-thakur-v-dhananjay-kanwar-2025",
+   "partially_read": {
+    "not_read": [
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     15,
+     16,
+     17,
+     19
+    ],
+    "read_paras": [
+     2,
+     14,
+     18,
+     20,
+     21
+    ],
+    "read_via": "Indian Kanoon fragment + LiveLaw report (published 2026-01-06) + LawFinder headnotes, per ground-truth/ground-truth-v2-erratum.md §3 (rater read, 2026-11-27)",
+    "verified_from_read_paras": "s.27 application in this case was filed DURING the pendency of the divorce petition (CMA No. 102 of 2017, in HMA Petition No. 140 of 2016; ex parte divorce decree 31 Jan 2018); s.27 'may' is discretionary (para 14); FCA s.7(1) Expl. (c) jurisdiction survives the decree (paras 14, 18); post-decree property order treated as part of the divorce decree (para 20); no opinion on the merits (para 21).",
+    "warning": "The LiveLaw summary phrase 'independent application' means independent of the DECREE (decidable after it), not independent of any proceeding. Anyone citing Astha Thakur for 's.27 needs no proceeding at all' is misreading it. Single High Court decision; does not bind outside Himachal Pradesh; not Supreme Court authority."
+   },
+   "plan_ref": "P2.5 — docs/10x_plane.md §4.2; ground-truth/ground-truth-v2-erratum.md §3",
+   "sources": [
+    "https://indiankanoon.org/docfragment/112564477/?formInput=section%2027%20of%20hindu%20marriage%20act",
+    "https://www.livelaw.in/high-court/himachal-pradesh-high-court/himachal-pradesh-high-court-family-court-jurisdiction-divorce-decree-property-claims-516993"
+   ],
+   "status": "unverified",
+   "verification_required": "P2.5 — read the FULL primary judgment, specifically the unread paras 3-13, 15-17 and 19, and confirm: (1) nothing in those paras contradicts the propositions taken from paras 2/14/18/20/21; (2) the facts (filing during pendency) as stated in the read paras; (3) whether the judgment addresses a BNSS/PWDVA/GWA case counting as an HMA proceeding (the erratum records it does not). Only then may the status move from 'unverified'. The partially-read propositions above are NOT a full verification."
+  }
+ ],
+ "graph_scrub_spec": {
+  "authority_id_map": {
+   "Astha Thakur v. Dhananjay Kanwar": "astha-thakur-v-dhananjay-kanwar-2025",
+   "Babulal Yadav v. Sonu Yadav": "babulal-yadav-v-sonu-yadav-2023",
+   "Balkrishna Ramchandra Kadam v. Sangeeta Balkrishna Kadam": "balkrishna-ramchandra-kadam-v-sangeeta-balkrishna-kadam-1997",
+   "Krishna Kumar Gupta v. Priti Gupta": "krishna-kumar-gupta-v-priti-gupta-2025",
+   "Pratibha Rani v. Suraj Kumar": "pratibha-rani-v-suraj-kumar-1985",
+   "Rajnesh v. Neha": "rajnesh-v-neha-2020",
+   "Rashmi Kumar v. Mahesh Kumar Bhada": "rashmi-kumar-v-mahesh-kumar-bhada-1997",
+   "Satish Chander Ahuja v. Sneha Ahuja": "satish-chander-ahuja-v-sneha-ahuja-2020",
+   "Sukhdev Singh v. Sukhbir Kaur": "sukhdev-singh-v-sukhbir-kaur-2025"
+  },
+  "exit_check": "After the scrub, grep graph v4.1 for (Rajnesh|Satish Chander Ahuja|Pratibha Rani|Rashmi Kumar|Sukhdev|Balkrishna|Babulal|Krishna Kumar Gupta|Astha Thakur) must return 0 matches outside this registry file. Any remaining match is a scrub failure.",
+  "note": "BUILDER PATCH SPEC ONLY — Lane 07 does NOT edit graph/laya-crpc-bns-section-decision-tree-v4.json (frozen graph v4; Lane 05 owns the v4.1 build). The builder (Lane 05 / coordinator) applies this spec when emitting graph v4.1, replacing every embedded case-name string with a canonical authority id pointing at this file. Prose must never read case names from the graph again.",
+  "replacement_rule": "In each listed section entry, replace every 'precedent' / 'precedent_never_to_cite' / 'exclusions' / 'related_sections[].relationship' string that names a case with {'authority_id': '<id from this file>', 'use': '<scope, e.g. maintenance-quantum-only>', 'never_use_for': [...]}. Keep the scope-limit text (e.g. 'NEVER cite Rajnesh for Stridhan') as a machine-readable 'never_use_for' list, not as free prose. Also scrub case names from stage2/global_guardrails (g-rajnesh), stage2/rechecks_detail[*].checks[*].condition / drop_reason / guardrails, stage1/mappings_detail/mappings[7].ambiguity_rule, and nodes[10]/nodes[15].question, replacing each with the same authority-id reference.",
+  "sections_to_scrub": [
+   "bnss-144",
+   "hma-24",
+   "hma-25",
+   "pwdva-20",
+   "hma-26",
+   "gwa-1890",
+   "hmga-1956-s6",
+   "welfare-principle",
+   "hma-27",
+   "bns-316",
+   "pwdva-17",
+   "pwdva-18",
+   "pwdva-19",
+   "proc-filing-magistrate",
+   "doc-stridhan-list-proof",
+   "doc-residence-proof"
+  ],
+  "verified_by_lane07_grep": {
+   "case_name_found_in_precedent_field": [
+    "bnss-144",
+    "hma-24",
+    "hma-25",
+    "pwdva-20",
+    "hma-27",
+    "bns-316",
+    "pwdva-17",
+    "pwdva-19"
+   ],
+   "case_name_found_only_in_scope_limit_note": [
+    "hma-26",
+    "gwa-1890",
+    "hmga-1956-s6",
+    "welfare-principle",
+    "pwdva-18"
+   ],
+   "caveat": "For the last three, Lane 07's grep found no case-name string in the precedent field; the builder MUST confirm whether a case string exists elsewhere in those entries (related_sections, notes, laya_question) before declaring them clean. Do not assume clean.",
+   "no_case_name_found_in_precedent_field_by_this_lanes_grep": [
+    "proc-filing-magistrate",
+    "doc-stridhan-list-proof",
+    "doc-residence-proof"
+   ]
+  }
+ },
+ "plan_ref": "docs/10x_plane.md §4.2 (V71-P4-2)",
+ "prose_gate_rule": "Consumer prose may emit a precedent string ONLY when an explicit verified-citation mode reads this file AND status == 'verified_primary' AND the authority id is listed for a section in kept_ids AND the use falls inside an allowed_scope. Default prose rule (src/laya_prose_v2.py Forbidden Items 1 & 2): zero precedent strings in consumer prose. This file alone does not authorise any citation in prose.",
+ "registry": "legal/verified_authorities.json",
+ "schema_version": "1.0",
+ "status": "PARTIAL — 1 of 9 case authorities verified_primary; 8 unverified. P2.4/P2.5 are NOT closed by this file.",
+ "verification_rule": "An authority is 'verified_primary' ONLY when its holding and citation metadata were confirmed from the primary judgment text (Supreme Court Reports / court PDF / India Code). Secondary summaries, LiveLaw reports, and the research notes in docs/legal-decisions-v4.md are evidence pointers, never verification by themselves. Nothing in this file was verified by Lane 07 from primary text in this pass except by adopting the plan's recorded verification of Sukhdev Singh (see its evidence_note). Every other entry stays 'unverified' with the exact step required."
+}
