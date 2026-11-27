@@ -1,6 +1,138 @@
 """Extract verifiable procedural facts from the user's own case statements."""
 
+from dataclasses import dataclass
 import re
+
+
+# ---------------------------------------------------------------------------
+# V71-P1-4 — Supervised classifier-head wiring (PLACEHOLDER interface)
+# ---------------------------------------------------------------------------
+# Lane 03 owns the multi-head Stage 0/1 classifier
+# (src/laya_v7_classifier.py, plan §1.2 V71-P1-3).  Until that classifier
+# ships, every function in this module is called with supervised=None and
+# behaves exactly as the regex-only evidence layer did before.
+#
+# CONTRACT (see docs/clarification-fallback-spec.md §5 for the full spec):
+# Lane 03's classifier MUST return, per question, a mapping keyed by field
+# name — "new_support", "interim", "permanent", "recover", "vary",
+# "wife", "minor_child", "parent" — to SupervisedSignal objects.  This
+# module NEVER invents classifier outputs: a signal is admitted as
+# evidence ONLY when (a) value == "yes", (b) score >= tau_high (0.70, the
+# same threshold src/laya_family.py:_interpret uses for numeric model
+# scores), and (c) its evidence span verifies against the literal question
+# text (exact start/end/text match).  Signals below tau_high, "no" /
+# "unknown" signals, and signals whose span does not verify are dropped
+# here — uncertainty is Lane 05's clarifier's job (V71-P1-5), not silent
+# evidence.  No score, span, or label in this file is a classifier output;
+# the defaults below are empty by construction.
+# ---------------------------------------------------------------------------
+
+#: Fields a supervised head may supply to this module.
+SUPERVISED_FIELDS = frozenset(
+    {"new_support", "interim", "permanent", "recover", "vary",
+     "wife", "minor_child", "parent"}
+)
+#: Beneficiary fields (subset of SUPERVISED_FIELDS) used by
+#: grounded_beneficiaries().
+BENEFICIARY_FIELDS = frozenset({"wife", "minor_child", "parent"})
+#: Purpose fields (subset of SUPERVISED_FIELDS) used by
+#: requested_procedural_actions().
+PURPOSE_FIELDS = frozenset({"interim", "permanent", "recover", "vary"})
+#: High-confidence threshold, mirroring laya_family._interpret (score >=
+#: 0.70 -> "yes").  Kept as a named constant so Lane 03 / Lane 10 calibrate
+#: it in one place instead of scattering literals.
+SUPERVISED_TAU_HIGH = 0.70
+
+
+@dataclass(frozen=True)
+class SupervisedSignal:
+    """One classifier-head prediction with its evidence span.
+
+    field: one of SUPERVISED_FIELDS (purpose or beneficiary).
+    value: "yes" | "no" | "unknown" (head's own label, not invented here).
+    score: head probability in [0, 1] for `value`.
+    span: {"start": int, "end": int, "text": str} — the token/clause span
+        the head attended to.  Must verify verbatim against the question.
+    head: which classifier head produced it, e.g. "purpose_head",
+        "beneficiary_head" (Lane 03 names the heads).
+    model: model identifier, for audit only.
+    """
+
+    field: str
+    value: str
+    score: float
+    span: dict | None = None
+    head: str = "unknown"
+    model: str = "laya_v7_classifier (Lane 03 — not yet implemented)"
+
+    @classmethod
+    def from_mapping(cls, mapping: dict) -> "SupervisedSignal":
+        """Build from a plain dict (Lane 03's JSON-able head output)."""
+        return cls(
+            field=mapping["field"],
+            value=mapping["value"],
+            score=float(mapping["score"]),
+            span=mapping.get("span"),
+            head=mapping.get("head", "unknown"),
+            model=mapping.get("model", "laya_v7_classifier (Lane 03 — not yet implemented)"),
+        )
+
+
+def verify_supervised_span(question: str, signal: SupervisedSignal) -> bool:
+    """Evidence-span verification: the claimed span must be literally true.
+
+    Returns True only when the span dict has integer start/end inside the
+    question, non-empty, and question[start:end] == span["text"] exactly.
+    A signal that fails this check is dropped, never repaired or guessed.
+    """
+    span = signal.span
+    if not isinstance(span, dict):
+        return False
+    start, end, text = span.get("start"), span.get("end"), span.get("text")
+    if type(start) is not int or type(end) is not int or not isinstance(text, str):
+        return False
+    if not 0 <= start < end <= len(question) or not text:
+        return False
+    if question[start:end] != text:
+        return False
+    if not any(char.isalpha() for char in text):
+        return False
+    return True
+
+
+def supervised_signals_to_evidence(question: str, supervised, *, tau_high: float = SUPERVISED_TAU_HIGH) -> dict:
+    """Admit verified high-confidence supervised signals as evidence.
+
+    `supervised` is a mapping field -> SupervisedSignal (or a plain dict
+    with the same keys, coerced via SupervisedSignal.from_mapping).
+    Only "yes" signals at score >= tau_high with a verified span are
+    admitted, as {"value": "yes", "source": "supervised_verified_span",
+    "span": ..., "score": ...}.  Everything else is dropped silently —
+    this function never emits "unknown" or "no" evidence, so a weak head
+    can never veto regex evidence or masquerade as a user statement.
+    """
+    evidence = {}
+    if not supervised:
+        return evidence
+    for field, raw in dict(supervised).items():
+        if field not in SUPERVISED_FIELDS:
+            continue
+        signal = raw if isinstance(raw, SupervisedSignal) else SupervisedSignal.from_mapping(raw)
+        if signal.value != "yes":
+            continue
+        score = signal.score
+        if type(score) not in {float, int} or not 0.0 <= score <= 1.0 or score < tau_high:
+            continue
+        if not verify_supervised_span(question, signal):
+            continue
+        evidence[field] = {
+            "value": "yes",
+            "source": "supervised_verified_span",
+            "span": dict(signal.span),
+            "score": round(float(score), 4),
+            "head": signal.head,
+        }
+    return evidence
 
 
 HMA_NAME = r"\b(?:hindu\s+marriage\s+act|hma)\b"
@@ -50,9 +182,9 @@ OWN_ORDER_FOLLOWUP = re.compile(
 )
 ORDER_ISSUED = re.compile(
     r"\b(?:(?:existing|current|previous|earlier|prior|my|our)\s+"
-    r"(?:\w+\s+){0,5}(?:order|maintenance)|"
+    r"(?:[\w.]+\s+){0,5}(?:order|maintenance)|"
     r"(?:i|we)\s+(?:already\s+)?(?:have|got|received|hold)\s+(?:(?:an?|the|my|our)\s+)?"
-    r"(?:\w+\s+){0,5}(?:order|maintenance)|"
+    r"(?:[\w.]+\s+){0,5}(?:order|maintenance)|"
     r"(?:court|judge|magistrate)\s+(?:has |had |already ){0,3}(?:made|issued|passed|awarded|granted|fixed|ordered)|"
     r"(?:i am|i'm|i’m|we are)\s+(?:the\s+)?(?:payer|payee|recipient|respondent|beneficiary)"
     r"\s+(?:in|on|under)\s+(?:an?|the|my|our)\s+(?:maintenance\s+)?order|"
@@ -203,7 +335,7 @@ SEPARATE_CLAIM = re.compile(
     r"(?:application|claim|order|request|support))\b",
     re.I,
 )
-SUPPORT = re.compile(r"\b(?:support|maintenan\w*|alimony|money|expenses|allowance)\b", re.I)
+SUPPORT = re.compile(r"\b(?:support|maint[ae]nan\w*|alimony|money|expenses|allowance|contribut\w*|help|cash)\b", re.I)
 NO_SEPARATE = re.compile(r"\b(?:do not|don't|does not|doesn't|never|not asking|not seeking|no)\b", re.I)
 
 
@@ -218,8 +350,12 @@ def separate_support_evidence(question: str) -> dict | None:
 REQUEST = re.compile(
     r"\b(?:i\b.{0,96}\band\s+(?:(?:now|also|still)\s+){0,2}(?:need|want|seek|wish|intend to (?:request|apply|seek|ask))|"
     r"i\s+(?:really\s+|now\s+|only\s+|also\s+|just\s+|specifically\s+){0,2}"
-    r"(?:want|need|seek|wish|would like|am asking|am trying|intend to (?:request|apply|seek|ask))|"
+    r"(?:want|need|seek|wish|would like|am asking|am requesting|am applying|am trying|intend to (?:request|apply|seek|ask))|"
     r"i(?:'d|’d)\s+like|how\s+(?:to|do|can|could|may|should|would)|"
+    r"where\s+(?:do|can|could|may|should)\s+(?:i|we)\s+(?:apply|seek|file|go|claim|ask)\b|"
+    r"what\s+(?:is|are)\s+the\s+(?:process(?:es)?|procedure)\s+to\b|"
+    r"what\s+do\s+(?:i|we)\s+file\b|"
+    r"is\s+(?:an?\s+)?order\b.{0,50}\bpossible\b|"
     r"(?:can|could|may|should)\s+(?:i|we|the court|the judge)|is there a way|"
     r"what\s+(?:can i|steps|about)|are both goals|"
     r"what steps|what should i do)\b",
@@ -228,6 +364,7 @@ REQUEST = re.compile(
 DECLINED = re.compile(
     r"\b(?:(?:i\s+(?:do not|don't|don’t|never|am not)|i['’]m\s+not)\s+"
     r"(?:want|need|seek|wish|ask|asking|seeking)|"
+    r"i\s+(?:explicitly\s+)?declin\w*\s+(?:any\s+)?(?:request|claim|application|support|maintenance)|"
     r"not interested in|not looking for|not asking for|no request for)\b",
     re.I,
 )
@@ -237,6 +374,7 @@ INTERIM_REQUEST = re.compile(
     r"\b(?:(?:interim|temporary)\s+(?:\w+\s+){0,2}(?:support|maintenance|money|aid|funds|help|expenses|fees|costs)|"
     r"(?:expenses|costs)\s+(?:paid\s+)?(?:for|of)\s+(?:defending|responding to|contesting)\s+"
     r"(?:\w+\s+){0,5}(?:case|petition|proceeding)|"
+    r"(?:costs?|fees?|expenses?)\s+of\s+(?:the\s+)?(?:case|proceeding|petition|suit|litigation)\b|"
     r"(?:court|case|legal|litigation)\s+(?:costs?|fees?|expenses?)|"
     r"(?:support|maintenance|money|funds|expenses|help).{0,55}\b(?:while|during|until)\b|"
     r"(?:pay|afford|cover|costs? of|money for)\s+(?:\w+\s+){0,5}(?:lawyer|solicitor|litigation|fees))\b",
@@ -265,6 +403,10 @@ CHANGE_REQUEST = re.compile(
     r"chang(?:e|ing)|var(?:y|ying|iation)|modif(?:y|ying|ication)|adjust(?:ing|ment)?)\b"
     r"(?:\s+\w+){0,6}\s+(?:amount|rate|maintenance|support|allowance|payment|pay|monthly)|"
     r"(?:higher|larger|lower|smaller|different|revised)\s+(?:monthly\s+)?(?:amount|rate|payment|maintenance)|"
+    r"(?:apply|ask|petition|request)\s+to\s+(?:vary|change|modify|adjust|increase|reduce|lower|raise)\b|"
+    r"(?:amount|rate|allowance|payment|maintenance)\s+(?:needs?|requires?)\s+"
+    r"(?:reduc(?:e|ed|ing)|increas(?:e|ed|ing)|chang(?:e|ed|ing)|var(?:y|ied|ying)|"
+    r"lower(?:ed|ing)|rais(?:e|ed|ing)|adjust(?:ed|ing|ment)?)\b|"
     r"(?:apply|ask)\s+for\s+(?:an?\s+)?(?:reduction|increase|change|variation|modification)|"
     r"(?:raise|reduce|lower|vary|change)\s+what\s+(?:it|the court|the judge)\s+(?:ordered|set|fixed)|"
     r"(?:have|get)\s+(?:my|the|our)\s+(?:monthly\s+)?(?:amount|rate|maintenance|allowance|payment)s?"
@@ -274,8 +416,16 @@ CHANGE_REQUEST = re.compile(
 CONTRAST = re.compile(r"(?<!\w)(?:but|however|whereas)(?!\w)", re.I)
 
 
-def requested_procedural_actions(question: str) -> dict:
-    """Find express requests and keep the authority check independent."""
+def requested_procedural_actions(question: str, *, supervised=None) -> dict:
+    """Find express requests and keep the authority check independent.
+
+    `supervised` (V71-P1-4, optional, default None = regex-only behaviour)
+    is a mapping field -> SupervisedSignal from the Lane 03 classifier
+    heads.  Verified high-confidence "yes" signals are merged in with
+    setdefault: they fill a purpose the regex conjunction missed (e.g. a
+    vary ask phrased without any REQUEST form) but never overwrite a
+    regex "no" (a declined clause) or an already-found regex "yes".
+    """
     masked = QUOTED.sub(lambda match: " " * len(match[0]), question)
     has_marriage_case = bool(MARRIAGE_CASE.search(masked) and CASE.search(masked))
     has_support_order = bool(
@@ -297,16 +447,8 @@ def requested_procedural_actions(question: str) -> dict:
             if PERMANENT_REQUEST.search(clause):
                 found.append("permanent")
             if has_support_order:
-                recovery = RECOVERY_REQUEST.search(clause)
                 previous = masked[max(0, local_start - 180):local_start]
-                if recovery and (
-                    PAYMENTS_DUE.search(clause)
-                    or recovery[0].casefold().startswith("enforc")
-                    or PAYMENTS_DUE.search(previous) and (
-                        "collect" in recovery[0].casefold()
-                        or re.search(r"\bclaim\s+(?:those|these|them|it)\b", clause, re.I)
-                    )
-                ):
+                if _recovery_ask(clause, previous):
                     found.append("recover")
                 if CHANGE_REQUEST.search(clause):
                     found.append("vary")
@@ -317,6 +459,10 @@ def requested_procedural_actions(question: str) -> dict:
                 evidence[field] = {
                     "value": value, "source": "user_text", "span": _span(question, local_start, local_end),
                 }
+    if supervised is not None:
+        for field, record in supervised_signals_to_evidence(question, supervised).items():
+            if field in PURPOSE_FIELDS:
+                evidence.setdefault(field, record)
     return evidence
 
 
@@ -340,7 +486,7 @@ EMPLOYED_OFFSPRING = re.compile(
     re.I,
 )
 PARENT_SELF = re.compile(
-    r"\b(?:as|i am|i'm|i’m)\s+(?:(?:his|her|their|the|a|retired|ageing|aging)\s+){0,3}(?:father|mother|parent)\b",
+    r"\b(?:as|i am|i'm|i’m)\s+(?:(?:his|her|their|the|a|retired|ageing|aging|elderly|old|aged)\s+){0,3}(?:father|mother|parent)\b",
     re.I,
 )
 MINOR_RECIPIENT = re.compile(
@@ -353,7 +499,7 @@ MINOR_RECIPIENT = re.compile(
 CHILD_ANTECEDENT = re.compile(rf"\b(?:my|our)\s+(?:\w+\s+){{0,2}}{CHILD_WORD}\b", re.I)
 CHILD_PRONOUN_AGE = re.compile(rf"^\s*(?:he|she|they)\s+(?:is|are|are both)\s+{AGE_UNDER_18}\b", re.I)
 CHILD_ONLY = re.compile(
-    r"\b(?:not for (?:me|myself)|only for (?:my |our |the )?(?:child|children|son|daughter)|"
+    r"\b(?:not for (?:me|myself)|(?:only|just)\s+for (?:my |our |the )?(?:child|children|son|daughter)|"
     r"on behalf of (?:my |our |the )?(?:child|children|son|daughter))\b",
     re.I,
 )
@@ -366,7 +512,7 @@ SELF_ONLY = re.compile(
 )
 
 
-def grounded_beneficiaries(question: str) -> dict:
+def grounded_beneficiaries(question: str, *, supervised=None) -> dict:
     masked = QUOTED.sub(lambda match: " " * len(match[0]), question)
     evidence = {}
 
@@ -406,6 +552,15 @@ def grounded_beneficiaries(question: str) -> dict:
                     break
                 antecedent = start if CHILD_ANTECEDENT.search(clause) else None
 
+    if supervised is not None:
+        # V71-P1-4 supervised wiring: a verified beneficiary "yes" from the
+        # Lane 03 classifier heads grounds the beneficiary even when the
+        # regex role patterns miss the phrasing.  Regex evidence wins on
+        # conflict (setdefault above); supervised never overwrites it.
+        for field, record in supervised_signals_to_evidence(question, supervised).items():
+            if field in BENEFICIARY_FIELDS and record["value"] == "yes":
+                evidence.setdefault(field, record)
+
     return evidence
 
 
@@ -416,13 +571,118 @@ DIRECT_SUPPORT_ASK = re.compile(
 )
 
 
-def direct_support_evidence(question: str) -> dict | None:
+def _recovery_ask(clause: str, previous: str = "") -> bool:
+    """True when a clause asks to collect money already due under an order.
+
+    Single source for the recovery conjunction, used by both
+    requested_procedural_actions() and _direct_support_ask().  A bare
+    "claim" / "recover" / "collect" is NOT enough on its own: "start a
+    claim ... for monthly living money" (final_check 002) is fresh support,
+    so recovery needs unpaid-money language in the clause (or just before
+    it) or an enforcement verb.  Mirrors the pre-V71-P1-4 inline logic.
+    """
+    recovery = RECOVERY_REQUEST.search(clause)
+    if not recovery:
+        return False
+    if PAYMENTS_DUE.search(clause) or recovery[0].casefold().startswith("enforc"):
+        return True
+    return bool(
+        PAYMENTS_DUE.search(previous)
+        and (
+            "collect" in recovery[0].casefold()
+            or re.search(r"\bclaim\s+(?:those|these|them|it)\b", clause, re.I)
+        )
+    )
+
+
+def _direct_support_ask(clause: str) -> bool:
+    """True when one clause expressly asks for fresh support.
+
+    V71-P1-4: the old DIRECT_SUPPORT_ASK pattern alone fired on 1 of 162
+    maintenance-fixture questions (verification 006, "be made to support
+    me"), so every fresh-support (bnss-144) row depended entirely on the
+    neural model's new_support score — the final_check bnss-144 FN. The
+    conjunction below covers the ordinary ask forms ("want a court to
+    arrange regular support", "how do I start a claim ... for monthly
+    living money", "I am requesting maintenance just for my daughter",
+    "Can the court tell them to contribute", "How do I seek court-ordered
+    support") while staying out of the other purposes:
+
+    * interim / permanent asks are excluded (INTERIM_REQUEST /
+      PERMANENT_REQUEST) — those route to hma-24 / hma-25, never bnss-144;
+    * a genuine change request (CHANGE_REQUEST) or a recovery ask
+      (RECOVERY_REQUEST + PAYMENTS_DUE / "enforc-") is excluded — those
+      route to bnss-146 / bnss-144-3.  Bare "claim" alone is NOT a
+      recovery ask: "start a claim ... for monthly living money"
+      (final_check 002) is fresh support, so recovery needs the
+      payments-due / enforcement conjunction, mirroring
+      requested_procedural_actions().
+    * DECLINED / existing-order / beneficiary gates live in
+      direct_support_evidence(), not here.
+    """
+    if DIRECT_SUPPORT_ASK.search(clause):
+        return True
+    if not (REQUEST.search(clause) and SUPPORT.search(clause)):
+        return False
+    if INTERIM_REQUEST.search(clause) or PERMANENT_REQUEST.search(clause):
+        return False
+    if CHANGE_REQUEST.search(clause):
+        return False
+    if _recovery_ask(clause):
+        return False
+    return True
+
+
+def direct_support_evidence(question: str, *, supervised=None) -> dict | None:
     masked = QUOTED.sub(lambda match: " " * len(match[0]), question)
-    if not grounded_beneficiaries(question):
+    beneficiaries = grounded_beneficiaries(question, supervised=supervised)
+    if not beneficiaries:
         return None
+    if supervised is not None:
+        # V71-P1-4 supervised wiring: a verified new_support "yes" from the
+        # Lane 03 classifier heads is sufficient evidence on its own — the
+        # regex ask is not required to also match.  Span verification happens
+        # inside supervised_signals_to_evidence(); unverified or
+        # below-threshold signals never reach here.
+        verified = supervised_signals_to_evidence(question, supervised)
+        if verified.get("new_support", {}).get("value") == "yes":
+            if not ORDER.search(masked) or not ORDER_ISSUED.search(masked):
+                return verified["new_support"]
     for start, end in _clause_ranges(masked):
         clause = masked[start:end]
-        if DIRECT_SUPPORT_ASK.search(clause) and not DECLINED.search(clause):
+        if _direct_support_ask(clause) and not DECLINED.search(clause):
             if not ORDER.search(masked) or not ORDER_ISSUED.search(masked):
                 return {"value": "yes", "source": "user_text", "span": _span(question, start, end)}
+    # V71-P1-4 whole-text fallback: lay ask forms often split the request
+    # verb and the support noun across clauses ("My grown-up daughter will
+    # not support me. What can I file?", challenge 25; "Who handles a
+    # request for cash ...? ... I am applying for the child.", verification
+    # 003; "Can I make an application?" after a non-support clause,
+    # development 007).  The conjunction is therefore also tried across the
+    # whole question, with the SAME exclusions applied whole-text, plus an
+    # UNCERTAIN guard so a hypothetical ("suppose ...") never becomes
+    # evidence.  The beneficiary + no-issued-order gates above still apply.
+    # The span is the minimal clause range covering every clause that
+    # carries the request or the support noun — never a guessed span.
+    if (
+        REQUEST.search(masked)
+        and SUPPORT.search(masked)
+        and not DECLINED.search(masked)
+        and not UNCERTAIN.search(masked)
+        and not INTERIM_REQUEST.search(masked)
+        and not PERMANENT_REQUEST.search(masked)
+        and not CHANGE_REQUEST.search(masked)
+        and not _recovery_ask(masked)
+    ):
+        if not ORDER.search(masked) or not ORDER_ISSUED.search(masked):
+            covering = [
+                (start, end)
+                for start, end in _clause_ranges(masked)
+                if REQUEST.search(masked[start:end]) or SUPPORT.search(masked[start:end])
+            ]
+            if covering:
+                span_start = min(start for start, _ in covering)
+                span_end = max(end for _, end in covering)
+                return {"value": "yes", "source": "user_text",
+                        "span": _span(question, span_start, span_end)}
     return None

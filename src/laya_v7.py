@@ -97,12 +97,14 @@ def assess_v7(
         "escalation_kinds": decision["escalation_kinds"],
         "gated_out": decision["gated_out"],
         "dispositions": decision["dispositions"],
-        "candidates_before_stage2": list(decision["kept_ids"]),
+        "candidates_before_gate": decision.get("candidates_before_gate", list(decision["kept_ids"])),
+        "candidates_before_stage2": decision.get("candidates_before_gate", list(decision["kept_ids"])),
+        "oos_handoff": decision.get("oos_handoff", False),
         "error": None,
     }
     if with_prose:
         prose_out = render_prose(result, decision["facts"])
-        fp_hits, q_flags = prose_forbidden_check(prose_out["prose"], result["kept_ids"], [], decision["facts"])
+        fp_hits, q_flags = prose_forbidden_check(prose_out["prose"], result["kept_ids"], decision["gated_out"], decision["facts"])
         result["prose"] = prose_out["prose"]
         result["prose_fp_hits"] = fp_hits
         result["prose_quality_flags"] = q_flags
@@ -165,12 +167,14 @@ def assess_v7_batch(
             "escalation_kinds": decision["escalation_kinds"],
             "gated_out": decision["gated_out"],
             "dispositions": decision["dispositions"],
-            "candidates_before_stage2": list(decision["kept_ids"]),
+            "candidates_before_gate": decision.get("candidates_before_gate", list(decision["kept_ids"])),
+            "candidates_before_stage2": decision.get("candidates_before_gate", list(decision["kept_ids"])),
+            "oos_handoff": decision.get("oos_handoff", False),
             "error": None,
         }
         if with_prose:
             prose_out = render_prose(rec, decision["facts"])
-            fp_hits, q_flags = prose_forbidden_check(prose_out["prose"], rec["kept_ids"], [], decision["facts"])
+            fp_hits, q_flags = prose_forbidden_check(prose_out["prose"], rec["kept_ids"], decision["gated_out"], decision["facts"])
             rec["prose"] = prose_out["prose"]
             rec["prose_fp_hits"] = fp_hits
             rec["prose_quality_flags"] = q_flags

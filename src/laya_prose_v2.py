@@ -555,7 +555,7 @@ def render_prose(rec: Dict[str, Any], facts: Optional[Dict[str, Any]] = None) ->
 
     prose = "\n\n".join(p for p in paras if p)
     ms = round((time.perf_counter() - t0) * 1000.0, 3)
-    return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids}
+    return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids, "status": "ok"}
 
 
 # ---------------------------------------------------------------------------
@@ -620,9 +620,11 @@ def prose_forbidden_check(
             hits.append({"item": item, "detail": f"precedent/case citation matched {pat!r}"})
             break
 
-    # 3. HMA 13 / 13B in prose without divorce_asked (or pending for 13) / mutual_consent for 13B
+    # 3. HMA 13 / 13B in prose without divorce_asked (or pending for 13) / mutual_consent for 13B.
+    # Canonical fact is proceeding_pending_hma (legacy proceeding_pending
+    # kept as a fallback so old fact dicts still check out).
     if re.search(r"\bSection 13\b(?!B).{0,40}Hindu Marriage Act", prose):
-        if (not (facts.get("divorce_asked") or facts.get("proceeding_pending"))) or ("hma-13" not in kept):
+        if (not (facts.get("divorce_asked") or facts.get("proceeding_pending_hma") or facts.get("proceeding_pending"))) or ("hma-13" not in kept):
             hits.append({"item": 3, "detail": "HMA 13 in prose without divorce_asked/pending or not kept"})
     if re.search(r"\bSection 13B\b", prose):
         if not (facts.get("divorce_asked") and facts.get("mutual_consent") and "hma-13b" in kept):
@@ -665,11 +667,15 @@ def prose_forbidden_check(
         hits.append({"item": 7, "detail": f"prose cites {sid} which Stage 2 dropped"})
 
     # 8. Maintenance amount stated as a number
+    # NOTE (coordinator, Lane 09 flag): [\d,]+ matches a bare comma, so a
+    # stray "," false-fired item 8. All four numeric patterns use
+    # [\d][\d,]* (must start with a digit), matching Lane 09's fix in
+    # laya_prose_kn.py. AMOUNT_WORDS untouched.
     for pat in (
-        r"₹\s?[\d,]+",
-        r"\bRs\.?\s?[\d,]+",
-        r"\brupees\s+[\d,]+",
-        r"\b[\d,]+\s*(?:per month|a month|/month|monthly)\b",
+        r"₹\s?[\d][\d,]*",
+        r"\bRs\.?\s?[\d][\d,]*",
+        r"\brupees\s+[\d][\d,]*",
+        r"\b[\d][\d,]*\s*(?:per month|a month|/month|monthly)\b",
         AMOUNT_WORDS,
     ):
         if re.search(pat, prose, re.I):
