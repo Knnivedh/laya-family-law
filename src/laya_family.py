@@ -15,7 +15,7 @@ from .laya_family_evidence import (
     grounded_beneficiaries,
     procedural_evidence,
     requested_procedural_actions,
-    separate_support_requested,
+    separate_support_evidence,
 )
 
 
@@ -135,6 +135,9 @@ def assess(
 
     requested = requested_procedural_actions(question)
     evidence = procedural_evidence(question) | requested
+    separate = separate_support_evidence(question)
+    if separate:
+        evidence["new_support"] = separate
     facts = _interpret(extract(question), {} if confirmed is None else confirmed, evidence)
     if any(item["value"] == "yes" for item in requested.values()):
         for purpose in PURPOSES[1:]:
@@ -160,6 +163,14 @@ def assess(
         return result
 
     routes = result["routes"]
+    order_actions = ("recover", "vary")
+    if is_yes("bnss_order") and all(
+        is_yes(field) and facts[field]["source"] == "model_suggestion" for field in order_actions
+    ):
+        for field in order_actions:
+            facts[field] = {"value": "unknown", "source": "ambiguous_order_request"}
+        ask(*order_actions)
+
     if is_yes("recover") or is_yes("vary"):
         if is_yes("bnss_order"):
             forum = "Start with the court that issued the maintenance order and confirm the available procedure."
@@ -197,13 +208,20 @@ def assess(
         is_yes("new_support")
         and facts["new_support"]["source"] != "user_confirmation"
         and any(is_yes(field) for field in PURPOSES if field != "new_support")
-        and not separate_support_requested(question)
+        and not separate
     ):
         facts["new_support"] = {"value": "unknown", "source": "ambiguous_request"}
         ask("new_support")
 
     if is_yes("new_support"):
-        role_evidence = grounded_beneficiaries(question)
+        if separate:
+            start, end = separate["span"]["start"], separate["span"]["end"]
+            role_evidence = grounded_beneficiaries(question[start:end])
+            for item in role_evidence.values():
+                item["span"]["start"] += start
+                item["span"]["end"] += start
+        else:
+            role_evidence = grounded_beneficiaries(question)
         for field in BENEFICIARIES:
             if facts[field]["source"] == "user_confirmation":
                 continue

@@ -236,6 +236,34 @@ class FamilyLawTests(unittest.TestCase):
                 result = assess(question, lambda _: {action: "yes"})
                 self.assertEqual(self.ids(result), set(expected))
 
+    def test_ambiguous_order_intents_do_not_issue_both_provisions(self):
+        answer = assess(
+            "I have a maintenance order under BNSS section 144. I have a question about its payment.",
+            lambda _: {"recover": "yes", "vary": "yes"},
+        )
+        self.assertEqual(self.ids(answer), set())
+        self.assertEqual({"recover", "vary"}, {item["field"] for item in answer["questions"]})
+
+    def test_other_family_members_case_or_support_does_not_transfer(self):
+        scenarios = (
+            ("My parents' HMA divorce petition is pending. I am their son and want my case costs paid.", "interim", "wife"),
+            ("My adult daughter sends money already. I am the husband and want money only from my wife.", "new_support", "parent"),
+            ("I have a seven-year-old. Do not assess payments for the child. I want money from my wife.", "new_support", "minor_child"),
+        )
+        for question, purpose, role in scenarios:
+            with self.subTest(question=question):
+                answer = assess(question, lambda _: {purpose: "yes", role: "yes"})
+                self.assertEqual(self.ids(answer), set())
+
+    def test_distinct_minor_claim_can_be_read_separately_from_matrimonial_case(self):
+        answer = assess(
+            "My divorce petition under HMA is pending. I am a wife seeking interim maintenance. "
+            "Separately I want a new support order for our baby.",
+            lambda _: {"interim": "yes", "wife": "yes"},
+        )
+        self.assertEqual(self.ids(answer), {"bnss-144", "hma-24"})
+        self.assertEqual(answer["facts"]["minor_child"]["value"], "yes")
+
     def test_follow_up_can_correct_a_fact_stated_in_the_question(self):
         result = assess(
             "My HMA divorce petition is still pending. Can I get interim support?",

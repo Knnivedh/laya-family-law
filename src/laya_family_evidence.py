@@ -33,7 +33,7 @@ DECREE_EFFECTIVE = re.compile(
     r"\b(?:(?:court|judge)\s+(?:has |had |already |is ){0,3}"
     r"(?:granted|entered|passed|issued|pronounced|passing|granting)|"
     r"(?:was|has been|had been|is being|got)\s+(?:already\s+)?(?:granted|entered|passed|issued|pronounced)|"
-    r"decree\s+(?:ended|dissolved)|ended\s+by\s+(?:a|the)\s+decree)\b",
+    r"decree\s+(?:ended|dissolved)|(?:ended|dissolved)\s+by\s+(?:a|the)\s+decree)\b",
     re.I,
 )
 ORDER_AUTHORITY = re.compile(
@@ -62,7 +62,7 @@ ORDER_ISSUED = re.compile(
 OWN = re.compile(r"\b(?:i|my|our|me|we|us)\b", re.I)
 OTHER = re.compile(
     r"\b(?:(?:my|our)\s+(?:friend|neighbor|neighbour|sister|brother|cousin|colleague|client|"
-    r"relative|parent|mother|father|daughter|son)|(?:someone\s+else)|"
+    r"relative|parents?|mother|father|daughter|son)|(?:someone\s+else)|"
     r"(?:article|textbook|internet|example|video|search result|forum post))\b",
     re.I,
 )
@@ -205,19 +205,19 @@ SUPPORT = re.compile(r"\b(?:support|maintenan\w*|alimony|money|expenses|allowanc
 NO_SEPARATE = re.compile(r"\b(?:do not|don't|does not|doesn't|never|not asking|not seeking|no)\b", re.I)
 
 
-def separate_support_requested(question: str) -> bool:
-    masked = QUOTED.sub(lambda m: " " * len(m[0]), question)
+def separate_support_evidence(question: str) -> dict | None:
+    masked = QUOTED.sub(lambda match: " " * len(match[0]), question)
     for start, end in _clause_ranges(masked):
         clause = masked[start:end]
-        if SEPARATE_CLAIM.search(clause) and SUPPORT.search(clause) and not NO_SEPARATE.search(clause):
-            return True
-    return False
+        if SEPARATE_CLAIM.search(clause) and SUPPORT.search(clause) and REQUEST.search(clause) and not NO_SEPARATE.search(clause):
+            return {"value": "yes", "source": "user_text", "span": _span(question, start, end)}
+    return None
 
 REQUEST = re.compile(
-    r"\b(?:i\b.{0,96}\band\s+(?:need|want|seek|wish)|"
+    r"\b(?:i\b.{0,96}\band\s+(?:need|want|seek|wish|intend to (?:request|apply|seek|ask))|"
     r"i\s+(?:really\s+|now\s+|only\s+|also\s+|just\s+|specifically\s+){0,2}"
-    r"(?:want|need|seek|wish|would like|am asking|am trying)|"
-    r"i(?:'d|’d)\s+like|how\s+(?:do|can|could|may|should|would)|"
+    r"(?:want|need|seek|wish|would like|am asking|am trying|intend to (?:request|apply|seek|ask))|"
+    r"i(?:'d|’d)\s+like|how\s+(?:to|do|can|could|may|should|would)|"
     r"(?:can|could|may|should)\s+(?:i|we|the court|the judge)|is there a way|"
     r"what\s+(?:can i|steps|about)|are both goals|"
     r"what steps|what should i do)\b",
@@ -342,6 +342,7 @@ CHILD_ONLY = re.compile(
 )
 SELF_ONLY = re.compile(
     r"\b(?:only for myself|just for myself|not for (?:my |our |the |any )?(?:children|child|son|daughter)|"
+    r"do not assess (?:\w+\s+){0,3}?(?:for|towards)\s+(?:my |our |the )?(?:children|child|son|daughter)|"
     r"(?:don't|do not|am not|['’]m not)\s+(?:asking|ask|seeking|seek|want)\s+(?:for\s+)?(?:any\s+)?(?:payments?|support|money|assistance|help)?"
     r"\s*(?:for|towards)\s+(?:my |our |the )?(?:children|child|son|daughter))\b",
     re.I,
@@ -362,7 +363,10 @@ def grounded_beneficiaries(question: str) -> dict:
 
     parent = PARENT_RECIPIENT.search(masked)
     denies_child_as_payer = re.search(
-        r"\bnot from (?:my|our)\s+(?:(?:adult|grown)\s+)?(?:son|daughter|child)\b", masked, re.I,
+        r"\b(?:not from (?:my|our)\s+(?:(?:adult|grown)\s+)?(?:son|daughter|child)|"
+        r"(?:only|solely|just)\s+from (?:my|our)\s+(?:wife|husband|spouse)|"
+        r"from (?:my|our)\s+(?:wife|husband|spouse)\s+(?:alone|only))\b",
+        masked, re.I,
     )
     if not denies_child_as_payer:
         if parent:

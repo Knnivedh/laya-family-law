@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent
 FROZEN = {
     "development": "7f7afea4d390567610df8b8b1c47a3c2e097c32ff515b44fe15197c89ca7b505",
     "verification": "e80b0e90cea8e5d3d0b56ee67a185771a9b50b814777be595193628d3e718817",
+    "challenge": "7c8476d211f777c5cdc492a5bfb69092f680349d71d5cc2e195c58c6dd2cffcb",
 }
 RULE_SOURCES = {
     "bnss-144": ("BNSS, 2023, section 144", BNSS),
@@ -135,7 +136,7 @@ def main():
     parser.add_argument("--strict", action="store_true", help="Fail if any measured engineering gate does not pass.")
     args = parser.parse_args()
     if args.split == "verification" and args.detail:
-        parser.error("Case-level detail is available for development only.")
+        parser.error("Case-level detail is available for the development and challenge banks.")
     extractor = extract_facts
     if args.extractor == "structured":
         from src.laya_family_structured import extract_facts as extractor
