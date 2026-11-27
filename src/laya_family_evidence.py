@@ -54,6 +54,8 @@ ORDER_ISSUED = re.compile(
     r"(?:i|we)\s+(?:already\s+)?(?:have|got|received|hold)\s+(?:(?:an?|the|my|our)\s+)?"
     r"(?:\w+\s+){0,5}(?:order|maintenance)|"
     r"(?:court|judge|magistrate)\s+(?:has |had |already ){0,3}(?:made|issued|passed|awarded|granted|fixed|ordered)|"
+    r"(?:i am|i'm|i’m|we are)\s+(?:the\s+)?(?:payer|payee|recipient|respondent|beneficiary)"
+    r"\s+(?:in|on|under)\s+(?:an?|the|my|our)\s+(?:maintenance\s+)?order|"
     r"order\s+(?:cites?|says?|states?|reads?)|"
     r"(?:was|has been|had been)\s+(?:already\s+)?(?:made|issued|passed|awarded|granted|fixed)|"
     r"order\b.{0,85}\b(?:has run|has been in place|is in force|is active|binds|requires))\b",
@@ -232,7 +234,9 @@ DECLINED = re.compile(
 MARRIAGE_CASE = re.compile(r"\b(?:marriage|marital|matrimonial|divorce|judicial separation|nullity|hma)\b", re.I)
 FAMILY_ORDER = re.compile(r"\b(?:maintenance|support|allowance|alimony|child support)\b", re.I)
 INTERIM_REQUEST = re.compile(
-    r"\b(?:(?:interim|temporary)\s+(?:\w+\s+){0,2}(?:support|maintenance|money|aid|funds|help)|"
+    r"\b(?:(?:interim|temporary)\s+(?:\w+\s+){0,2}(?:support|maintenance|money|aid|funds|help|expenses|fees|costs)|"
+    r"(?:expenses|costs)\s+(?:paid\s+)?(?:for|of)\s+(?:defending|responding to|contesting)\s+"
+    r"(?:\w+\s+){0,5}(?:case|petition|proceeding)|"
     r"(?:court|case|legal|litigation)\s+(?:costs?|fees?|expenses?)|"
     r"(?:support|maintenance|money|funds|expenses|help).{0,55}\b(?:while|during|until)\b|"
     r"(?:pay|afford|cover|costs? of|money for)\s+(?:\w+\s+){0,5}(?:lawyer|solicitor|litigation|fees))\b",
@@ -245,7 +249,9 @@ PERMANENT_REQUEST = re.compile(
 )
 RECOVERY_REQUEST = re.compile(r"\b(?:recover(?:y|ed|ing)?|collect(?:ed|ing|ion)?|enforc(?:e|ed|ing|ement)|claim)\b", re.I)
 PAYMENTS_DUE = re.compile(
-    r"\b(?:unpaid|missing|missed|arrears|owing|owed|owes|outstanding|balance|skipped|shortfall|overdue|"
+    r"\b(?:unpaid|missing|missed|arrears|owing|owed|owes|outstanding|balance|skipped|shortfall|overdue|remainder|"
+    r"remaining\s+(?:sums?|amounts?|instal+ments?|payments?)|"
+    r"(?:paid|sent|received)\s+only\s+part|"
     r"(?:instalments?|payments?)\s+(?:were\s+)?(?:not\s+paid|due|behind))\b",
     re.I,
 )
@@ -255,7 +261,9 @@ CHANGE_REQUEST = re.compile(
     r"(?:\s+\w+){0,6}\s+(?:amount|rate|maintenance|support|allowance|payment|pay|monthly)|"
     r"(?:higher|larger|lower|smaller|different|revised)\s+(?:monthly\s+)?(?:amount|rate|payment|maintenance)|"
     r"(?:apply|ask)\s+for\s+(?:an?\s+)?(?:reduction|increase|change|variation|modification)|"
-    r"(?:raise|reduce|lower|vary|change)\s+what\s+(?:it|the court|the judge)\s+(?:ordered|set|fixed))\b",
+    r"(?:raise|reduce|lower|vary|change)\s+what\s+(?:it|the court|the judge)\s+(?:ordered|set|fixed)|"
+    r"(?:have|get)\s+(?:my|the|our)\s+(?:monthly\s+)?(?:amount|rate|maintenance|allowance|payment)s?"
+    r"\s+(?:raised|lowered|reduced|altered|changed|increased|varied|modified))\b",
     re.I,
 )
 CONTRAST = re.compile(r"(?<!\w)(?:but|however|whereas)(?!\w)", re.I)
@@ -285,10 +293,14 @@ def requested_procedural_actions(question: str) -> dict:
                 found.append("permanent")
             if has_support_order:
                 recovery = RECOVERY_REQUEST.search(clause)
+                previous = masked[max(0, local_start - 180):local_start]
                 if recovery and (
                     PAYMENTS_DUE.search(clause)
                     or recovery[0].casefold().startswith("enforc")
-                    or PAYMENTS_DUE.search(masked) and "collect" in recovery[0].casefold()
+                    or PAYMENTS_DUE.search(previous) and (
+                        "collect" in recovery[0].casefold()
+                        or re.search(r"\bclaim\s+(?:those|these|them|it)\b", clause, re.I)
+                    )
                 ):
                     found.append("recover")
                 if CHANGE_REQUEST.search(clause):
@@ -314,7 +326,7 @@ WIFE_RECIPIENT = re.compile(
 )
 MALE_SELF = re.compile(r"\b(?:i am|i'm|i’m)\s+(?:a\s+|the\s+)?(?:man|male)\b", re.I)
 PARENT_RECIPIENT = re.compile(
-    r"\b(?:(?:my|our)\s+(?:adult|grown(?:[- ]up)?|working|employed)\s+(?:son|daughter|child)|"
+    r"\b(?:(?:my|our)\s+(?:[\w-]+\s+){0,3}(?:adult|grown(?:[- ]up)?|working|employed)\s+(?:son|daughter|child)|"
     r"(?:from|support from)\s+(?:his|her|their)\s+(?:adult|grown(?:[- ]up)?)\s+(?:son|daughter|child))\b",
     re.I,
 )
@@ -390,3 +402,22 @@ def grounded_beneficiaries(question: str) -> dict:
                 antecedent = start if CHILD_ANTECEDENT.search(clause) else None
 
     return evidence
+
+
+DIRECT_SUPPORT_ASK = re.compile(
+    r"\b(?:can|could|may)\s+(?:my|our)\b.{1,75}\bbe\s+(?:made|required|ordered)\s+"
+    r"to\s+(?:support|maintain|provide for)\s+(?:me|us)\b",
+    re.I,
+)
+
+
+def direct_support_evidence(question: str) -> dict | None:
+    masked = QUOTED.sub(lambda match: " " * len(match[0]), question)
+    if not grounded_beneficiaries(question):
+        return None
+    for start, end in _clause_ranges(masked):
+        clause = masked[start:end]
+        if DIRECT_SUPPORT_ASK.search(clause) and not DECLINED.search(clause):
+            if not ORDER.search(masked) or not ORDER_ISSUED.search(masked):
+                return {"value": "yes", "source": "user_text", "span": _span(question, start, end)}
+    return None

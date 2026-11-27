@@ -264,6 +264,24 @@ class FamilyLawTests(unittest.TestCase):
         self.assertEqual(self.ids(answer), {"bnss-144", "hma-24"})
         self.assertEqual(answer["facts"]["minor_child"]["value"], "yes")
 
+    def test_direct_order_and_payment_requests_in_lay_language(self):
+        scenarios = (
+            ("Can my well-paid grown-up son be required to support me? I am his father and cannot manage on my own.",
+             "bnss-144"),
+            ("My HMA marriage case is currently ongoing. How do I get my expenses paid for responding to the petition?",
+             "hma-24"),
+            ("I am the payer in an order under BNSS section 144. Could I have the monthly allowance lowered?",
+             "bnss-146"),
+            ("My maintenance order was made under BNSS section 144. I am owed three instalments. How do I claim them?",
+             "bnss-144-3"),
+            ("My support order cites BNSS section 144. Only part of the court-ordered payment arrived. Can the court collect the remainder?",
+             "bnss-144-3"),
+        )
+        for question, section in scenarios:
+            with self.subTest(section=section):
+                answer = assess(question, lambda _: {"maintenance": "unknown"})
+                self.assertEqual(self.ids(answer), {section})
+
     def test_follow_up_can_correct_a_fact_stated_in_the_question(self):
         result = assess(
             "My HMA divorce petition is still pending. Can I get interim support?",

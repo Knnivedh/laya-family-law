@@ -52,3 +52,17 @@ and guided outcomes separately. The authored banks in this iteration are
 engineering evidence and use only the routes the current intake implements.
 Independent legal review, the original family-law gate, and broader family
 law including Kannada remain separate milestones.
+
+## Iteration protocol used
+
+The first verification bank was assessed twice on unchanged assets. Its
+case-level misses remained unopened during the first revision. A new
+34-question final check was then frozen before the initial verification
+misses were opened for diagnosis. The initial 46-question bank is regression
+evidence for every later revision. The additional 34-question challenge bank
+was used to diagnose and retest procedural intent and beneficiary errors.
+
+Keep exact provision-set match and required clarification accuracy separate.
+Measure structural source checks and false provision emissions as separate
+counts. Neither the fixture authors nor the structural checker perform
+independent legal or prose review of a production answer.

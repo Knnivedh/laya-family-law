@@ -18,6 +18,7 @@ FROZEN = {
     "development": "7f7afea4d390567610df8b8b1c47a3c2e097c32ff515b44fe15197c89ca7b505",
     "verification": "e80b0e90cea8e5d3d0b56ee67a185771a9b50b814777be595193628d3e718817",
     "challenge": "7c8476d211f777c5cdc492a5bfb69092f680349d71d5cc2e195c58c6dd2cffcb",
+    "final_check": "5d8ffe1eb42cc7af41ae9f90af64cc0ed803c3bfd1fb993d76fe8d4dddb75cbe",
 }
 RULE_SOURCES = {
     "bnss-144": ("BNSS, 2023, section 144", BNSS),
@@ -33,7 +34,10 @@ def load_cases(split):
     digest = sha256(data).hexdigest()
     if digest != FROZEN[split]:
         raise ValueError(f"Frozen {split} case bytes did not match: {digest}")
-    return json.loads(data), digest
+    rows = json.loads(data)
+    for row in rows:
+        row.setdefault("kind", "positive" if row["expected"] else "boundary")
+    return rows, digest
 
 
 def audit_routes(result, question):
@@ -135,7 +139,7 @@ def main():
     parser.add_argument("--report", type=Path)
     parser.add_argument("--strict", action="store_true", help="Fail if any measured engineering gate does not pass.")
     args = parser.parse_args()
-    if args.split == "verification" and args.detail:
+    if args.split in {"verification", "final_check"} and args.detail:
         parser.error("Case-level detail is available for the development and challenge banks.")
     extractor = extract_facts
     if args.extractor == "structured":

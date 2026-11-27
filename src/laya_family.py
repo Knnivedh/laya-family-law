@@ -12,6 +12,7 @@ import unicodedata
 from collections.abc import Callable, Mapping, Sequence
 
 from .laya_family_evidence import (
+    direct_support_evidence,
     grounded_beneficiaries,
     procedural_evidence,
     requested_procedural_actions,
@@ -136,8 +137,9 @@ def assess(
     requested = requested_procedural_actions(question)
     evidence = procedural_evidence(question) | requested
     separate = separate_support_evidence(question)
-    if separate:
-        evidence["new_support"] = separate
+    direct_support = separate or direct_support_evidence(question)
+    if direct_support:
+        evidence["new_support"] = direct_support
     facts = _interpret(extract(question), {} if confirmed is None else confirmed, evidence)
     if any(item["value"] == "yes" for item in requested.values()):
         for purpose in PURPOSES[1:]:
