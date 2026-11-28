@@ -55,7 +55,7 @@ class ChatHTTPTests(unittest.TestCase):
     def setUpClass(cls):
         from src.laya_chat_api import make_server
 
-        cls.server = make_server(port=0)
+        cls.server = make_server(port=0, extractor_mode="evidence")
         cls.thread = Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
 
@@ -93,6 +93,74 @@ class ChatHTTPTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(result["provisions"][0]["id"], "hma-13")
         self.assertTrue(result["provisions"][0]["source_url"].startswith("https://www.indiacode.nic.in/"))
+
+    def test_sma_judicial_separation_uses_the_act_named_by_the_user(self):
+        status, result = self.request("/v1/assess", {"messages": [{
+            "text": "We got married under the Special Marriage Act. I want to apply for judicial separation from my husband.",
+        }]})
+        self.assertEqual((status, result["status"]), (200, "assessment"))
+        self.assertEqual([p["id"] for p in result["provisions"]], ["sma-23"])
+        self.assertIn("indiacode.nic.in", result["provisions"][0]["source_url"])
+        self.assertIn("Special Marriage Act", result["answer"])
+
+    def test_court_marriage_does_not_establish_which_act_governs(self):
+        question = "We had a court marriage. I want to apply for judicial separation from my husband."
+        status, result = self.request("/v1/assess", {"messages": [{
+            "text": question,
+        }]})
+        self.assertEqual((status, result["status"]), (200, "needs_clarification"))
+        self.assertEqual(result["provisions"], [])
+        self.assertIn("hma_applicable", [q["id"] for q in result["questions"]])
+        status, result = self.request("/v1/assess", {"messages": [
+            {"text": question}, {"text": "Our marriage certificate names the Special Marriage Act."},
+        ]})
+        self.assertEqual((status, result["status"]), (200, "assessment"))
+        self.assertEqual([p["id"] for p in result["provisions"]], ["sma-23"])
+
+    def test_own_hma_statement_can_establish_judicial_separation_route(self):
+        status, result = self.request("/v1/assess", {"messages": [{
+            "text": "We were married under the Hindu Marriage Act. I want a court order to live apart without ending my marriage.",
+        }]})
+        self.assertEqual((status, result["status"]), (200, "assessment"))
+        self.assertEqual([p["id"] for p in result["provisions"]], ["hma-10"])
+        self.assertIn("ground", result["answer"])
+
+    def test_law_stated_in_a_different_persons_case_does_not_apply(self):
+        status, result = self.request("/v1/assess", {"messages": [{
+            "text": "My cousin said, \"We were married under the Special Marriage Act.\" I want to divorce my husband.",
+        }]})
+        self.assertEqual((status, result["status"]), (200, "needs_clarification"))
+        self.assertEqual(result["questions"][0]["id"], "hma_applicable")
+
+    def test_first_person_act_evidence_blocks_an_inconsistent_confirmation(self):
+        status, result = self.request("/v1/assess", {"messages": [
+            {"text": DIVORCE},
+            {"text": "We got married under the Special Marriage Act.", "answers": {"hma_applicable": True}},
+        ]})
+        self.assertEqual((status, result["status"]), (200, "needs_review"))
+        self.assertEqual(result["provisions"], [])
+        self.assertEqual(result["review_reason"], "conflicting_governing_marriage_law")
+
+    def test_explicit_denial_of_domestic_violence_preserves_ordinary_support(self):
+        status, result = self.request("/v1/assess", {"messages": [{
+            "text": (
+                "I have been married for two years. My husband lends me money when I ask. "
+                "I want a maintenance order because my salary has reduced. There has been no domestic violence."
+            ),
+        }]})
+        self.assertEqual((status, result["status"]), (200, "assessment"))
+        self.assertEqual([p["id"] for p in result["provisions"]], ["bnss-144"])
+        self.assertIsNone(result["safety_message"])
+
+    def test_no_shared_household_statement_does_not_convert_child_support_to_dv(self):
+        status, result = self.request("/v1/assess", {"messages": [{
+            "text": (
+                "My former partner will not pay our child expenses. We never lived together or married. "
+                "Can I ask for maintenance?"
+            ),
+        }]})
+        self.assertEqual((status, result["status"]), (200, "assessment"))
+        self.assertEqual([p["id"] for p in result["provisions"]], ["bnss-144"])
 
     def test_mixed_law_unknown_and_unprompted_facts(self):
         status, result = self.request("/v1/assess", {"messages": [
@@ -169,6 +237,16 @@ class ChatHTTPTests(unittest.TestCase):
         })[0], 413)
 
 
+    def test_new_maintenance_order_is_not_treated_as_existing_order_enforcement(self):
+        status, result = self.request("/v1/assess", {"messages": [{
+            "text": "My husband has not paid monthly support for six months. I want to apply for a new BNSS 144 maintenance order for myself.",
+        }]})
+        self.assertEqual((status, result["status"]), (200, "assessment"))
+        self.assertIn("bnss-144", [p["id"] for p in result["provisions"]])
+        self.assertNotIn("bnss-144-3", [p["id"] for p in result["provisions"]])
+        self.assertNotIn("bnss_order", [q["id"] for q in result["questions"]])
+
+
 class IntegratedAuditTests(unittest.TestCase):
     def test_integrated_classifier_uses_checkpoint_calibration(self):
         from src import laya_integrated
@@ -212,6 +290,28 @@ class IntegratedAuditTests(unittest.TestCase):
         self.assertTrue(fb_measured)
         self.assertTrue(fp_measured)
         self.assertEqual(fp, 0)
+
+    def test_chat_result_accepts_classifier_extractor(self):
+        from src.laya_chat_api import _chat_result
+
+        sample = {
+            "error": None,
+            "extractor_mode": "classifier",
+            "kept_statutory_ids": ["bnss-144"],
+            "pending_clarifications": [],
+            "escalation_kinds": [],
+            "prose": "Eligible maintenance section: BNSS Section 144.",
+            "prose_fp_hits": [],
+            "in_scope": True,
+            "dispositions": {"bnss-144": {"reason_codes": ["maintenance_requested"]}},
+            "turn_id": 1,
+            "lang": "kn",
+            "court_live": ["Magistrate"],
+        }
+        payload = _chat_result(sample, hma_applicable=None)
+        self.assertEqual(payload["status"], "assessment")
+        self.assertEqual(payload["extractor"], "classifier")
+        self.assertEqual([p["id"] for p in payload["provisions"]], ["bnss-144"])
 
 
 if __name__ == "__main__":

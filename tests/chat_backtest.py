@@ -43,7 +43,7 @@ def _measure(endpoint: str, rows: list[tuple[str, set[str]]]) -> dict:
         )
         start = perf_counter()
         try:
-            with urlopen(request, timeout=5) as response:
+            with urlopen(request, timeout=15) as response:
                 result = json.load(response)
         except HTTPError as exc:
             with exc:
@@ -79,9 +79,10 @@ def _measure(endpoint: str, rows: list[tuple[str, set[str]]]) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json-out", type=Path)
+    parser.add_argument("--mode", choices=("auto", "evidence"), default="auto")
     args = parser.parse_args()
     suites = _suites()
-    with make_server(port=0) as server:
+    with make_server(port=0, extractor_mode=args.mode) as server:
         thread = Thread(target=server.serve_forever, daemon=True)
         thread.start()
         try:

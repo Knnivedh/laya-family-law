@@ -45,7 +45,7 @@ from __future__ import annotations
 
 import uuid
 from time import perf_counter
-from typing import Any
+from typing import Any, Literal
 
 from .laya_clarifier import rank_clarifications
 from .laya_graph_engine import (
@@ -77,8 +77,10 @@ except Exception:  # pragma: no cover - import-time degradation
 
 try:
     from .laya_v7_evidence import extract_grounded_v7 as _extract_grounded_v7
+    from .laya_v7_evidence import judicial_separation_intent as _judicial_separation_intent
 except Exception:  # pragma: no cover
     _extract_grounded_v7 = None  # type: ignore[assignment]
+    _judicial_separation_intent = None  # type: ignore[assignment]
 
 try:
     from .laya_v7_graph import evaluate_stage2_v7 as _evaluate_stage2_v7
@@ -437,13 +439,62 @@ def _apply_superseding_transitions(state: SessionState, turn_id: int) -> None:
 # ---------------------------------------------------------------------------
 
 def _extract(question: str, *, locale: str | None, mode: str, device: str,
-              kannada_strategy: str) -> dict[str, Any]:
-    """Stage 0/1 extraction with graceful degradation (never raises)."""
+              kannada_strategy: str, strict_pwdva: bool = False) -> dict[str, Any]:
+    """Stage 0/1 extraction with graceful degradation (never raises).
+
+    When ``mode`` is ``"auto"`` or ``"classifier"`` and a trained v7.1
+    checkpoint (``models/v71-classifier/best/model.pt``) is available, runs the
+    trained multilingual classifier bridged via ``laya_integrated`` and merges
+    deterministic English strict-PWDVA/grounded safety checks without letting
+    English-only regex vetoes silence Kannada or Kanglish questions.
+    """
+    options = {"strict_pwdva": True} if strict_pwdva else {}
+    if mode in ("auto", "classifier"):
+        try:
+            from . import laya_integrated as _integrated
+            if _integrated.checkpoint_exists():
+                resolved_ckpt = _integrated.resolve_checkpoint(None)
+                from .laya_lang_normalizer import detect_script_locale
+                lang_info = detect_script_locale(question)
+                lang_code = str(lang_info.get("lang", "en"))
+                if mode == "auto":
+                    issues, facts, _ = _integrated._auto_stage1(question, lang_code, resolved_ckpt)
+                else:
+                    pred = _integrated._predict_classifier(question, resolved_ckpt)
+                    issues, facts, _ = _integrated._classifier_to_stage1(pred, question)
+                if strict_pwdva and _extract_grounded_v7 is not None:
+                    grounded = _extract_grounded_v7(question, strict_pwdva=True)
+                    gfacts = grounded.get("facts") or {}
+                    if "pwdva_monetary_basis_blocked" in gfacts:
+                        facts["pwdva_monetary_basis_blocked"] = gfacts["pwdva_monetary_basis_blocked"]
+                    gneg = set(grounded.get("negated_issues") or set())
+                    for n in gneg:
+                        if n not in issues or issues[n].intent != "requested":
+                            issues[n] = IssueEvidence(issue=n, intent="denied", source="grounded_guard", confidence=1.0)
+                    facts["negated_issues"] = set(facts.get("negated_issues") or set()) | gneg
+                return {
+                    "lang": lang_code,
+                    "script": str(lang_info.get("script", "latin")),
+                    "translated_text": None,
+                    "extractor_mode": "classifier",
+                    "facts": facts,
+                    "issues": issues,
+                    "negated_issues": set(facts.get("negated_issues") or set()),
+                }
+            elif mode == "classifier":
+                return {"error": "v71 classifier checkpoint missing", "facts": {}, "issues": {},
+                        "negated_issues": set(), "lang": "en", "script": "latin",
+                        "extractor_mode": "failed", "translated_text": None}
+        except Exception as exc:
+            if mode == "classifier":
+                return {"error": f"v71 classifier failed: {exc}", "facts": {}, "issues": {},
+                        "negated_issues": set(), "lang": "en", "script": "latin",
+                        "extractor_mode": "failed", "translated_text": None}
     if _extract_v7 is not None:
         try:
             return _extract_v7(
                 question, locale=locale, mode=mode, device=device,
-                kannada_strategy=kannada_strategy,
+                kannada_strategy=kannada_strategy, **options,
             )
         except Exception as exc:  # neural path unavailable on this VM
             return {"error": f"extract_v7 failed: {exc}", "facts": {}, "issues": {},
@@ -451,7 +502,7 @@ def _extract(question: str, *, locale: str | None, mode: str, device: str,
                     "extractor_mode": "failed", "translated_text": None}
     if _extract_grounded_v7 is not None:
         try:
-            grounded = _extract_grounded_v7(question)
+            grounded = _extract_grounded_v7(question, **options)
             return {
                 "lang": "en", "script": "latin", "translated_text": None,
                 "extractor_mode": "evidence",
@@ -509,6 +560,8 @@ def assess_turn(
     kannada_strategy: str = "native_laya",
     with_prose: bool = True,
     session_id: str | None = None,
+    judicial_separation_act: Literal["hma", "sma"] | None = None,
+    strict_pwdva: bool = False,
 ) -> tuple[dict[str, Any], SessionState]:
     """Run one unified turn. Returns (result, new_state).
 
@@ -519,9 +572,16 @@ def assess_turn(
     ``gated_out_layer_a`` / ``gated_out_stage2``, ``turn_id``,
     ``pending_clarifications``, ``override_log`` (this turn's entries) and
     ``vocab_profile``.
+
+    A host may opt into a potential judicial-separation route for the
+    selected marriage statute. The host confirms applicability before
+    presenting provisions and prose to the user.
+    Strict PWDVA intake uses explicit, turn-scoped monetary-relief blockers.
     """
     if vocab_profile not in VOCAB_PROFILES:
         raise ValueError(f"Unknown vocab_profile {vocab_profile!r}; expected one of {VOCAB_PROFILES}")
+    if judicial_separation_act not in (None, "hma", "sma"):
+        raise ValueError("judicial_separation_act must be hma, sma, or None")
     t0 = perf_counter()
     if state is None:
         state = new_session(session_id or f"laya-v71-{uuid.uuid4().hex[:12]}")
@@ -530,7 +590,7 @@ def assess_turn(
 
     extracted = _extract(
         question, locale=locale, mode=mode, device=device,
-        kannada_strategy=kannada_strategy,
+        kannada_strategy=kannada_strategy, strict_pwdva=strict_pwdva,
     )
     turn = TurnRecord(
         turn_id=turn_id,
@@ -559,10 +619,46 @@ def assess_turn(
             )
     open_markers = set((extracted.get("facts") or {}).get("open_fact_markers") or set())
 
+    pwdva_basis = turn.extracted_facts.pop("pwdva_monetary_basis_blocked", None)
     state = resolve_turn_state(state, turn, confirmations)
+    if strict_pwdva and pwdva_basis is not None:
+        # Only qualified affirmative or negative evidence emits this key.
+        # The latest such turn revises the gate. Silence leaves it untouched.
+        pwdva_basis.turn = turn_id
+        turn.extracted_facts[pwdva_basis.key] = pwdva_basis
+        state.active_facts[pwdva_basis.key] = pwdva_basis
+        state.fact_history.setdefault(pwdva_basis.key, []).append(pwdva_basis)
+
+    separation = None
+    if judicial_separation_act is not None and _judicial_separation_intent is not None:
+        separation = state.active_issues.get("judicial_separation")
+        amended_intent = _judicial_separation_intent(question)
+        divorce = turn.extracted_issues.get("divorce")
+        divorce_requested = divorce is not None and divorce.intent == "requested"
+        if amended_intent == "requested" and divorce_requested:
+            amended_intent = "uncertain"
+        elif amended_intent is None and divorce_requested and separation is not None:
+            amended_intent = "denied"
+        source = "user_text"
+        declared = turn.confirmations.get("judicial_separation_requested")
+        if amended_intent is None and separation is not None and separation.intent == "uncertain":
+            if isinstance(declared, bool):
+                amended_intent = "requested" if declared else "denied"
+                source = "user_confirmation"
+        if amended_intent is not None:
+            # Petition preference can change. A new express choice supersedes
+            # a previously confirmed preference for the same matter.
+            separation = _issue_for("judicial_separation", amended_intent, source, 1.0, turn_id)
+            turn.extracted_issues["judicial_separation"] = separation
+            state.active_issues["judicial_separation"] = separation
 
     facts = stage2_facts(state, open_fact_markers=open_markers)
+    if not strict_pwdva:
+        facts.pop("pwdva_monetary_basis_blocked", None)
     issues = dict(state.active_issues)
+    if separation is not None:
+        facts["judicial_separation_act"] = judicial_separation_act
+        facts["judicial_separation_only"] = separation.intent != "denied"
 
     # Maintenance sub-routes profile: maintenance-only intake first.
     maintenance_routes: dict[str, Any] | None = None
@@ -654,11 +750,18 @@ def assess_turn(
     ][:2] if result["in_scope"] else []
     clarifications = []
     if result["in_scope"] and len(state.pending_clarifications) < 2:
-        clarifications = rank_clarifications(
+        if separation is not None and separation.intent == "uncertain":
+            clarifications.append({
+                "fact_key": "judicial_separation_requested",
+                "question": "Are you asking for a court-ordered separation while staying married?",
+            })
+        state.pending_clarifications.extend(clarifications)
+        ranked = rank_clarifications(
             state, facts, issues,
             max_questions=2 - len(state.pending_clarifications), kept_ids=kept_ids,
         )
-        state.pending_clarifications.extend(clarifications)
+        state.pending_clarifications.extend(ranked)
+        clarifications.extend(ranked)
     result["pending_clarifications"] = list(state.pending_clarifications)
     result["clarifying_questions"] = clarifications
 

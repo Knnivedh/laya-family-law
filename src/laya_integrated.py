@@ -142,12 +142,19 @@ def checkpoint_exists(checkpoint: str | Path | None = None) -> bool:
 # classifier module is mid-edit by Lane B, and must not import torch)
 # ---------------------------------------------------------------------------
 
+def _select_device() -> str:
+    try:
+        import torch
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    except Exception:
+        return "cpu"
+
+
 def _load_classifier(checkpoint_path: Path) -> tuple[Any, Any, Any]:
     """Load (model, tokenizer, config) for a checkpoint, cached per path.
 
     Raises RuntimeError with an actionable message when torch/transformers
-    are unavailable (this VM) or the checkpoint cannot be loaded. Never
-    returns a fake model.
+    are unavailable or the checkpoint cannot be loaded. Never returns a fake model.
     """
     key = str(checkpoint_path)
     if key in _CLASSIFIER_CACHE:
@@ -159,7 +166,7 @@ def _load_classifier(checkpoint_path: Path) -> tuple[Any, Any, Any]:
             "Could not import src.laya_v7_classifier "
             f"(Lane B may be mid-edit): {exc}"
         ) from exc
-    model, cfg = load_checkpoint(checkpoint_path, device="cpu")
+    model, cfg = load_checkpoint(checkpoint_path, device=_select_device())
     try:
         from transformers import AutoTokenizer
     except ImportError as exc:
@@ -201,7 +208,204 @@ def _predict_classifier(text: str, checkpoint_path: Path) -> dict[str, Any]:
     return pred
 
 
-def _classifier_to_stage1(pred: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+BRIDGE_DERIVED_KEYS = frozenset({
+    "arrears_recovery_asked",
+    "custody_negated",
+    "first_demand_never_made",
+    "forum_question_asked",
+    "hypothetical_or_joint_prop_fact_only",
+    "interim_only_asked",
+    "interim_unpaid_with_joint_or_parallel",
+    "judicial_separation_act",
+    "maintenance_negated",
+    "maintenance_variation_asked",
+    "money_fact_child_or_parallel",
+    "no_dispute_empty",
+    "post_decree_lump_sum_enforcement",
+    "procedure_how_to_asked",
+    "pwdva_monetary_basis_blocked",
+    "residence_negated",
+    "stay_in_house_under_eviction_pressure",
+    "stridhan_abandoned_or_undisputed",
+    "stridhan_held_by_inlaws_refused",
+    "stridhan_negated",
+    "stridhan_safe_in_own_possession",
+    "urgent_safety_risk",
+    "violence_negated",
+})
+
+
+def _attach_bridge_facts(
+    issues: dict[str, Any],
+    facts: dict[str, Any],
+    enums_plain: dict[str, Any],
+    question_text: str = "",
+) -> None:
+    """Derive all graph-consumed keys uncovered by the 28 classifier fact heads."""
+    def _is_sup(k: str) -> bool:
+        ev = facts.get(k)
+        return isinstance(ev, FactEvidence) and ev.status == "supported"
+
+    def _is_den(k: str) -> bool:
+        ev = facts.get(k)
+        return isinstance(ev, FactEvidence) and ev.status == "denied"
+
+    def _req(k: str) -> bool:
+        ev = issues.get(k)
+        return isinstance(ev, IssueEvidence) and ev.intent == "requested"
+
+    def _set(k: str, val: Any, *, source: str = "classifier_bridge") -> None:
+        if k in facts:
+            return
+        if isinstance(val, bool):
+            status = "supported" if val else "denied"
+        elif val is None or val == "":
+            status = "unknown"
+        else:
+            status = "supported"
+        facts[k] = FactEvidence(key=k, status=status, value=val, source=source, confidence=1.0 if status != "unknown" else 0.0)
+
+    negated_issues = facts.get("negated_issues") or set()
+
+    # Semantic derivations from classifier predictions
+    urgent = _is_sup("violence") or _is_sup("child_safety_risk")
+    _set("urgent_safety_risk", urgent)
+    _set("interim_only_asked", _is_sup("interim_asked") and _is_sup("proceeding_pending_hma") and not _is_sup("money_fact"))
+    _set("money_fact_child_or_parallel", _is_sup("money_fact") and (_is_sup("child_maintenance_only") or not _is_sup("existing_order_enforcement")))
+    _set("stay_in_house_under_eviction_pressure", _is_sup("residence_claim") and (_is_sup("coercive_eviction_or_lockout") or _is_sup("violence")))
+    _set("stridhan_held_by_inlaws_refused", _is_sup("stridhan_claim") and (_is_sup("demand_made") or _is_sup("stridhan_sold_or_mortgaged")))
+    _set("stridhan_safe_in_own_possession", _is_den("stridhan_claim"))
+    _set("stridhan_abandoned_or_undisputed", _is_den("stridhan_claim"))
+    _set("first_demand_never_made", _is_sup("stridhan_claim") and _is_den("demand_made"))
+
+    for issue_key, fact_key, neg_key in (
+        ("custody", "custody_claim", "custody_negated"),
+        ("maintenance", "money_fact", "maintenance_negated"),
+        ("residence", "residence_claim", "residence_negated"),
+        ("stridhan", "stridhan_claim", "stridhan_negated"),
+        ("violence", "violence", "violence_negated"),
+    ):
+        _set(neg_key, (issue_key in negated_issues) or _is_den(fact_key))
+
+    proc_ev = issues.get("procedure")
+    proc_req = isinstance(proc_ev, IssueEvidence) and proc_ev.intent == "requested"
+    proc_any = isinstance(proc_ev, IssueEvidence) and proc_ev.intent in ("requested", "incidental")
+    _set("forum_question_asked", proc_any)
+    _set("procedure_how_to_asked", proc_req)
+    any_requested = any(_req(name) for name in issues)
+    _set("no_dispute_empty", _is_sup("in_scope") and not any_requested and _is_den("stridhan_claim"))
+    modality = enums_plain.get("modality_time", {}).get("value", "present")
+    _set(
+        "hypothetical_or_joint_prop_fact_only",
+        modality == "hypothetical"
+        or (_is_sup("joint_property_claim") and not _is_sup("proceeding_pending_hma") and not _is_sup("being_filed") and not _req("divorce")),
+    )
+
+    # Deterministic grounded extraction for post-order / Act / strict PWDVA keys
+    if question_text:
+        try:
+            from src.laya_v7_evidence import extract_grounded_v7
+            grounded = extract_grounded_v7(question_text, strict_pwdva=True).get("facts") or {}
+            for gkey in (
+                "arrears_recovery_asked",
+                "maintenance_variation_asked",
+                "interim_unpaid_with_joint_or_parallel",
+                "post_decree_lump_sum_enforcement",
+                "pwdva_monetary_basis_blocked",
+            ):
+                if gkey in grounded and isinstance(grounded[gkey], FactEvidence):
+                    facts[gkey] = grounded[gkey]
+        except Exception:
+            pass
+    for fallback_key in (
+        "arrears_recovery_asked",
+        "maintenance_variation_asked",
+        "interim_unpaid_with_joint_or_parallel",
+        "post_decree_lump_sum_enforcement",
+        "pwdva_monetary_basis_blocked",
+    ):
+        _set(fallback_key, False, source="classifier_bridge_default")
+    if "judicial_separation_act" not in facts:
+        facts["judicial_separation_act"] = FactEvidence(
+            key="judicial_separation_act", status="unknown", value=None,
+            source="classifier_bridge_default", confidence=0.0,
+        )
+
+
+_COUPLED_ISSUE_FACT: tuple[tuple[str, str], ...] = (
+    ("maintenance", "money_fact"),
+    ("divorce", "divorce_asked"),
+    ("custody", "custody_claim"),
+    ("violence", "violence"),
+    ("residence", "residence_claim"),
+    ("stridhan", "stridhan_claim"),
+    ("joint_property", "joint_property_claim"),
+    ("restitution", "restitution_asked"),
+    ("birth_certificate", "birth_cert_asked"),
+    ("dv_compensation", "dv_injury_comp_asked"),
+)
+
+
+def _sync_coupled_pairs(
+    pred: dict[str, Any],
+    issues: dict[str, Any],
+    facts: dict[str, Any],
+) -> None:
+    """Keep strongly predicted issues and primary facts mutually consistent."""
+    raw_issues = pred.get("issues") or {}
+    raw_facts = pred.get("facts") or {}
+
+    for iss_key, fac_key in _COUPLED_ISSUE_FACT:
+        iss_ev = issues.get(iss_key)
+        fac_ev = facts.get(fac_key)
+        if (
+            isinstance(iss_ev, IssueEvidence)
+            and iss_ev.intent == "requested"
+            and iss_ev.confidence >= 0.50
+            and isinstance(fac_ev, FactEvidence)
+            and fac_ev.status == "unknown"
+        ):
+            p_sup = float((raw_facts.get(fac_key) or {}).get("probs", {}).get("supported", 0.0))
+            if p_sup >= 0.20:
+                facts[fac_key] = FactEvidence(
+                    key=fac_key,
+                    status="supported",
+                    value=True,
+                    source="classifier_coupled",
+                    confidence=iss_ev.confidence,
+                )
+
+    for iss_key, fac_key in _COUPLED_ISSUE_FACT + (("residence", "coercive_eviction_or_lockout"),):
+        iss_ev = issues.get(iss_key)
+        fac_ev = facts.get(fac_key)
+        if (
+            isinstance(fac_ev, FactEvidence)
+            and fac_ev.status == "supported"
+            and fac_ev.confidence >= 0.70
+            and isinstance(iss_ev, IssueEvidence)
+            and iss_ev.intent == "uncertain"
+        ):
+            p_req = float((raw_issues.get(iss_key) or {}).get("probs", {}).get("requested", 0.0))
+            if p_req >= 0.20:
+                issues[iss_key] = IssueEvidence(
+                    issue=iss_key,
+                    intent="requested",
+                    source="classifier_coupled",
+                    confidence=fac_ev.confidence,
+                )
+                if fac_key == "coercive_eviction_or_lockout":
+                    res_ev = facts.get("residence_claim")
+                    if isinstance(res_ev, FactEvidence) and res_ev.status == "unknown":
+                        facts["residence_claim"] = FactEvidence(
+                            key="residence_claim",
+                            status="supported",
+                            value=True,
+                            source="classifier_coupled",
+                            confidence=fac_ev.confidence,
+                        )
+
+
+def _classifier_to_stage1(pred: dict[str, Any], question_text: str = "") -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     """Convert a predict_text() result to (issues, facts, enums) for Graph v4.
 
     Mirrors tests/recall_eval.py::predict_sections_from_stage1: issue
@@ -230,6 +434,7 @@ def _classifier_to_stage1(pred: dict[str, Any]) -> tuple[dict[str, Any], dict[st
         facts[name] = FactEvidence(
             key=name, status=state, value=value, source="classifier", confidence=conf
         )
+    _sync_coupled_pairs(pred, issues, facts)
     enums_plain: dict[str, Any] = {}
     for head, val in (pred.get("enums") or {}).items():
         value = val.get("value") if isinstance(val, dict) else val
@@ -255,7 +460,67 @@ def _classifier_to_stage1(pred: dict[str, Any]) -> tuple[dict[str, Any], dict[st
         name for name, ev in issues.items() if ev.intent == "denied"
     }
     facts["open_fact_markers"] = set()
+    _attach_bridge_facts(issues, facts, enums_plain, question_text)
     return issues, facts, enums_plain
+
+
+def _auto_stage1(
+    question: str,
+    language: str,
+    checkpoint_path: Path,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Hybrid grounded-evidence + multilingual MuRIL extraction for mode='auto'.
+
+    Grounded English rules anchor active English claims (preserving high
+    precision on hard-negative gates and third-person hypotheticals), while
+    calibrated MuRIL handles Kannada, Kanglish, and paraphrased English
+    queries where English patterns are silent.
+    """
+    ev_issues, ev_facts, ev_enums = _rule_based_stage1(question, language)
+    ev_active = any(
+        isinstance(v, IssueEvidence) and v.intent in ("requested", "denied")
+        for v in ev_issues.values()
+    ) or any(
+        isinstance(v, FactEvidence)
+        and v.status == "supported"
+        and v.key not in ("in_scope", "domestic_relationship")
+        for v in ev_facts.values()
+    )
+
+    ev_in_scope = ev_facts.get("in_scope")
+    ev_oos = isinstance(ev_in_scope, FactEvidence) and ev_in_scope.status == "denied"
+    if language == "en" and (ev_active or ev_oos):
+        return ev_issues, ev_facts, ev_enums
+
+    pred = _predict_classifier(question, checkpoint_path)
+    clf_issues, clf_facts, clf_enums = _classifier_to_stage1(pred, question)
+
+    pending_ev = clf_facts.get("proceeding_pending_hma")
+    if isinstance(pending_ev, FactEvidence) and pending_ev.status == "supported" and pending_ev.confidence < 0.65:
+        clf_facts["proceeding_pending_hma"] = FactEvidence(
+            key="proceeding_pending_hma", status="unknown", value=None,
+            source="auto_guard", confidence=0.0,
+        )
+
+    if ev_active:
+        for name, e_ev in ev_issues.items():
+            c_ev = clf_issues.get(name)
+            if (
+                isinstance(e_ev, IssueEvidence)
+                and e_ev.intent == "requested"
+                and (not isinstance(c_ev, IssueEvidence) or c_ev.intent == "uncertain")
+            ):
+                clf_issues[name] = e_ev
+        for iss_key, fac_key in _COUPLED_ISSUE_FACT:
+            e_fac = ev_facts.get(fac_key)
+            c_fac = clf_facts.get(fac_key)
+            if (
+                isinstance(e_fac, FactEvidence)
+                and e_fac.status == "supported"
+                and (not isinstance(c_fac, FactEvidence) or c_fac.status == "unknown")
+            ):
+                clf_facts[fac_key] = e_fac
+    return clf_issues, clf_facts, clf_enums
 
 
 # ---------------------------------------------------------------------------
@@ -420,13 +685,12 @@ def run_question(
                 f"classifier checkpoint exists at {resolved} but cannot run "
                 f"here: {exc}"
             ) from exc
-        issues, facts, enums = _classifier_to_stage1(pred)
+        issues, facts, enums = _classifier_to_stage1(pred, question)
         extractor = "classifier"
         checkpoint_str = str(resolved)
     elif mode_norm == "auto" and resolved.is_file():
         try:
-            pred = _predict_classifier(question, resolved)
-            issues, facts, enums = _classifier_to_stage1(pred)
+            issues, facts, enums = _auto_stage1(question, language, resolved)
             extractor = "classifier"
             checkpoint_str = str(resolved)
         except Exception as exc:  # auto never fails on the neural path

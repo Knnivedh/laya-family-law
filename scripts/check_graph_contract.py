@@ -49,6 +49,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from laya_v7_classifier import ENUMS, FACTS, ISSUES  # noqa: E402
+from laya_integrated import BRIDGE_DERIVED_KEYS  # noqa: E402
 
 GRAPH_PATH = REPO_ROOT / "src" / "laya_v7_graph.py"
 
@@ -58,9 +59,8 @@ GRAPH_PATH = REPO_ROOT / "src" / "laya_v7_graph.py"
 # mentions the key), not from this table.
 ESCALATION_ONLY_FUNCS = {"_derive_escalations_v7", "layer_a_filter_options"}
 
-# Bridge-derived keys (tests/recall_eval.py::predict_sections_from_stage1,
-# lines ~236-238): built from denied issue intents, not predicted directly.
-BRIDGE_DERIVED = {"negated_issues", "denied_issues"}
+# Bridge-derived keys: denied-intent projections + C1 runtime _attach_bridge_facts.
+BRIDGE_DERIVED = {"negated_issues", "denied_issues"} | set(BRIDGE_DERIVED_KEYS)
 
 # Legacy-only inputs to _normalize_legacy_facts derivations.
 LEGACY_INPUTS = {"gold_fact", "magistrate_case_only", "proceeding_pending"}

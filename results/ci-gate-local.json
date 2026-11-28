@@ -1,0 +1,40 @@
+{
+  "gates": [
+    {
+      "gate": "frozen_sha",
+      "status": "pass",
+      "detail": "GRAPH V4 + FROZEN SHA TEST PASS: 34 sections / 66 nodes / 99 edges, 0 dangling edges, 7/7 frozen hashes intact.",
+      "command": "C:\\Users\\LOQ\\.gemini\\antigravity\\scratch\\.laya_venv\\Scripts\\python.exe -m tests.test_graph_v4"
+    },
+    {
+      "gate": "unit",
+      "status": "pass",
+      "detail": "\n----------------------------------------------------------------------\nRan 124 tests in 4.775s\n\nOK",
+      "command": "C:\\Users\\LOQ\\.gemini\\antigravity\\scratch\\.laya_venv\\Scripts\\python.exe -m unittest discover -s tests -p test_*.py -v"
+    },
+    {
+      "gate": "prose",
+      "status": "pass",
+      "detail": "PROSE VALIDATION PASS: 246 cases, Fp=0, quality_flags=0, 15/15 adversarial mutants caught, mean=0.0296ms, max=0.121ms",
+      "command": "C:\\Users\\LOQ\\.gemini\\antigravity\\scratch\\.laya_venv\\Scripts\\python.exe -m tests.test_prose_renderer_v2"
+    },
+    {
+      "gate": "leakage",
+      "status": "pass",
+      "detail": "  tests/fixtures/laya_maintenance_development.json: overlap=0 max_cosine=0.6776 synthetic_ids=[]\n  tests/fixtures/laya_maintenance_verification.json: overlap=0 max_cosine=0.6249 synthetic_ids=[]\n  tests/fixtures/laya_maintenance_challenge.json: overlap=0 max_cosine=0.6922 synthetic_ids=[]\n  tests/fixtures/laya_maintenance_final_check.json: overlap=0 max_cosine=0.7217 synthetic_ids=[]\n  top cosine hits: [{'cosine': 0.8269, 'synthetic_id': 'SYN-TR-4228', 'ref_file': 'test-bank/brutal-bank-v1-frozen.json', 'ref_id': 'B-058'}, {'cosine': 0.7805, 'synthetic_id': 'SYN-TR-0117', 'ref_file': 'ground-truth/ground-truth-v2-hma27-A.json', 'ref_id': 'H14'}, {'cosine': 0.7762, 'synthetic_id': 'SYN-TR-2366', 'ref_file': 'test-bank/brutal-bank-v1-frozen.json', 'ref_id': 'B-142'}]",
+      "command": "C:\\Users\\LOQ\\.gemini\\antigravity\\scratch\\.laya_venv\\Scripts\\python.exe -m scripts.check_ngram_leakage --strict"
+    },
+    {
+      "gate": "license",
+      "status": "pass",
+      "detail": "scanned=['src/laya_v7_extractor.py', 'src/laya_v7_student.py'] missing=[] hits=['none']",
+      "command": "python scripts/ci_gate.py --gate license"
+    },
+    {
+      "gate": "latency-determinism",
+      "status": "blocked",
+      "detail": "models/student_int8.onnx absent (Lane 08, V71-P5-2, not yet landed). No CPU latency / determinism measurement is possible here. Run on RTX/CI once the artifact exists: python -m tests.v7_backtest --suite 16q --mode student_onnx --device cpu --misses 0 (x2).",
+      "command": "python -m tests.v7_backtest --suite 16q --mode student_onnx --device cpu --misses 0"
+    }
+  ]
+}

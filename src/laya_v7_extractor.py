@@ -596,6 +596,7 @@ def extract_v7_batch(
     device: str = "cuda",
     kannada_strategy: str = "native_laya",
     batch_size: int = 32,
+    strict_pwdva: bool = False,
 ) -> list[dict[str, Any]]:
     """Batched Stage 0/1 extraction preserving strict per-question isolation."""
     use_mode = mode
@@ -645,6 +646,7 @@ def extract_v7_batch(
             translated_text=translated,
             is_kannada_orig=is_kn,
             raw_kannada=raw_text if is_kn else "",
+            strict_pwdva=strict_pwdva and use_mode == "evidence",
         )
         facts: dict[str, Any] = dict(grounded["facts"])
         facts["_raw_analysis"] = analysis_text
@@ -683,6 +685,7 @@ def extract_v7(
     mode: str = "auto",
     device: str = "cuda",
     kannada_strategy: str = "native_laya",
+    strict_pwdva: bool = False,
 ) -> dict[str, Any]:
     return extract_v7_batch(
         [raw_text],
@@ -691,4 +694,5 @@ def extract_v7(
         device=device,
         kannada_strategy=kannada_strategy,
         batch_size=1,
+        strict_pwdva=strict_pwdva,
     )[0]

@@ -1,0 +1,72 @@
+{
+  "n": 498,
+  "exact_count": 418,
+  "exact_rate": 0.8394,
+  "wilson_95": [
+    0.8045,
+    0.869
+  ],
+  "micro_p": 0.8918,
+  "micro_r": 0.7914,
+  "micro_f1": 0.8386,
+  "tp_fp_fn": [
+    478,
+    58,
+    126
+  ],
+  "silent": 38,
+  "per_language_exact": {
+    "en": "215/239 (0.900)",
+    "kn": "102/131 (0.779)",
+    "kn_roman": "101/128 (0.789)"
+  },
+  "per_issue_exact_requested": {
+    "birth_certificate": "44/44 (1.000)",
+    "custody": "51/75 (0.680)",
+    "divorce": "31/31 (1.000)",
+    "dv_compensation": "20/31 (0.645)",
+    "joint_property": "37/37 (1.000)",
+    "maintenance": "61/79 (0.772)",
+    "procedure": "16/23 (0.696)",
+    "residence": "29/47 (0.617)",
+    "restitution": "28/30 (0.933)",
+    "stridhan": "43/43 (1.000)",
+    "violence": "20/31 (0.645)"
+  },
+  "per_cluster_exact": {
+    "core": "123/154 (0.799)",
+    "hn_b": "49/78 (0.628)",
+    "hn_c": "59/61 (0.967)",
+    "hn_d": "43/43 (1.000)",
+    "hn_e": "49/51 (0.961)",
+    "hn_f": "30/30 (1.000)",
+    "hn_h": "28/28 (1.000)",
+    "neg": "37/53 (0.698)"
+  },
+  "failure_tags": {
+    "exact": 418,
+    "silent": 38,
+    "extra_only": 16,
+    "empty_expected_nonempty_pred": 9,
+    "missing_and_extra": 11,
+    "missing_only": 6
+  },
+  "top_missing_sections": {
+    "hmga-1956-s6": 24,
+    "gwa-1890": 24,
+    "welfare-principle": 24,
+    "pwdva-18": 23,
+    "pwdva-17": 8,
+    "pwdva-19": 8,
+    "pwdva-22": 8,
+    "bnss-144": 7
+  },
+  "top_extra_sections": {
+    "pwdva-20": 27,
+    "bnss-144": 18,
+    "hma-9": 7,
+    "hmga-1956-s6": 2,
+    "gwa-1890": 2,
+    "welfare-principle": 2
+  }
+}

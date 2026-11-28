@@ -609,20 +609,60 @@ def train(args) -> int:
             max_weight=args.loss_max_weight, unknown_index=unknown_index)
         return torch.tensor(w, dtype=torch.float, device=device)
 
+    def _slot_weights(label_rows, n_slots, n_classes, unknown_index):
+        out_w = []
+        cap = min(3.5, float(args.loss_max_weight))
+        for s in range(n_slots):
+            counts = [0] * n_classes
+            for row in label_rows:
+                counts[row[s]] += 1
+            n_max = max(counts) if counts else 1
+            row_w = []
+            for idx, c in enumerate(counts):
+                if idx == unknown_index:
+                    row_w.append(1.0)
+                elif c == 0:
+                    row_w.append(1.0)
+                else:
+                    w = max(1.0, (0.5 * n_max / max(c, 40)) ** 0.35)
+                    row_w.append(min(cap, w))
+            mean_w = sum(row_w) / len(row_w)
+            out_w.append([w / mean_w for w in row_w])
+        return torch.tensor(out_w, dtype=torch.float, device=device)
+
+    def _enum_weights(enum_vals_list, n_classes):
+        counts = [0] * n_classes
+        for v in enum_vals_list:
+            counts[v] += 1
+        n_max = max(counts) if counts else 1
+        row_w = [
+            min(4.0, max(1.0, (n_max / max(c, 40)) ** 0.4)) if c > 0 else 1.0
+            for c in counts
+        ]
+        mean_w = sum(row_w) / len(row_w)
+        return torch.tensor([w / mean_w for w in row_w], dtype=torch.float, device=device)
+
     # Issue head: intents (requested, incidental, denied, uncertain) —
     # the "unknown-like" neutral state is "uncertain", index 3.
     # Fact head: states (supported, denied, unknown, conflicting) —
     # neutral state "unknown", index 2.
-    w_issue = (_head_weights([encode_labels(r)["issue"] for r in train_recs],
+    encoded_train = [encode_labels(r) for r in train_recs]
+    w_issue = (_head_weights([e["issue"] for e in encoded_train],
                             len(ISSUE_INTENTS), 3)
                if args.class_weights else None)
-    w_fact = (_head_weights([encode_labels(r)["fact"] for r in train_recs],
+    w_fact = (_head_weights([e["fact"] for e in encoded_train],
                            len(FACT_STATES), 2)
               if args.class_weights else None)
+    w_issue_slots = (_slot_weights([e["issue"] for e in encoded_train],
+                                   len(ISSUES), len(ISSUE_INTENTS), 3)
+                     if args.class_weights else None)
+    w_fact_slots = (_slot_weights([e["fact"] for e in encoded_train],
+                                  len(FACTS), len(FACT_STATES), 2)
+                    if args.class_weights else None)
     if args.class_weights:
         print(f"class weights issue={ [round(v, 3) for v in w_issue.tolist()] } "
               f"fact={ [round(v, 3) for v in w_fact.tolist()] } "
-              f"(effective-number beta={args.loss_beta} "
+              f"(per-slot balanced + effective-number beta={args.loss_beta} "
               f"unknown_w={args.loss_unknown_weight} cap={args.loss_max_weight})")
 
     def head_loss(logits, targets, weight, n_classes):
@@ -634,7 +674,27 @@ def train(args) -> int:
         return nn.CrossEntropyLoss(weight=weight)(
             logits.reshape(-1, n_classes), targets.reshape(-1))
 
-    ce_enum = {h: nn.CrossEntropyLoss() for h in ENUMS}
+    def slot_head_loss(logits, targets, slot_weights, fallback_weight, n_classes):
+        """Per-slot balanced CE/focal loss over [B, S, C] logits and [B, S] targets."""
+        import torch.nn.functional as F
+        if slot_weights is None:
+            return head_loss(logits, targets, fallback_weight, n_classes)
+        log_p = F.log_softmax(logits, dim=-1)
+        tgt_lp = log_p.gather(-1, targets.unsqueeze(-1)).squeeze(-1)
+        loss_el = -tgt_lp
+        if args.loss == "focal_ce":
+            tgt_p = tgt_lp.exp()
+            loss_el = ((1.0 - tgt_p) ** args.focal_gamma) * loss_el
+        pos_w = slot_weights.gather(1, targets.T).T
+        return (loss_el * pos_w).mean()
+
+    ce_enum = {
+        h: nn.CrossEntropyLoss(
+            weight=_enum_weights([e["enums"][h] for e in encoded_train], len(ENUMS[h]))
+            if args.class_weights else None
+        )
+        for h in ENUMS
+    }
     bce = nn.BCEWithLogitsLoss()
 
     # Optimiser (FALLBACK-2): separate encoder / head learning rates —
@@ -740,10 +800,10 @@ def train(args) -> int:
                     gold["fact"].extend(batch["fact"][i].tolist())
                     pred["fact"].extend(fact_p[i].argmax(-1).tolist())
                     for h in ENUMS:
-                        gold[h].extend(enums_in[h].tolist())
-                        pred[h].extend(
-                            torch.softmax(out["enum_logits"][h], dim=-1)[i]
-                            .argmax(-1).tolist())
+                        gold[h].append(int(enums_in[h][i].item()))
+                        pred[h].append(
+                            int(torch.softmax(out["enum_logits"][h], dim=-1)[i]
+                                .argmax(-1).item()))
                     gate_gold = batch["gate"][i].round().long()
                     gate_pred = (torch.sigmoid(
                         out["clause_gate_logits"][i]) >= cfg.tau_neg).long()
@@ -801,10 +861,12 @@ def train(args) -> int:
                                     dtype=amp_dtype,
                                     enabled=amp_dtype is not None):
                     out = model_forward(b_in)
-                    loss_issue = head_loss(out["issue_logits"], b_in["issue"],
-                                           w_issue, len(ISSUE_INTENTS))
-                    loss_fact = head_loss(out["fact_logits"], b_in["fact"],
-                                          w_fact, len(FACT_STATES))
+                    loss_issue = slot_head_loss(
+                        out["issue_logits"], b_in["issue"],
+                        w_issue_slots, w_issue, len(ISSUE_INTENTS))
+                    loss_fact = slot_head_loss(
+                        out["fact_logits"], b_in["fact"],
+                        w_fact_slots, w_fact, len(FACT_STATES))
                     loss_enum = sum(
                         ce_enum[h](out["enum_logits"][h], enums_in[h])
                         for h in ENUMS) / len(ENUMS)

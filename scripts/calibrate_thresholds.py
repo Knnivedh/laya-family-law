@@ -165,6 +165,20 @@ def decode_labels(pred_issues, pred_facts, temp_issue, temp_fact,
     return issues, facts
 
 
+def decode_enums(pred_enums: dict[str, Any] | None) -> dict[str, dict[str, str]]:
+    """Decode {head: prob_dict} or {head: {'value': ...}} for Stage 2."""
+    out: dict[str, dict[str, str]] = {}
+    for head, val in (pred_enums or {}).items():
+        if isinstance(val, dict):
+            if "value" in val:
+                out[head] = {"value": str(val["value"])}
+            elif val:
+                out[head] = {"value": max(val, key=lambda k: float(val[k]))}
+        else:
+            out[head] = {"value": str(val)}
+    return out
+
+
 def f_beta(prec: float, rec: float, beta: float = 1.2) -> float:
     b2 = beta * beta
     if prec + rec == 0:
@@ -284,7 +298,7 @@ def main(argv=None) -> int:
                 temp_issue, temp_fact, tau_issue, tau_fact,
                 tau0_issue, tau0_fact)
             pred = harness.predict_sections_from_stage1(
-                issues, facts, row["pred_enums"])
+                issues, facts, decode_enums(row["pred_enums"]))
             if pred == exp:
                 exact += 1
             tp += len(pred & exp)
@@ -408,7 +422,7 @@ def main(argv=None) -> int:
             row["pred_issues"], row["pred_facts"],
             temp_issue, temp_fact, tau_issue, tau_fact, tau0_issue, tau0_fact)
         final_preds.append(harness.predict_sections_from_stage1(
-            issues, facts, row["pred_enums"]))
+            issues, facts, decode_enums(row["pred_enums"])))
     check = harness.score_predictions(gold_recs, final_preds)
     check.pop("rows", None)
     if (check["exact_count"] != current["exact"]

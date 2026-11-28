@@ -266,6 +266,7 @@ class ClassifierConfig:
     # encoded separately). See module docstring — the "~9x VRAM saving"
     # claim is UNVERIFIED (8.1x padded tokens, not proven VRAM).
     pooling: str = "one_pass"
+    pool_mode: str = "mean_ln"
     # Loss (FALLBACK-2 item 2, GPT-RERUN claim 2): "weighted_ce" is the
     # BASELINE (default), "focal_ce" the CHALLENGER. ASL is NOT an option:
     # it is a binary multi-label loss and does not fit 4 mutually exclusive
@@ -936,6 +937,7 @@ def build_model(config: ClassifierConfig | None = None):
             self.encoder = AutoModel.from_pretrained(cfg.backbone, config=hf_cfg)
             hidden = hf_cfg.hidden_size
             self.dropout = nn.Dropout(cfg.dropout)
+            self.pool_norm = nn.LayerNorm(hidden)
             if cfg.freeze_backbone:
                 for p in self.encoder.parameters():
                     p.requires_grad = False
@@ -965,7 +967,11 @@ def build_model(config: ClassifierConfig | None = None):
             return out.last_hidden_state  # [B, T, H]
 
         def _pooled(self, hidden, attention_mask):
-            # [CLS] pooling (position 0) — encoder is BERT-style.
+            if getattr(self.cfg, "pool_mode", "cls") == "mean_ln":
+                mask = attention_mask.unsqueeze(-1).to(hidden.dtype)
+                mean_vec = (hidden * mask).sum(dim=1) / mask.sum(dim=1).clamp_min(1.0)
+                return self.dropout(self.pool_norm(mean_vec))
+            # [CLS] pooling (position 0) — legacy fallback.
             return self.dropout(hidden[:, 0, :])
 
         def span_attention(self, hidden, attention_mask):
@@ -1015,6 +1021,8 @@ def build_model(config: ClassifierConfig | None = None):
                 cls_onehot[:, :, 0] = 1.0
                 weights = torch.where(bad.unsqueeze(-1), cls_onehot, weights)
             clause_vecs = torch.einsum("bct,bth->bch", weights, hidden)
+            if getattr(self.cfg, "pool_mode", "cls") == "mean_ln":
+                clause_vecs = self.pool_norm(clause_vecs)
             # Zero out padded slots (span (0,0)) so they carry no signal.
             padded = (ends <= starts)
             clause_vecs = clause_vecs.masked_fill(padded.unsqueeze(-1), 0.0)
@@ -1113,7 +1121,7 @@ def fuse_issue_probs(full_probs, clause_probs, clause_gate_logits,
     keep = valid & (~vetoed)
     clause_req = clause_probs[:, :, :, req]  # [B, C, 11]
     masked = clause_req.masked_fill(~keep.unsqueeze(-1), float("-inf"))
-    cmax_req, _ = masked.amax(dim=1)  # [B, 11]; -inf where no clause kept
+    cmax_req = masked.amax(dim=1)  # [B, 11]; -inf where no clause kept
     cmax_req = torch.where(
         torch.isfinite(cmax_req), cmax_req,
         torch.zeros_like(cmax_req),
@@ -1172,17 +1180,27 @@ def predict_text(model, tokenizer, text: str,
         clause_mask[0, :c] = clause_batch["attention_mask"]
         clause_token_tensor = None
     with torch.no_grad():
-        out = model(full["input_ids"], full["attention_mask"],
-                    clause_ids, clause_mask,
-                    clause_counts=torch.tensor([c]),
-                    clause_token_spans=clause_token_tensor)
+        try:
+            dev = next(model.parameters()).device
+        except (StopIteration, AttributeError):
+            dev = torch.device("cpu")
+        input_ids = full["input_ids"].to(dev)
+        attention_mask = full["attention_mask"].to(dev)
+        c_ids = clause_ids.to(dev) if clause_ids is not None else None
+        c_mask = clause_mask.to(dev) if clause_mask is not None else None
+        c_counts = torch.tensor([c], device=dev)
+        c_spans = clause_token_tensor.to(dev) if clause_token_tensor is not None else None
+        out = model(input_ids, attention_mask,
+                    c_ids, c_mask,
+                    clause_counts=c_counts,
+                    clause_token_spans=c_spans)
         issue_p = torch.softmax(
             out["issue_logits"] / max(cfg.temperature_issue, 1e-6), dim=-1)
         clause_p = torch.softmax(
             out["clause_issue_logits"] / max(cfg.temperature_issue, 1e-6), dim=-1)
         fused = fuse_issue_probs(
             issue_p, clause_p, out["clause_gate_logits"],
-            torch.tensor([c]), tau_neg=cfg.tau_neg,
+            c_counts, tau_neg=cfg.tau_neg,
             temperature=cfg.temperature_issue)
         fact_p = torch.softmax(
             out["fact_logits"] / max(cfg.temperature_fact, 1e-6), dim=-1)

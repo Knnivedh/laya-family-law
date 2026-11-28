@@ -23,7 +23,7 @@ KNOWN_SECTIONS = frozenset({
     "gwa-1890", "hmga-1956-s6", "welfare-principle", "hma-26",
     "hma-27", "bns-316",
     "pwdva-17", "pwdva-18", "pwdva-19", "pwdva-22",
-    "hma-13", "hma-13b", "hma-9",
+    "hma-13", "hma-13b", "hma-9", "hma-10", "sma-23",
     "births-deaths-act-1969",
 })
 
@@ -258,6 +258,21 @@ def _render_residence_and_dv(kept: set, facts: Dict[str, Any]) -> str:
             "caused by acts of domestic violence."
         )
     return _join_clauses(parts)
+
+
+def _render_judicial_separation(kept: set) -> str:
+    if "hma-10" in kept:
+        section = "Section 10 of the Hindu Marriage Act, 1955"
+    elif "sma-23" in kept:
+        section = "Section 23 of the Special Marriage Act, 1954"
+    else:
+        return ""
+    return (
+        f"{section} provides for judicial separation on specified statutory grounds. "
+        "If the court grants a decree, you can live apart while remaining married. "
+        "A family-law lawyer can check which grounds may apply to your facts and "
+        "whether the petition belongs in the local Family Court or District Court."
+    )
 
 
 def _render_divorce_and_restitution(kept: set, facts: Dict[str, Any]) -> Tuple[str, bool]:
@@ -518,7 +533,12 @@ def render_prose(rec: Dict[str, Any], facts: Optional[Dict[str, Any]] = None) ->
         ms = round((time.perf_counter() - t0) * 1000.0, 3)
         return {"prose": prose, "prose_render_ms": ms, "prose_template_version": TEMPLATE_VERSION, "unknown_ids": unknown_ids, "status": "ok"}
 
-    paras: List[str] = [INTRO_LINE]
+    separation = _render_judicial_separation(kept)
+    paras: List[str] = [(
+        "These are potential legal routes. A court decides whether the statutory "
+        "requirements are met based on the facts and evidence."
+        if separation else INTRO_LINE
+    )]
 
     p_maint = _render_maintenance(kept, facts)
     if p_maint:
@@ -536,6 +556,8 @@ def render_prose(rec: Dict[str, Any], facts: Optional[Dict[str, Any]] = None) ->
     if p_res:
         paras.append(p_res)
 
+    if separation:
+        paras.append(separation)
     p_div, div_failsafe = _render_divorce_and_restitution(kept, facts)
     if p_div:
         paras.append(p_div)
@@ -576,6 +598,8 @@ SECTION_PATTERNS = [
     (r"\bSection 13\b(?!B).{0,40}Hindu Marriage Act", "hma-13"),
     (r"\bSection 13B\b.{0,40}Hindu Marriage Act", "hma-13b"),
     (r"\bSection 9\b.{0,40}Hindu Marriage Act", "hma-9"),
+    (r"\bSection 10\b.{0,40}Hindu Marriage Act", "hma-10"),
+    (r"\bSection 23\b.{0,40}Special Marriage Act", "sma-23"),
     (r"\bSection 316\b.{0,40}Bharatiya Nyaya Sanhita", "bns-316"),
     (r"\bBNS\b.{0,10}s\.?\s*316\b", "bns-316"),
     (r"\bSection 6\b.{0,40}Hindu Minority and Guardianship Act", "hmga-1956-s6"),

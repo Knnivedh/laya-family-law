@@ -242,8 +242,9 @@ CLOSED_LATER = re.compile(
 )
 FUTURE_EVENT = re.compile(r"\b(?:scheduled|next (?:week|month|year)|tomorrow|will be|not yet)\b", re.I)
 ORDER_SOUGHT = re.compile(
-    r"\b(?:apply(?:ing)? for|ask(?:ing)? for|want|seek(?:ing)?)\b.{0,43}"
-    r"\border\s+(?:to be|that (?:will|would) be)\s+(?:issued|made|passed|granted)\b",
+    r"\b(?:(?:apply(?:ing)?|ask(?:ing)?|petition(?:ing)?)\s+for|want|need|seek(?:ing)?|request(?:ing)?|get(?:ting)?|start(?:ing)?)\b.{0,45}"
+    r"\b(?:(?:a|an|my\s+first|the\s+first)\s+(?:new\s+|fresh\s+)?(?:interim\s+)?(?:court\s+|bnss(?:\s+(?:s\.?|section)\s*144)?\s+)?(?:maintenance|support)\s+order\b"
+    r"|order\s+(?:to be|that (?:will|would) be)\s+(?:issued|made|passed|granted)\b)",
     re.I,
 )
 # S.O. 848(E) brought BNSS into force on 1 July 2024. Earlier dates need review.
@@ -431,6 +432,15 @@ def requested_procedural_actions(question: str, *, supervised=None) -> dict:
     has_support_order = bool(
         ORDER.search(masked) and (FAMILY_ORDER.search(masked) or BNSS.search(masked) and SECTION_144.search(masked))
     )
+    if has_support_order and ORDER_SOUGHT.search(masked):
+        stripped = ORDER_SOUGHT.sub(" ", masked)
+        has_support_order = any(
+            ORDER.search(masked[s:e])
+            and ORDER_ISSUED.search(masked[s:e])
+            and (FAMILY_ORDER.search(masked[s:e]) or (BNSS.search(masked[s:e]) and SECTION_144.search(masked[s:e])))
+            and not NO_ORDER.search(masked[s:e])
+            for s, e in _clause_ranges(stripped)
+        )
     evidence = {}
     for start, end in _clause_ranges(masked):
         boundaries = [start]

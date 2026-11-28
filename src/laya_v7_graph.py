@@ -54,6 +54,9 @@ MAGISTRATE_SECTIONS = frozenset({
 })
 REGISTRAR_SECTIONS = frozenset({"births-deaths-act-1969"})
 
+JUDICIAL_SEPARATION_FORUM = "Family Court or District Court (confirm local jurisdiction)"
+JUDICIAL_SEPARATION_SECTIONS = {"hma": "hma-10", "sma": "sma-23"}
+
 SECTION_FORUM_AUTHORITY = {
     **{s: ("Family Court", "FCA s.7(1)") for s in FAMILY_COURT_SECTIONS},
     "bnss-144": ("Magistrate", "BNSS s.144 / JMFC (note: FCA s.7(2)(a) where Family Court established)"),
@@ -64,6 +67,8 @@ SECTION_FORUM_AUTHORITY = {
     "bns-316": ("Magistrate", "BNSS Sch. I / BNS s.316 (civil property claim in Family Court FCA s.7 Expl.(c))"),
     **{s: ("Magistrate", "PWDVA s.27 / JMFC") for s in ("pwdva-17", "pwdva-18", "pwdva-19", "pwdva-20", "pwdva-22")},
     "births-deaths-act-1969": ("Registrar", "RBD Act 1969 ss.7-13"),
+    "hma-10": (JUDICIAL_SEPARATION_FORUM, "HMA s.19 / FCA ss.7–8"),
+    "sma-23": (JUDICIAL_SEPARATION_FORUM, "SMA s.31 / FCA ss.7–8"),
 }
 
 
@@ -181,7 +186,9 @@ def court_for_v7(kept_ids: list[str], in_scope: bool) -> tuple[list[str], str]:
             courts.add("Magistrate")
         if kept & REGISTRAR_SECTIONS:
             courts.add("Registrar")
-        order = ["Family Court", "Magistrate", "Registrar"]
+        if kept.intersection(JUDICIAL_SEPARATION_SECTIONS.values()):
+            courts.add(JUDICIAL_SEPARATION_FORUM)
+        order = ["Family Court", "Magistrate", "Registrar", JUDICIAL_SEPARATION_FORUM]
         return [c for c in order if c in courts], "kept"
     if not in_scope:
         return [], "out-of-scope"
@@ -517,8 +524,16 @@ def evaluate_stage2_v7(
                             handled_maint = True
                     if not handled_maint and money_fact:
                         _add_disp("bnss-144", "eligible", "subsistence_maintenance_bnss144")
-                        if sex != "male" and dom_rel and not child_only:
-                            _add_disp("pwdva-20", "eligible", "pwdva_s20_monetary_relief")
+                        # PWDVA s.20(1)(d) covers monetary relief for the aggrieved woman
+                        # as well as her children; only male claimants and direct child
+                        # self-claimants (role=="child") are excluded here.
+                        if sex != "male" and dom_rel and role != "child":
+                            if proved_true(facts, "pwdva_monetary_basis_blocked"):
+                                _add_disp("pwdva-20", "conditional", "pwdva_monetary_basis_needs_review",
+                                          ["domestic_violence_linked_monetary_loss"])
+                                gated_out.append("pwdva-20: gated (monetary relief basis needs review)")
+                            else:
+                                _add_disp("pwdva-20", "eligible", "pwdva_s20_monetary_relief")
 
     # --- 1b. Post-order enforcement sub-routes (v4.1: bnss-144-3 / bnss-146) ---
     # R-LANE08: before this lane, evaluate_stage2_v7 had NO disposition for
@@ -546,7 +561,12 @@ def evaluate_stage2_v7(
                       ["existing_order_statute_bnss144"])
             gated_out.append("bnss-146: gated (conditional only — EN prose template + BNSS-order statute check pending)")
 
-    # --- 2. Matrimonial slice (HMA 13, 13B, 9) ---
+    # --- 2. Matrimonial slice ---
+    separation_act = _as_str(facts, "judicial_separation_act", "")
+    separation_section = JUDICIAL_SEPARATION_SECTIONS.get(separation_act)
+    if separation_section and _wanted("judicial_separation") and js_only:
+        _add_disp(separation_section, "eligible", "potential_judicial_separation_requested")
+
     if (_wanted("divorce") or divorce_asked) and ("divorce" not in negated) and not js_only:
         if divorce_asked:
             if mutual_consent:
@@ -559,7 +579,8 @@ def evaluate_stage2_v7(
             _add_disp("hma-13", "conditional", "divorce_not_expressly_asked", ["divorce_asked"])
             gated_out.append("hma-13: gated (divorce not asked)")
 
-    if (_wanted("restitution") or restitution_asked) and not divorce_asked and ("restitution" not in negated):
+    if ((_wanted("restitution") or restitution_asked) and not divorce_asked
+            and "restitution" not in negated and not (separation_section and js_only)):
         _add_disp("hma-9", "eligible", "restitution_of_conjugal_rights")
 
     # --- 3. Custody slice (HMA 26 vs GWA 1890 + principles) ---

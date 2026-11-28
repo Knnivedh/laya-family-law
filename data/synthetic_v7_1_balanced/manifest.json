@@ -1,0 +1,27 @@
+{
+  "added_balanced_rows": 1082,
+  "added_by_lang": {
+    "en": 378,
+    "kn": 350,
+    "kn_roman": 354
+  },
+  "balanced_train_by_lang": {
+    "en": 3712,
+    "kn": 2150,
+    "kn_roman": 2222
+  },
+  "balanced_train_rows": 8084,
+  "grouped_dev_rows": 498,
+  "grouped_train_rows": 7002,
+  "overlap_vs_grouped_dev": {
+    "shared_blocks": 0,
+    "shared_ids": 0,
+    "shared_normalized_texts": 0
+  },
+  "seed": 7102,
+  "sha256": {
+    "balanced_train.jsonl": "cd4b7a5f83d766c39d94e1488e5a72a55fc6901dfe998bb576dcea70088371ef",
+    "grouped_dev.jsonl": "8051572d5696ed8793b5bd280a1d678cf2dcde191037fd30d26c393c28e14e4d",
+    "grouped_train.jsonl": "cc849a0944234cd9dbadf834f809a9a3fdeeeedd87da5e0ca0b77bd7b38db4d5"
+  }
+}

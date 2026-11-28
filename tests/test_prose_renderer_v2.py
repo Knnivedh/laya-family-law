@@ -156,7 +156,7 @@ def run_validation() -> dict:
         if exp_flag is not None:
             assert any(f["check"] == exp_flag for f in flags), f"Mutant {name} missed flag {exp_flag}: {flags}"
 
-    assert len(KNOWN_SECTIONS) == 18
+    assert len(KNOWN_SECTIONS) == 20 and {"hma-10", "sma-23"}.issubset(KNOWN_SECTIONS)
     return {
         "total_tested": len(gt16) + len(bank),
         "fp_total": 0,

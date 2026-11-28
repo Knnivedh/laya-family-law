@@ -1,11 +1,8 @@
 # LAYA — Indian Family-Law Classification System
 
-**Current checkout and chatbot pilot (2026-11-28).** Run `python -m src.laya_chat_api`
-for the local JSON endpoint. The v7.1 evidence backtest measured 261/500 exact
-on synthetic validation and 14/28 on Kaanoon. The chatbot has separate
-first-turn and follow-up checks. See the [integration guide and release
-criteria](docs/chatbot-integration.md) before connecting a user-facing chat.
-The v7 scores below are historical run results.
+**Current checkout, balanced MuRIL `auto` runtime & chatbot pilot (2026-11-28).** Run `python -m src.laya_chat_api --port 8765 --mode auto`
+for the local JSON endpoint (`124/124` unit tests passing, `61/61` Graph v4 contract inputs covered, `0` uncovered keys). With the balanced grouped corpus (`8,084` train / `498` block-disjoint `grouped_dev`, zero leakage) and `google/muril-base-cased` (`mean_ln` pooling, `models/v71-classifier/best/model.pt`), hybrid `mode="auto"` measured **418/498 (83.9%)** exact on disjoint `grouped_dev` (`KN 77.9%`, `kn_roman 78.9%`, `EN 90.0%`, up from `314/498 = 63.1%`), **227/230 (98.7%, micro-F1 `0.9939`, `0` FP, `13/16` Kannada `C13`)** on `Brutal-230`, **466/500 (93.2%)** on frozen `validation-500`, **14/16** on `16-Q`, and **14/28** on `Kaanoon-28` (`774` live HTTP `/v1/assess` requests with `0` HTTP errors, `369/500` Turn-1 validation exact vs `219/500` CPU evidence). Remaining legal-coverage gaps, official India Code verification notes, and full metrics are recorded in [`results/v71-muril-10x-report.md`](results/v71-muril-10x-report.md) and [`docs/statutory-gaps-government-sources.md`](docs/statutory-gaps-government-sources.md); see [integration guide and release criteria](docs/chatbot-integration.md) before connecting a user-facing chat.
+The historical `v7` / `v6` scores below are preserved reference results.
 
 > **A fully interconnected decision graph over the Laya language model that classifies
 > complex Indian family-law questions (in plain layman wording, English or Kannada)

@@ -11,6 +11,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from .laya_family_evidence import NO_ORDER, ORDER, ORDER_ISSUED
 from .laya_v7_schema import FactEvidence, IssueEvidence, TextSpan
 
 # Quote / hypothetical / third-party masking (never swallow English apostrophes like husband's / in-laws')
@@ -98,7 +99,7 @@ _CHILD_ONLY_CLAIM_RE = re.compile(
     re.I,
 )
 _CHILD_MENTION_RE = re.compile(
-    r"\b(?:child|children|kids|son|daughter|baby|toddler|infant|newborn|twins|minor|"
+    r"\b(?:child|children|kids|son|daughter|boy|girl|baby|toddler|infant|newborn|twins|minor|"
     r"(?:[1-9]|1[0-7])(?:\.\d+)?\s*-?\s*(?:yrs?|years?)\s*-?\s*old|(?:[1-9]|1[0-7])\s*years?\s*\d+\s*months?|(?:\d{1,2})\s*months?\s*old|"
     r"(?:six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen)-year-old)\b",
     re.I,
@@ -284,6 +285,12 @@ _EXISTING_ORDER_RE = re.compile(
     r"pays\s+the\s+ordered\s+amount|order\s+(?:made|passed|issued|granted)\s+under|already\s+have\s+an\s+order|under\s+(?:my|our)\s+(?:bnss|crpc|hma).{0,25}order)\b",
     re.I,
 )
+_PROSPECTIVE_MAINTENANCE_ORDER_RE = re.compile(
+    r"\b(?:want|need|would\s+like|apply(?:ing)?\s+for|ask(?:ing)?\s+for|"
+    r"seek(?:ing)?|request(?:ing)?|get(?:ting)?)\s+"
+    r"(?:a|an|my\s+first|the\s+first)\s+(?:new\s+)?(?:interim\s+)?(?:maintenance|support)\s+order\b",
+    re.I,
+)
 _ARREARS_VARY_RE = re.compile(
     r"\b(?:arrears|unpaid(?:\s+amount)?|missed|skipped|overdue|defaulted|shortfall|stopped\s+paying|paid\s+(?:nothing|only)|"
     r"has\s+not\s+paid\s+(?:the\s+)?maintenance|has\s+not\s+paid\b|not\s+paid\s+since\b|not\s+paying\s+(?:the\s+)?maintenance|irregularly|enforce(?:\s+it)?|"
@@ -400,6 +407,50 @@ _VIOLENCE_NEG_MASK_RE = re.compile(
     r"no\s+(?:violence|physical\s+harm|abuse)|has\s+never\s+hit|"
     r"(?:nobody|no\s+one|no-one)\s+(?:has\s+|have\s+)?(?:ever\s+)?(?:hit|beat(?:en)?|slapped|abused|threatened|harassed|hurt|touched)\s+(?:me|us|him|her|them)?|"
     r"(?:has\s+not|hasn['’]t|have\s+not|haven['’]t)\s+(?:ever\s+)?(?:hit|beat(?:en)?|slapped|abused|threatened|harassed|hurt|touched))\b",
+    re.I,
+)
+# These anchors distinguish evidence for withholding an automatic §20 route
+# from legal eligibility. In particular, living apart now does not rule out a
+# past domestic relationship or a right to reside (Prabha Tyagi, paras 58–62).
+_PWDVA_BROAD_DENIAL_RE = re.compile(
+    r"\b(?:no\s+(?:domestic\s+)?(?:violence|abuse)|"
+    r"never\s+(?:committed|experienced|suffered)\s+(?:any\s+)?(?:domestic\s+)?(?:violence|abuse))"
+    r"\b(?!\s+(?:complaint|order|report|claim|charge|case|allegation|petition)s?\b)",
+    re.I,
+)
+_PWDVA_SCOPED_DENIAL_RE = re.compile(
+    r"\bno\s+(?:physical|sexual|verbal|emotional|economic|financial)\s+(?:violence|abuse)"
+    r"\b(?!\s+(?:complaint|order|report|claim|charge|case|allegation|petition)s?\b)",
+    re.I,
+)
+_PWDVA_THREAT_DENIAL_RE = re.compile(
+    r"\b(?:never|(?:has|have|did)\s+not|hasn['’]t|haven['’]t|didn['’]t)\s+"
+    r"(?:ever\s+)?threatened?\s+to\s+(?:kill|harm|hurt)\s+(?:me|us|him|her|them)\b",
+    re.I,
+)
+_NEVER_COHABITED = (
+    r"we(?:\s+(?:have|had)|['’]ve)?\s+never\s+"
+    r"(?:lived\s+together|shared\s+(?:(?:a|the|our)\s+)?(?:home|household))"
+)
+_PWDVA_NEVER_SHARED_RE = re.compile(r"\b" + _NEVER_COHABITED + r"\b", re.I)
+_PWDVA_UNMARRIED_RE = re.compile(
+    r"\b(?:" + _NEVER_COHABITED + r"\s+(?:or\s+|and\s+never\s+)(?:got\s+)?married|"
+    r"we(?:\s+(?:have|had)|['’]ve)?\s+never\s+(?:(?:been|got)\s+)?married|"
+    r"we\s+were\s+never\s+married)\b",
+    re.I,
+)
+_PWDVA_PAST_SHARED_RE = re.compile(
+    r"\bwe\s+(?:(?:had|previously|once)\s+)?(?:lived\s+together|"
+    r"used\s+to\s+live\s+together|were\s+living\s+together|"
+    r"shared\s+(?:a|the|our)\s+(?:home|household))\b",
+    re.I,
+)
+_PWDVA_ECONOMIC_CONTROL_RE = re.compile(
+    r"\b(?:he|she|they|my\s+(?:husband|wife|spouse|partner))\s+(?:has\s+)?"
+    r"(?:tak(?:es?|ing|en)|took|seiz(?:es?|ed))\s+(?:all\s+)?my\s+(?:wages|salary)\b|"
+    r"\b(?:he|she|they|my\s+(?:husband|wife|spouse|partner))\s+(?:has\s+)?"
+    r"(?:stop(?:s|ped)?|prevent(?:s|ed)?|block(?:s|ed)?)\s+me\s+from\s+"
+    r"accessing\s+(?:my|our|the\s+joint)\s+(?:bank\s+account|money)\b",
     re.I,
 )
 # Negated-lockout mask (same nobody/has-not shapes, lockout verbs): a denial
@@ -588,7 +639,81 @@ def _split_non_hypothetical_clauses(masked: str) -> tuple[list[str], bool]:
     return active, False
 
 
-def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is_kannada_orig: bool = False, raw_kannada: str = "") -> dict[str, Any]:
+_SEPARATION_TERM = r"(?:judicial|court[- ]ordered)\s+separation\b"
+_DIRECT_SEPARATION_PREFIX = r"^\s*(?:(?:actually|also|please|so|now|instead|to\s+be\s+clear)[,:]?\s+)?"
+_SEPARATION_ACTION = (
+    r"(?:to\s+(?:apply\s+for|ask\s+for|file\s+for|seek|get|request|obtain)\s+)?"
+    r"(?:(?:a|the)\s+(?:(?:decree|order|petition)\s+(?:for|of)\s+)?)?"
+)
+_SEPARATION_REQUEST_RE = re.compile(
+    _DIRECT_SEPARATION_PREFIX
+    + r"(?:"
+    r"(?:I|we)\s+(?:want|need|seek|would\s+like|am\s+seeking|are\s+seeking|am\s+requesting)\s+"
+    + _SEPARATION_ACTION
+    + r"|(?:how\s+)?(?:can|may|should|could|do)\s+(?:I|we)\s+"
+    r"(?:apply\s+for|ask\s+for|file\s+for|seek|get|request|obtain)\s+"
+    + _SEPARATION_ACTION
+    + r")" + _SEPARATION_TERM,
+    re.I,
+)
+_SEPARATION_LAY_ACTION = (
+    r"(?:to\s+(?:live\s+(?:apart|separately)|stay\s+apart)\s+(?:under|with)\s+a\s+court\s+order"
+    r"|a\s+court\s+order\s+to\s+(?:live\s+(?:apart|separately)|stay\s+apart))\s+"
+    r"(?:without\s+(?:ending|dissolving)\s+(?:(?:my|our|the)\s+)?marriage|"
+    r"while\s+(?:remaining|staying)\s+married)\b"
+)
+_SEPARATION_LAY_RE = re.compile(
+    _DIRECT_SEPARATION_PREFIX
+    + r"(?:I|we)\s+(?:want|would\s+like)\s+"
+    + _SEPARATION_LAY_ACTION,
+    re.I,
+)
+_SEPARATION_RETRACTION_RE = re.compile(
+    _DIRECT_SEPARATION_PREFIX + r"(?:I|we)\s+"
+    r"(?:(?:(?:do\s+not|don['’]t)\s+(?:want|need|seek)|no\s+longer\s+(?:want|need|seek))\s+"
+    r"(?:" + _SEPARATION_ACTION + _SEPARATION_TERM + "|" + _SEPARATION_LAY_ACTION
+    + r")|(?:changed\s+(?:my|our)\s+mind\s+about|withdraw\s+(?:my|our)\s+request\s+for)\s+"
+    + _SEPARATION_TERM + r")",
+    re.I,
+)
+_SEPARATION_ALTERNATIVES_RE = re.compile(
+    _SEPARATION_TERM + r"\s+(?:or|and)\s+(?:a\s+)?divorce\b",
+    re.I,
+)
+_SEPARATION_UNCERTAINTY_RE = re.compile(
+    _DIRECT_SEPARATION_PREFIX
+    + r"(?:I|we)\s+(?:(?:am|are)\s+not\s+sure|(?:do\s+not|don['’]t)\s+know)"
+    r"\s+(?:if|whether)\s+(?:I|we)\s+(?:want|need|should\s+(?:get|seek|file\s+for))\s+"
+    + _SEPARATION_TERM,
+    re.I,
+)
+
+
+def judicial_separation_intent(text: str) -> str | None:
+    """Read personal petition intent. A mere mention does not create a route."""
+    clauses, all_non_personal = _split_non_hypothetical_clauses(_mask_quotes_and_noise(text))
+    if all_non_personal:
+        return None
+    requests = [clause for clause in clauses
+                if _SEPARATION_REQUEST_RE.search(clause) or _SEPARATION_LAY_RE.search(clause)]
+    retracts = any(_SEPARATION_RETRACTION_RE.search(clause) for clause in clauses)
+    if any(_SEPARATION_UNCERTAINTY_RE.search(clause) for clause in clauses):
+        return "uncertain"
+    if requests:
+        if retracts or any(_SEPARATION_ALTERNATIVES_RE.search(clause) for clause in requests):
+            return "uncertain"
+        return "requested"
+    return "denied" if retracts else None
+
+
+def extract_grounded_v7(
+    raw_text: str,
+    *,
+    translated_text: str | None = None,
+    is_kannada_orig: bool = False,
+    raw_kannada: str = "",
+    strict_pwdva: bool = False,
+) -> dict[str, Any]:
     """Derive strictly grounded FactEvidence & IssueEvidence from question text.
 
     Never reads IDs or ground truth. Produces explicit three-state facts with
@@ -685,13 +810,22 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
     child_neg = bool(_CHILD_UNRELATED_NEG_RE.search(active_text))
     minor_child_st = "denied" if (is_adult_child or child_neg) else ("supported" if bool(_MINOR_CHILD_AGE_RE.search(active_text)) or (has_child_mention and not is_adult_child) else "unknown")
 
-    # "only" + school-fees ask + a child mentioned anywhere in the question
-    # ("Today I only want help with school fees support", son named in the
-    # previous sentence): the only thing asked for is the child's schooling.
-    # Applied here, after the child-mention variables exist, under the same
-    # "for myself" exclusion as the main child-only rule.
+    # "only" attached specifically to school-fees / child-expense support
+    # ("Today I only want help with school fees", "I only want the fees,
+    # nothing else") — avoid matching unrelated "only" like "stay only with me"
+    # or "earn only 8,000".
     school_fees_only = (
-        bool(re.search(r"\bonly\b", active_text, re.I))
+        bool(
+            re.search(
+                r"\b(?:only\s+(?:want|need|ask(?:ing)?|seek(?:ing)?)\s+(?:for\s+)?(?:the\s+|my\s+|our\s+)?"
+                r"(?:(?:child|son|daughter|children)(?:'s)?\s+)?(?:school|tuition|education)?\s*(?:fees?|expenses?|support)\b|"
+                r"only\s+(?:the\s+)?(?:school\s+)?fees?\b|(?:school|tuition|education)\s*(?:fees?|expenses?)\s+only|"
+                r"only\s+(?:want|need)\s+(?:monthly\s+)?support\s+for\s+(?:my|our)\s+(?:child|children|son|daughter)(?:'s)?\s+(?:education|schooling|fees?)|"
+                r"only\s+for\s+(?:my|our|the|his|her)\s+(?:child|children|son|daughter)(?:'s)?\s+(?:school|tuition|education|fees?))\b",
+                active_text,
+                re.I,
+            )
+        )
         and bool(_SCHOOL_FEES_RE.search(active_text))
         and has_child_mention
     )
@@ -739,6 +873,36 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
     divorce_neg = bool(_DIVORCE_NEG_RE.search(active_text))
     mutual_consent = bool(_MUTUAL_CONSENT_RE.search(active_text)) and not bool(_MUTUAL_NEG_RE.search(active_text))
     restitution_raw = bool(_RESTITUTION_RE.search(active_text))
+    # Disambiguate child-return ("Our little boy... barred from meeting him.
+    # I am asking for him to come back and live with me.") from spousal
+    # restitution (HMA s.9). Without an explicit spouse/marital cohabitation
+    # cue, a "him/her to come back" ask paired with minor-child access denial
+    # is child custody (GWA 1890), NOT restitution of conjugal rights.
+    explicit_spouse_restitution = bool(
+        re.search(
+            r"\b(?:restitution\s+of\s+conjugal\s+rights|as\s+husband\s+and\s+wife|"
+            r"restore\s+marital\s+cohabitation|"
+            r"(?:husband|wife|spouse)\s+(?:to\s+(?:return|come\s+back)|back\s+home))\b",
+            active_text,
+            re.I,
+        )
+    )
+    child_return_mask = (
+        restitution_raw
+        and not explicit_spouse_restitution
+        and has_child_mention
+        and bool(
+            re.search(
+                r"\b(?:barred\s+from\s+meeting|not\s+let\s+me\s+(?:see|meet)|"
+                r"moved\b[^.!?;]{0,30}\b(?:to|into)\s+(?:his|her|their)\s+parents|took\s+(?:the\s+|my\s+|our\s+)?(?:boy|girl|son|daughter|child|kids)|"
+                r"asking\s+for\s+(?:him|her|them)\s+to\s+come\s+back)\b",
+                active_text,
+                re.I,
+            )
+        )
+    )
+    if child_return_mask:
+        restitution_raw = False
     # "One moment I want to end the marriage, the next moment I want my
     # husband back" states both intents: divorce is uncertain, restitution
     # requested — so a conflict marker plus a restitution ask suppresses
@@ -751,8 +915,19 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
     maint_neg = bool(_MAINT_NEG_RE.search(active_text))
     money_fact = bool(_MAINT_CLAIM_RE.search(active_text)) and not maint_neg
     lump_sum = bool(_LUMP_SUM_RE.search(active_text)) and not maint_neg
+    prospective_only = False
+    if strict_pwdva and _PROSPECTIVE_MAINTENANCE_ORDER_RE.search(active_text):
+        # An application for a new order may accompany an issued order. Check
+        # for separate evidence of the latter after removing the request.
+        remaining = [_PROSPECTIVE_MAINTENANCE_ORDER_RE.sub(" ", clause) for clause in clauses]
+        prospective_only = not any(
+            ORDER.search(clause) and ORDER_ISSUED.search(clause)
+            and _EXISTING_ORDER_RE.search(clause) and not NO_ORDER.search(clause)
+            for clause in remaining
+        )
     existing_order = (
-        bool(_EXISTING_ORDER_RE.search(active_text))
+        not prospective_only
+        and bool(_EXISTING_ORDER_RE.search(active_text))
         and bool(_ARREARS_VARY_RE.search(active_text))
         and (not bool(_ENHANCE_COST_RE.search(active_text)) or bool(_ORDER_REVISE_RE.search(active_text)))
     )
@@ -761,7 +936,7 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
         decree = True
         lump_sum = True
     interim_only_ord = bool(re.search(r"\binterim\s+maintenance\b.{0,40}\b(?:fixed|till\s+the\s+divorce\s+ends|only\s+till)\b", active_text, re.I))
-    if interim_only_ord:
+    if interim_only_ord and not prospective_only:
         pending_hma = True
         existing_order = True
     interim_while_pending = (
@@ -796,7 +971,13 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
     if bool(_RESIDENCE_COLOC_ALLOW_RE.search(active_text)):
         residence_claim = True
 
-    vio_text = _VIOLENCE_NEG_MASK_RE.sub(" ", active_text)
+    broad_harm_denial = strict_pwdva and bool(_PWDVA_BROAD_DENIAL_RE.search(active_text))
+    harm_scan = active_text
+    if strict_pwdva:
+        harm_scan = _PWDVA_BROAD_DENIAL_RE.sub(" ", harm_scan)
+        harm_scan = _PWDVA_SCOPED_DENIAL_RE.sub(" ", harm_scan)
+        harm_scan = _PWDVA_THREAT_DENIAL_RE.sub(" ", harm_scan)
+    vio_text = _VIOLENCE_NEG_MASK_RE.sub(" ", harm_scan)
     violence = bool(_VIOLENCE_RE.search(vio_text))
     coercive_lockout = bool(_COERCIVE_LOCKOUT_RE.search(lockout_text)) and not res_neg
     explicit_res_only = bool(_EXPLICIT_RES_ONLY_RE.search(active_text)) and not violence
@@ -846,7 +1027,7 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
     stridhan_held_by_inlaws_refused = bool(stridhan_item and _STRIDHAN_INLAWS_REFUSED_RE.search(active_text))
     # Imminent-danger language, plus the existing child-safety signal (the
     # graph already treats child_safety_risk as a safety trigger).
-    urgent_safety_risk = bool(_URGENT_SAFETY_RE.search(active_text)) or child_safety_risk
+    urgent_safety_risk = bool(_URGENT_SAFETY_RE.search(harm_scan)) or child_safety_risk
     other_live = (
         money_fact or custody_claim or residence_claim or violence
         or stridhan_claim or divorce_asked or birth_cert or dv_injury_comp
@@ -939,6 +1120,25 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
         "no_dispute_empty": _fact("no_dispute_empty", "supported" if no_dispute_empty else "denied", no_dispute_empty),
     }
 
+    if strict_pwdva and not all_hyp_or_3p:
+        # Treat concrete harm as reason to retain consideration of the route,
+        # including economic control without a trigger for urgent danger.
+        affirmative_harm = (
+            violence or coercive_lockout or urgent_safety_risk
+            or bool(_PWDVA_ECONOMIC_CONTROL_RE.search(harm_scan))
+        )
+        never_shared_or_married = (
+            not residence_claim
+            and bool(_PWDVA_NEVER_SHARED_RE.search(active_text))
+            and bool(_PWDVA_UNMARRIED_RE.search(active_text))
+            and not _PWDVA_PAST_SHARED_RE.search(active_text)
+        )
+        blocker = "pwdva_monetary_basis_blocked"
+        if affirmative_harm:
+            facts[blocker] = _fact(blocker, "denied", False)
+        elif broad_harm_denial or never_shared_or_married:
+            facts[blocker] = _fact(blocker, "supported", True)
+
     negated_issues: set[str] = set()
     if divorce_neg:
         negated_issues.add("divorce")
@@ -952,7 +1152,9 @@ def extract_grounded_v7(raw_text: str, *, translated_text: str | None = None, is
         negated_issues.add("stridhan")
     if stridhan_neg:
         negated_issues.add("stridhan")
-    if _VIOLENCE_NEG_MASK_RE.search(active_text) and not violence:
+    if (broad_harm_denial or _VIOLENCE_NEG_MASK_RE.search(active_text)) and not (
+        violence or (strict_pwdva and (coercive_lockout or urgent_safety_risk))
+    ):
         negated_issues.add("violence")
 
     issues: dict[str, IssueEvidence] = {}

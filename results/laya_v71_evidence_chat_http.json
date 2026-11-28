@@ -1,0 +1,84 @@
+{
+  "validation": {
+    "questions": 500,
+    "exact_provision_set": 219,
+    "exact_with_assessment_or_urgent_status": 129,
+    "answers_returned": 155,
+    "exact_with_answer": 133,
+    "micro_tp_fp_fn": [
+      303,
+      40,
+      459
+    ],
+    "status_counts": {
+      "needs_review": 282,
+      "urgent": 44,
+      "assessment": 108,
+      "needs_clarification": 51,
+      "out_of_scope": 15
+    },
+    "p50_ms": 15.81,
+    "p95_ms": 29.6
+  },
+  "kaanoon": {
+    "questions": 28,
+    "exact_provision_set": 10,
+    "exact_with_assessment_or_urgent_status": 5,
+    "answers_returned": 11,
+    "exact_with_answer": 5,
+    "micro_tp_fp_fn": [
+      10,
+      8,
+      19
+    ],
+    "status_counts": {
+      "needs_clarification": 6,
+      "urgent": 6,
+      "assessment": 6,
+      "needs_review": 10
+    },
+    "p50_ms": 24.42,
+    "p95_ms": 36.45
+  },
+  "16q": {
+    "questions": 16,
+    "exact_provision_set": 13,
+    "exact_with_assessment_or_urgent_status": 12,
+    "answers_returned": 13,
+    "exact_with_answer": 12,
+    "micro_tp_fp_fn": [
+      40,
+      0,
+      5
+    ],
+    "status_counts": {
+      "urgent": 5,
+      "assessment": 9,
+      "out_of_scope": 1,
+      "needs_clarification": 1
+    },
+    "p50_ms": 16.18,
+    "p95_ms": 28.67
+  },
+  "brutal": {
+    "questions": 230,
+    "exact_provision_set": 169,
+    "exact_with_assessment_or_urgent_status": 132,
+    "answers_returned": 151,
+    "exact_with_answer": 151,
+    "micro_tp_fp_fn": [
+      334,
+      0,
+      81
+    ],
+    "status_counts": {
+      "needs_clarification": 62,
+      "urgent": 31,
+      "assessment": 105,
+      "needs_review": 21,
+      "out_of_scope": 11
+    },
+    "p50_ms": 15.94,
+    "p95_ms": 29.47
+  }
+}
