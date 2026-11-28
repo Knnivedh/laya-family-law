@@ -58,8 +58,8 @@ Checkpoint layout (contract C2, owned by Lane B)
 -------------------------------------------------
 ``models/v71-classifier/best/model.pt`` + ``config.json`` + ``thresholds.json``
 in the same directory. ``load_checkpoint`` reads the config from inside
-``model.pt``; per-head thresholds from ``thresholds.json`` are consumed by
-Lane B's calibration/predict path, not re-implemented here. ``--checkpoint``
+``model.pt``. When present, ``thresholds.json`` supplies temperatures and
+the classifier's per-head neutral fallback policy. ``--checkpoint``
 accepts a ``model.pt`` file or a directory (``.../best`` or
 ``.../v71-classifier`` — ``best/model.pt`` is appended as needed).
 
@@ -72,7 +72,9 @@ activates the classifier path unchanged.
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
+import math
 import sys
 from pathlib import Path
 from time import perf_counter
@@ -87,7 +89,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from src.laya_lang_normalizer import detect_script_locale  # noqa: E402
-from src.laya_prose_v2 import render_prose  # noqa: E402
+from src.laya_prose_v2 import prose_forbidden_check, render_prose  # noqa: E402
 from src.laya_v7_extractor import extract_v7  # noqa: E402
 from src.laya_v7_graph import evaluate_stage2_v7  # noqa: E402
 from src.laya_v7_schema import FactEvidence, IssueEvidence  # noqa: E402
@@ -168,6 +170,35 @@ def _load_classifier(checkpoint_path: Path) -> tuple[Any, Any, Any]:
     tokenizer = AutoTokenizer.from_pretrained(cfg.backbone)
     _CLASSIFIER_CACHE[key] = (model, tokenizer, cfg)
     return model, tokenizer, cfg
+
+
+def _predict_classifier(text: str, checkpoint_path: Path) -> dict[str, Any]:
+    from src.laya_v7_classifier import decode_with_thresholds, predict_text
+
+    model, tokenizer, cfg = _load_classifier(checkpoint_path)
+    calibration_path = checkpoint_path.with_name("thresholds.json")
+    if not calibration_path.is_file():
+        return predict_text(model, tokenizer, text, cfg)
+
+    calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
+    temperatures = {
+        key: float(calibration.get(key, getattr(cfg, key)))
+        for key in ("temperature_issue", "temperature_fact")
+    }
+    if any(not math.isfinite(value) or value <= 0 for value in temperatures.values()):
+        raise ValueError("Calibration temperatures must be finite and positive.")
+    pred = predict_text(model, tokenizer, text, replace(cfg, **temperatures))
+    decoded = decode_with_thresholds(
+        {name: item["probs"] for name, item in pred["issues"].items()},
+        {name: item["probs"] for name, item in pred["facts"].items()},
+        calibration,
+    )
+    for group, key in (("issues", "intent"), ("facts", "state")):
+        for name, label in decoded[group].items():
+            item = pred[group][name]
+            item[key] = label
+            item["confidence"] = item["probs"].get(label, 0.0)
+    return pred
 
 
 def _classifier_to_stage1(pred: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -350,7 +381,8 @@ def run_question(
     Keys: question, language, extractor ("classifier" | "rule_based"),
     checkpoint (path or None), fallback_reason (None or str), issues, facts,
     enums, sections (sorted list), court, escalations (list of kind strings,
-    in Graph v4's canonical order), prose (str or None), latency_ms.
+    in Graph v4's canonical order), prose (str or None), latency_ms, plus
+    route_trace and error for evaluation.
 
     Raises FileNotFoundError in mode="classifier" when no checkpoint exists,
     and RuntimeError when a checkpoint exists but cannot be loaded (e.g. no
@@ -382,11 +414,8 @@ def run_question(
                 "run the Colab notebook first or use --mode rule-based"
             )
         try:
-            from src.laya_v7_classifier import predict_text
-
-            model, tokenizer, cfg = _load_classifier(resolved)
-            pred = predict_text(model, tokenizer, question, cfg)
-        except RuntimeError as exc:
+            pred = _predict_classifier(question, resolved)
+        except (RuntimeError, OSError, ValueError, TypeError, AttributeError) as exc:
             raise RuntimeError(
                 f"classifier checkpoint exists at {resolved} but cannot run "
                 f"here: {exc}"
@@ -396,10 +425,7 @@ def run_question(
         checkpoint_str = str(resolved)
     elif mode_norm == "auto" and resolved.is_file():
         try:
-            from src.laya_v7_classifier import predict_text
-
-            model, tokenizer, cfg = _load_classifier(resolved)
-            pred = predict_text(model, tokenizer, question, cfg)
+            pred = _predict_classifier(question, resolved)
             issues, facts, enums = _classifier_to_stage1(pred)
             extractor = "classifier"
             checkpoint_str = str(resolved)
@@ -428,11 +454,26 @@ def run_question(
         "escalations_typed": decision["escalations_typed"],
         "escalation_kinds": decision["escalation_kinds"],
     }
+    route_trace = {
+        "kept_ids": decision["kept_ids"],
+        "candidates_before_gate": decision["candidates_before_gate"],
+        "dispositions": decision["dispositions"],
+        "gated_out": decision["gated_out"],
+    }
+    error = None
     try:
         prose_out = render_prose(prose_rec, decision["facts"])
         prose: str | None = prose_out["prose"]
+        hits, flags = prose_forbidden_check(
+            prose, decision["kept_ids"], decision["gated_out"], decision["facts"],
+        )
+        route_trace.update(prose_fp_hits=hits, prose_quality_flags=flags)
+        if prose_out.get("status") != "ok" or hits:
+            prose = None
+            error = "prose_validation_error"
     except Exception:
         prose = None
+        error = "prose_validation_error"
 
     latency_ms = round((perf_counter() - t0) * 1000.0, 1)
     return {
@@ -448,6 +489,8 @@ def run_question(
         "court": list(decision["court_live"]),
         "escalations": list(decision["escalation_kinds"]),
         "prose": prose,
+        "route_trace": route_trace,
+        "error": error,
         "latency_ms": latency_ms,
     }
 

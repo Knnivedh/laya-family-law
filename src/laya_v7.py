@@ -62,7 +62,7 @@ def assess_v7(
     mode: str = "auto",
     device: str = "cuda",
     custody_vocab: str = "v3_bundled",
-    kannada_strategy: str = "nllb_then_en",
+    kannada_strategy: str = "native_laya",
     with_prose: bool = True,
 ) -> dict[str, Any]:
     """Run LAYA v7 end-to-end strictly from production inputs (question, locale, confirmations)."""
@@ -123,7 +123,7 @@ def assess_v7_batch(
     mode: str = "auto",
     device: str = "cuda",
     custody_vocab: str = "v3_bundled",
-    kannada_strategy: str = "nllb_then_en",
+    kannada_strategy: str = "native_laya",
     with_prose: bool = True,
     batch_size: int = 16,
 ) -> tuple[list[dict[str, Any]], float]:

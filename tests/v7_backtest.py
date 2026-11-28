@@ -196,7 +196,9 @@ def compute_fb(rec: dict[str, Any]) -> dict[str, Any]:
     candidates: list[str] | None = None
     fb_source = ""
     fb_measured = False
-    if isinstance(rec.get("candidates_before_gate"), list) and rec.get("candidates_before_gate"):
+    if isinstance(rec.get("candidates_before_gate"), list) and (
+        rec["candidates_before_gate"] or not kept
+    ):
         candidates = list(rec["candidates_before_gate"])
         fb_source = "candidates_before_gate"
         fb_measured = True
@@ -337,6 +339,7 @@ def score_dataset(
     *,
     mode: str,
     device: str,
+    kannada_strategy: str = "native_laya",
     project_custody: bool = False,
     legacy_16q_compat: bool = False,
     print_misses: int = 0,
@@ -358,6 +361,7 @@ def score_dataset(
         confirmations_list=[item.get("confirmations") for item in items],
         mode=mode,
         device=device,
+        kannada_strategy=kannada_strategy,
         custody_vocab="statutory_primary" if project_custody else "v3_bundled",
         with_prose=True,
         batch_size=16,
@@ -780,6 +784,9 @@ def main() -> int:
     parser.add_argument("--suite", choices=("16q", "brutal", "both", "all_with_sealed"), default="both")
     parser.add_argument("--mode", choices=("auto", "laya", "structured", "evidence"), default="laya")
     parser.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
+    parser.add_argument("--kannada-strategy", choices=("native_laya", "nllb_then_en"),
+                        default="native_laya",
+                        help="nllb_then_en opts into the noncommercial research translator.")
     parser.add_argument("--misses", type=int, default=20)
     parser.add_argument("--strict", action="store_true",
                         help="Fail loudly unless Brutal-230 esc_kinds_strict >= 200/230 and per_cat_min >= 0.75.")
@@ -816,6 +823,7 @@ def main() -> int:
             _load_16q(),
             mode=args.mode,
             device=args.device,
+            kannada_strategy=args.kannada_strategy,
             project_custody=False,
             legacy_16q_compat=True,
             print_misses=args.misses,
@@ -831,6 +839,7 @@ def main() -> int:
             _load_brutal(),
             mode=args.mode,
             device=args.device,
+            kannada_strategy=args.kannada_strategy,
             project_custody=True,
             print_misses=args.misses,
             g12_verified=args.g12_verified,
@@ -845,6 +854,7 @@ def main() -> int:
             _load_sealed(SEALED_FRESH_PATH),
             mode=args.mode,
             device=args.device,
+            kannada_strategy=args.kannada_strategy,
             project_custody=False,
             print_misses=0,
             blind_text=True,
@@ -860,6 +870,7 @@ def main() -> int:
             _load_sealed(SEALED_KN_PATH),
             mode=args.mode,
             device=args.device,
+            kannada_strategy=args.kannada_strategy,
             project_custody=False,
             print_misses=0,
             blind_text=True,

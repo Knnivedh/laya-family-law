@@ -73,6 +73,7 @@ LEGACY_SOURCE_MAP: dict[str, ProvenanceSource] = {
     "user_text": "user_text_verified_span",
     "user_text_verified_span": "user_text_verified_span",
     "translated": "translated_verified_span",
+    "translated_text": "translated_verified_span",
     "translated_verified_span": "translated_verified_span",
     "model": "model_calibrated_high",
     "model_calibrated_high": "model_calibrated_high",
@@ -203,7 +204,6 @@ KNOWN_FACT_KEYS: tuple[str, ...] = (
 #: as proceeding_pending_hma, decree, demand_made) update the fact only.
 FACT_KEY_TO_ISSUE: dict[str, str] = {
     "divorce_asked": "divorce",
-    "mutual_consent": "divorce",
     "restitution_asked": "restitution",
     "money_fact": "maintenance",
     "custody_claim": "custody",

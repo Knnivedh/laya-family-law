@@ -1,5 +1,12 @@
 # LAYA — Indian Family-Law Classification System
 
+**Current checkout and chatbot pilot (2026-11-28).** Run `python -m src.laya_chat_api`
+for the local JSON endpoint. The v7.1 evidence backtest measured 261/500 exact
+on synthetic validation and 14/28 on Kaanoon. The chatbot has separate
+first-turn and follow-up checks. See the [integration guide and release
+criteria](docs/chatbot-integration.md) before connecting a user-facing chat.
+The v7 scores below are historical run results.
+
 > **A fully interconnected decision graph over the Laya language model that classifies
 > complex Indian family-law questions (in plain layman wording, English or Kannada)
 > into the exact article / section set that applies — in a fraction of a second

@@ -47,20 +47,10 @@ no harness change needed — and the stand-in path goes dead. The stand-in
 cannot do classifier mode (no torch, no checkpoint on this VM): it exits 2
 and points at Colab/RTX.
 
-Known C1 interface gap (flagged to the coordinator, not worked around
-silently): the C1 output dict carries no pre-gate candidates and no
-``gated_out``, so genuine Fb measurement is NOT possible through the C1
-output alone, and Fp item 7's dropped half (prose cites a section Stage 2
-dropped) is unmeasurable — the real-runtime Fp is a lower bound. Fp
-items 1-6, 8, 9 and item 7's cited-not-kept half ARE checkable from the
-prose + kept sections + the C1 ``facts`` dict (verified against the
-pipeline's own check on H5). Through the stand-in, Fb/Fp ARE measured
-genuinely from the underlying ``assess_v7_batch`` record (``compute_fb`` /
-``prose_fp_hits``). Through the real runtime, Fb is reported UNMEASURED
-and the 16-Q rating is computed with the Fb term omitted and flagged as
-a provisional upper bound. If Lane C later exposes
-``candidates_before_gate`` / ``gated_out`` on the C1 dict, the harness
-picks them up with no other change (see ``_fb_fp_for_row``).
+Current C1 results include ``route_trace`` with pre-gate candidates,
+dispositions, dropped routes and prose check results. This supports the
+same Fb/Fp measurements as the stand-in. Older C1 records without this
+trace have unmeasured Fb and a partial Fp check.
 
 Modes
 -----
@@ -560,10 +550,10 @@ def _run_questions(
 def _fb_fp_for_row(out: dict[str, Any]) -> tuple[int | None, bool, list, int | None, bool]:
     """Return (fb_count, fb_measured, fb_details, fp_count, fp_measured).
 
-    Stand-in path (``_assess_record`` present): genuine Fb from
+    Trace path (``route_trace`` or stand-in ``_assess_record``): Fb from
     ``compute_fb`` and Fp from the pipeline's own ``prose_fp_hits``
-    (computed with real facts + gated_out). Real-runtime path: Fb is
-    UNMEASURED (C1 exposes no pre-gate candidates) and Fp is checked
+    (computed with real facts + gated_out). Older results without a trace
+    have unmeasured Fb, and Fp is checked
     from the prose text + kept sections + the C1 ``facts`` dict (which
     ``_normalize_prose_facts`` accepts as-is — dicts with a "status"
     key). That covers Fp items 1-6, 8, 9 and item 7's cited-not-kept
@@ -574,7 +564,7 @@ def _fb_fp_for_row(out: dict[str, Any]) -> tuple[int | None, bool, list, int | N
     (verified on H5: facts={} gave a false item-3 hit; real facts
     give none). A row with no prose at all has Fp unmeasured.
     """
-    rec = out.get("_assess_record")
+    rec = out.get("route_trace", out.get("_assess_record"))
     if isinstance(rec, dict):
         fb = v7b.compute_fb(rec)
         fp = len(rec.get("prose_fp_hits") or []) if "prose_fp_hits" in rec else None
@@ -582,7 +572,7 @@ def _fb_fp_for_row(out: dict[str, Any]) -> tuple[int | None, bool, list, int | N
             fb["fb_count"], bool(fb["fb_measured"]), fb["fb_details"],
             fp, fp is not None,
         )
-    # Real runtime: no pre-gate data in the C1 dict. Fp is checked from
+    # Older results with no pre-gate data. Fp is checked from
     # the prose + kept sections + the C1 facts dict (NOT empty facts —
     # see docstring: empty facts false-fire item 3 on any HMA 13/13B
     # mention). Item 7's dropped half is unmeasurable (no gated_out),
@@ -676,7 +666,7 @@ def _score_typed_suite(
         per_cat[item.get("category", "all")].append(exact)
 
         fb_count, fb_measured, fb_details, fp_prose, fp_measured = _fb_fp_for_row(out)
-        rec = out.get("_assess_record")
+        rec = out.get("route_trace", out.get("_assess_record"))
         q_flags = (
             len(rec.get("prose_quality_flags") or [])
             if isinstance(rec, dict) and "prose_quality_flags" in rec
@@ -1189,10 +1179,8 @@ def _self_test() -> int:
           f"raw={s['raw_formula_rating']} capped={s['capped_rating']}")
     check("toy_16q_fb0_measured", s["fb_count"] == 0
           and s["rows"][0]["fb_measured"] is True
-          and s["fb_measured"] is False,
-          f"fb={s['fb_count']} suite_measured={s['fb_measured']} "
-          f"(False because the empty-dispositions T2 row is unmeasured — "
-          f"same semantics as the real 16-Q evidence run)")
+          and s["fb_measured"] is True,
+          f"fb={s['fb_count']} suite_measured={s['fb_measured']}")
 
     # 6. compute_fb passthrough: hma-25 gated for no decree -> Fb 1.
     fb = v7b.compute_fb({

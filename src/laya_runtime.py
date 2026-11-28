@@ -258,21 +258,17 @@ def resolve_turn_state(
     #   * a later supported fact DOES overwrite a prior denied one (the
     #     fact is newly asserted — this is MT4 accretion itself).
     #   * "unknown" never overwrites anything.
-    #   * explicit retraction is ONLY via user_confirmation (rank 1, step 2).
+    #   * explicit issue retractions use the separate denied intent below.
     #   * a genuine conflict is flagged ONLY when both sides are grounded in
     #     text spans (prior.span and new.span both present) with opposite
     #     statuses — otherwise the "contradiction" is just absence.
-    # Consequence to record: until Stage 0/1 emits an explicit
-    # "explicitly-denied-in-text" signal (Lane 01 / P1-3), a prose retraction
-    # ("Actually I don't want a divorce") cannot retract without a
-    # confirmation. That is a known limitation, not silent behaviour.
     for key, ev in new_turn.extracted_facts.items():
         ev.turn = turn_id
         prior = state.active_facts.get(key)
         if prior is None:
             state.active_facts[key] = ev
-        elif ev.status == "unknown":
-            pass  # absence of information never overwrites
+        elif ev.status == "unknown" or provenance_rank(ev.source) > provenance_rank(prior.source):
+            pass  # lower provenance and absent evidence cannot displace a decision
         elif ev.status == prior.status:
             state.active_facts[key] = ev  # newer turn refreshes
         elif prior.status == "supported" and ev.status == "denied":
@@ -308,14 +304,10 @@ def resolve_turn_state(
         prior = state.active_issues.get(name)
         if prior is None:
             state.active_issues[name] = ev
-        elif ev.intent == "uncertain":
-            pass  # "uncertain" never overwrites a decided intent
-        elif ev.intent == prior.intent:
-            state.active_issues[name] = ev
-        elif prior.intent == "requested" and ev.intent in ("denied", "uncertain"):
-            pass  # requested is sticky against later-turn absence
-        else:
-            # Later "requested" accretes over prior denied/uncertain.
+        elif ev.intent != "uncertain" and (
+            prior.intent == "uncertain" or provenance_rank(ev.source) <= provenance_rank(prior.source)
+        ):
+            # Grounded denials explicitly retract an issue. Omission is uncertain.
             state.active_issues[name] = ev
 
     # 2. Explicit user confirmations (provenance rank 1 — always win).
@@ -514,7 +506,7 @@ def assess_turn(
     locale: str | None = None,
     mode: str = "auto",
     device: str = "cuda",
-    kannada_strategy: str = "nllb_then_en",
+    kannada_strategy: str = "native_laya",
     with_prose: bool = True,
     session_id: str | None = None,
 ) -> tuple[dict[str, Any], SessionState]:
@@ -653,15 +645,20 @@ def assess_turn(
         "error": extracted.get("error"),
     }
 
-    # Clarifying questions (max 2/turn), ranked by remedy-flip gain.
-    clarifications = rank_clarifications(
-        state, facts, issues, max_questions=2, kept_ids=kept_ids
-    )
-    # Do not duplicate questions already pending from conflict flagging.
-    existing_keys = {q.get("fact_key") for q in state.pending_clarifications}
-    for q in clarifications:
-        if q.get("fact_key") not in existing_keys:
-            state.pending_clarifications.append(q)
+    # Recompute pending questions so confirmed or no-longer-relevant facts drop
+    # off the list. Keep conflict prompts only while the conflict is active.
+    state.pending_clarifications = [
+        q for q in state.pending_clarifications
+        if (ev := state.active_facts.get(q["fact_key"])) is not None
+        and ev.status == "conflicting"
+    ][:2] if result["in_scope"] else []
+    clarifications = []
+    if result["in_scope"] and len(state.pending_clarifications) < 2:
+        clarifications = rank_clarifications(
+            state, facts, issues,
+            max_questions=2 - len(state.pending_clarifications), kept_ids=kept_ids,
+        )
+        state.pending_clarifications.extend(clarifications)
     result["pending_clarifications"] = list(state.pending_clarifications)
     result["clarifying_questions"] = clarifications
 

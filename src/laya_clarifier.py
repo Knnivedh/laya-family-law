@@ -123,8 +123,7 @@ CLARIFICATION_TARGETS: tuple[ClarificationTarget, ...] = (
     ClarificationTarget(
         fact_key="bnss_order",
         question=(
-            "Does the existing maintenance order cite section 144 of the BNSS, "
-            "2023, or does it cite the older section 125 of the CrPC?"
+            "Does the existing maintenance order cite section 144 of the BNSS, 2023?"
         ),
         base_priority=70.0,
         flips_if_yes=("bnss-144-3", "bnss-146"),
@@ -163,10 +162,7 @@ CLARIFICATION_TARGETS: tuple[ClarificationTarget, ...] = (
     ),
     ClarificationTarget(
         fact_key="decree",
-        question=(
-            "Has a decree for your marriage already been passed, or is a "
-            "one-time / lump-sum settlement being sought?"
-        ),
+        question="Has a court already passed a decree in your marriage case?",
         base_priority=40.0,
         flips_if_yes=("hma-25",),
         flips_if_no=("hma-25",),
@@ -195,6 +191,19 @@ CLARIFICATION_TARGETS: tuple[ClarificationTarget, ...] = (
 
 _TARGET_BY_KEY = {t.fact_key: t for t in CLARIFICATION_TARGETS}
 
+_TARGET_ISSUES = {
+    "violence": {"violence", "residence", "dv_compensation"},
+    "urgent_safety_risk": {"violence", "residence", "custody"},
+    "proceeding_pending_hma": {"maintenance", "custody", "stridhan", "joint_property"},
+    "being_filed": {"maintenance", "custody", "stridhan", "joint_property"},
+    "demand_made": {"stridhan"},
+    "minor_child": {"maintenance", "custody"},
+    "mutual_consent": {"divorce"},
+    "decree": {"maintenance"},
+    "domestic_relationship": {"violence", "residence", "dv_compensation"},
+    "custody_claim": {"custody"},
+}
+
 
 def _fact_evidence(facts: dict[str, Any], key: str) -> FactEvidence | None:
     val = facts.get(key)
@@ -221,11 +230,10 @@ def _needs_clarification(
         if key in ("violence", "urgent_safety_risk", "in_scope"):
             return True, "not_extracted"
         return False, "not_raised"
-    rank = provenance_rank(ev.source)
-    if rank <= 3:
-        return False, "already_verified"
     if ev.status == "conflicting":
         return True, "conflicting"
+    if provenance_rank(ev.source) == 1 or ev.span is not None:
+        return False, "already_verified"
     if ev.status == "unknown":
         return True, "unknown"
     if ev.source in ("model_uncertain", "model", "model_suggestion"):
@@ -258,6 +266,8 @@ def rank_clarifications(
     # Plan rule: scope disambiguation fires only when nothing was kept and
     # scope itself is uncertain.
     scope_candidate = kept == [] and not proved_true(facts, "in_scope", default=False)
+    requested = {name for name, item in (issues or {}).items()
+                 if isinstance(item, IssueEvidence) and item.intent == "requested"}
 
     scored: list[tuple[float, ClarificationTarget, str]] = []
     for target in CLARIFICATION_TARGETS:
@@ -266,6 +276,13 @@ def rank_clarifications(
         if target.fact_key == "in_scope" and not scope_candidate:
             # in_scope is only asked when kept == [] (plan §2.3 rule 2);
             # a kept section already proves scope.
+            continue
+        relevant_to = _TARGET_ISSUES.get(target.fact_key)
+        if relevant_to is not None and relevant_to.isdisjoint(requested):
+            continue
+        if target.fact_key == "bnss_order" and not proved_true(facts, "existing_order_enforcement"):
+            continue
+        if target.fact_key == "minor_child" and not proved_true(facts, "child_fact"):
             continue
         askable, why = _needs_clarification(facts, target.fact_key, kept_ids=kept)
         if not askable:

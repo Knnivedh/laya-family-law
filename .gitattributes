@@ -1,0 +1,4 @@
+# Benchmark hashes are computed over the original LF bytes.
+/data/**/*.jsonl text eol=lf
+/ground-truth/*.json text eol=lf
+/test-bank/**/*.json text eol=lf
