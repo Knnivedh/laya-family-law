@@ -199,7 +199,7 @@ def part_b_smoke_f1(train_file: str, val_file: str, n_train: int,
     train, _ = load_corpus_jsonl(train_file)
     groups: dict[tuple, list] = defaultdict(list)
     for r in train:
-        groups[tuple(sorted(r["meta"].get("blocks", [])))].append(r)
+        groups[tuple(sorted((r.get("meta") or {}).get("blocks", [])))].append(r)
     sigs = sorted(groups, key=lambda s: -len(groups[s]))
     dev_sigs = set(sigs[::7])  # ~1/7 of signatures held out
     smoke_train = [r for s in sigs if s not in dev_sigs
@@ -213,7 +213,7 @@ def part_b_smoke_f1(train_file: str, val_file: str, n_train: int,
                     "id": r["id"], "lang": r["lang"], "text": r["text"],
                     "issues": r["issues"], "facts": r["facts"],
                     "enums": r["enums"], "spans": r["spans"],
-                    "meta": r["meta"],
+                    "meta": r.get("meta") or {},
                 }, ensure_ascii=False) + "\n")
 
     train_path = work / "smoke_train.jsonl"
