@@ -18,18 +18,18 @@
 
 ---
 
-## 2. Statutory Regimes NOT Yet Executable (`needs_review` / Phase 2–4 Expansion Target)
+## 2. Chatbot Statutory Guards & Remaining Regimes (`src/laya_chat_api.py` vs Phase 2–4 Graph Expansion)
 
-These regimes were verified against India Code & Supreme Court decisions and **must never be routed by analogy to HMA**:
+Verified against India Code & Supreme Court records so unsupported regimes **never** route by analogy to HMA or wrong civil forums:
 
-1. **Personal Marriage / Divorce Statutes (Governing-Law Gate):**
-   - **Dissolution of Muslim Marriages Act, 1939**, **Muslim Women (Protection of Rights on Divorce) Act, 1986 §3** (*Danial Latifi* lifetime-adequate provision inside *iddat*), **Muslim Women (Protection of Rights on Marriage) Act, 2019 §§5–6** (*Mohd. Abdul Samad v. State of Telangana*, 2024 SC confirming independent CrPC §125/BNSS §144 right alongside 1986 Act).
-   - **Divorce Act, 1869** (Christian marriages), **Parsi Marriage and Divorce Act, 1936**, **Foreign Marriage Act, 1969** (cross-border marriages), **HAMA, 1956 §§18–22**.
-   - **Parents and Senior Citizens Act, 2007 §12:** Prohibits simultaneous double recovery under this Act and BNSS §144 — requires explicit election clarification when a parent mentions a Senior Citizens Tribunal order.
-2. **Adoption, Child Marriage & Civil Registration Granularity:**
-   - **Juvenile Justice (Care and Protection of Children) Act, 2015 §61 (as amended 2021)** & **CARA Adoption Regulations 2022:** Adoption order jurisdiction shifted from Civil Court to the **District Magistrate** (*in camera*, 2-month statutory target) — do **not** route JJ Act adoption to Family Court!
-   - **Prohibition of Child Marriage Act, 2006:** Child marriage voidability + minor safety protections + penalty provisions.
-   - **Registration of Births and Deaths Act, 1969 §§13 & 15:** Currently grouped as single Act-level ID (`births-deaths-act-1969`); needs separate routing between §13 delayed registration (>1 year requires Magistrate order) vs §15 clerical/fraudulent correction.
+1. **Implemented Chatbot Intake Guards (`src/laya_chat_api.py`, 2026-11-28, `128/128` unit tests pass):**
+   - **Personal Marriage Laws Beyond `HMA`/`SMA`:** Explicit declarations under *Muslim personal law* (*Dissolution of Muslim Marriages Act, 1939*, *Muslim Women Acts 1986 §3 & 2019*), *Divorce Act, 1869* (Christian), *Parsi Marriage and Divorce Act, 1936*, or *Foreign Marriage Act, 1969* suppress `HMA_QUESTION` and withhold `hma-*` matrimonial sections cleanly (`needs_review` with `review_reason="unsupported_personal_marriage_law"` + India Code Act URLs), while preserving independent `BNSS §144` / `PWDVA` relief where claimed (*Mohd. Abdul Samad*, 2024 SC).
+   - **Adoption Jurisdiction (`JJ Act, 2015 §61` as amended 2021):** Adoption order queries route cleanly to `needs_review` (`review_reason="adoption_district_magistrate_jurisdiction"`, forum `["District Magistrate"]`) referencing JJ Act §61 & CARA Regulations 2022 rather than Civil/Family Court.
+   - **Senior Citizens Double-Recovery Election (`Parents and Senior Citizens Act, 2007 §12`):** Claims mentioning a Senior Citizens Maintenance Tribunal alongside `BNSS §144` trigger `senior_citizens_election` clarification before awarding `bnss-144`.
+   - **RBD Act, 1969 `§13(3)` vs `§15` Sub-Routes:** Birth certificate assessments distinguish `§13(3)` delayed registration (>1 year requiring First-Class Magistrate order) vs `§15` Registrar correction/cancellation metadata.
+   - **Pre-1 July 2024 Savings (`BNSS §531` / `BNS §358`):** Pre-cutoff `CrPC §125` / `IPC §406` references attach `pre_july_2024_savings=True` statutory savings notices.
+2. **Remaining Non-Executable Graph Regimes (`v7.1` / Phase 2–4 Expansion Targets):**
+   - Native executable graph routes (`Stage 2`) still remain to be built for personal marriage/maintenance statutes (*Muslim Women Acts 1986/2019*, *Divorce Act, 1869*, *Parsi Marriage & Divorce Act, 1936*, *Foreign Marriage Act, 1969*, *HAMA, 1956 §§18–22*), standalone *Prohibition of Child Marriage Act, 2006* routes, and `HMA` vs `MWPSC §12` tribunal integration inside Graph v4.1.
 3. **Unverified Judicial Precedents Registry (`legal/verified_authorities.json`):**
    - Only **1 of 9** listed case authorities (*Sukhdev Singh v. Sukhbir Kaur*, `[2025] 2 SCR 1569`, `2025 INSC 197`) is `verified_primary`; 8 remain `unverified` pending primary judgment reading (`P2.4`/`P2.5`). Consumer prose in `src/laya_prose_v2.py` keeps **zero unverified case-name emissions (`Fp=0`)**.
 

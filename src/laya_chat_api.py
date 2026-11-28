@@ -25,11 +25,21 @@ ACT_SOURCES = {
     "bns": "https://www.indiacode.nic.in/bitstream/123456789/20062/1/a2023-45.pdf",
     "gwa": "https://www.indiacode.nic.in/bitstream/123456789/2318/1/189008.pdf",
     "births": "https://www.indiacode.nic.in/bitstream/123456789/1682/3/a1969-18.pdf",
+    "muslim": "https://www.indiacode.nic.in/handle/123456789/2298",
+    "christian": "https://www.indiacode.nic.in/handle/123456789/2280",
+    "parsi": "https://www.indiacode.nic.in/handle/123456789/2476",
+    "foreign": "https://www.indiacode.nic.in/handle/123456789/1520",
+    "jj_act": "https://cara.wcd.gov.in/",
+    "senior_citizens": "https://www.indiacode.nic.in/bitstream/123456789/6831/1/maintenance_and_welfare_of_parents_and_senior_citizens_act%2C_2007.pdf",
 }
 
 HMA_QUESTION = {
     "id": "hma_applicable",
     "text": "Is your marriage governed by the Hindu Marriage Act? If you are unsure, check your marriage certificate or ask a lawyer.",
+}
+SENIOR_CITIZENS_QUESTION = {
+    "id": "senior_citizens_election",
+    "text": "Section 12 of the Maintenance and Welfare of Parents and Senior Citizens Act, 2007 bars parallel claims under both that Act and BNSS Section 144. Have you elected only one forum?",
 }
 
 _QUOTED = re.compile(r'"[^"]*"|“[^”]*”|‘[^’]*’')
@@ -48,6 +58,48 @@ _MARRIAGE_ACT = re.compile(
 )
 
 
+_PERSONAL_LAW_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("muslim", re.compile(
+        r"\b(?:muslim\s+(?:marriage|personal\s+law|divorce|women\s+act)|nikah|mehr|mahr|iddat|talaq(?:-e-\w+)?|khula|dissolution\s+of\s+muslim\s+marriages)\b",
+        re.I,
+    )),
+    ("christian", re.compile(
+        r"\b(?:christian\s+marriage|indian\s+divorce\s+act|divorce\s+act,?\s*1869|church\s+marriage)\b",
+        re.I,
+    )),
+    ("parsi", re.compile(
+        r"\b(?:parsi\s+(?:marriage|divorce|personal\s+law)|parsi\s+marriage\s+and\s+divorce\s+act)\b",
+        re.I,
+    )),
+    ("foreign", re.compile(
+        r"\b(?:foreign\s+marriage\s+act)\b",
+        re.I,
+    )),
+)
+_ADOPTION_RE = re.compile(
+    r"\b(?:adopt(?:ion|ing)?\s+(?:order|a\s+child|the\s+child|under\s+jj)|cara\s+adoption|district\s+magistrate\s+adoption|step-?parent\s+adoption)\b",
+    re.I,
+)
+_SENIOR_CITIZENS_RE = re.compile(
+    r"\b(?:senior\s+citizens?\s+act|maintenance\s+and\s+welfare\s+of\s+parents|maintenance\s+tribunal)\b",
+    re.I,
+)
+_PRE_JULY_2024_SAVINGS_RE = re.compile(
+    r"\b(?:before\s+(?:1\s+)?july\s+2024|prior\s+to\s+(?:1\s+july\s+2024|bnss|bns)|pre-?(?:bnss|bns)\s+(?:case|offence|application|proceeding)|"
+    r"ipc\s*(?:section|sec\.?|s\.?|§)?\s*406\b|"
+    r"(?:crpc|cr\.?\s*p\.?\s*c\.?)\s*(?:section|sec\.?|s\.?|§)?\s*125\b[^.!?;]{0,25}\b(?:pending|filed\s+(?:before|in\s+202[0-3])))\b",
+    re.I,
+)
+_RBD_DELAYED_RE = re.compile(
+    r"\b(?:delay(?:ed)?\s+registration|after\s+(?:one|1)\s+year|years?\s+late|late\s+birth\s+(?:entry|registration|certificate)|unregistered\s+birth)\b",
+    re.I,
+)
+_RBD_CORRECTION_RE = re.compile(
+    r"\b(?:correct(?:ion|ing)?\s+(?:the\s+)?(?:name|date\s+of\s+birth|spelling|entry|error)|wrong\s+(?:name|date\s+of\s+birth|spelling)|rectif(?:y|ication))\b",
+    re.I,
+)
+
+
 def _declared_marriage_acts(text: str) -> set[str]:
     """Read explicit own-marriage statements without inferring a law from identity."""
     text = _QUOTED.sub(" ", text)
@@ -57,6 +109,35 @@ def _declared_marriage_acts(text: str) -> set[str]:
             acts.update("hma" if match.lower() == "hindu" else "sma"
                         for match in _MARRIAGE_ACT.findall(clause))
     return acts
+
+
+def _declared_other_personal_laws(text: str) -> set[str]:
+    """Read explicit non-HMA/non-SMA marriage-regime statements."""
+    cleaned = _QUOTED.sub(" ", text)
+    laws: set[str] = set()
+    for clause in re.split(r"[,.;!?\n]+", cleaned):
+        if _UNCERTAIN_ACT.search(clause):
+            continue
+        for law_id, pattern in _PERSONAL_LAW_PATTERNS:
+            if pattern.search(clause):
+                laws.add(law_id)
+    return laws
+
+
+def _statutory_advisories(text: str) -> dict[str, Any]:
+    """Check statutory jurisdiction, election, and temporal savings rules."""
+    cleaned = _QUOTED.sub(" ", text)
+    rbd_mode: str | None = None
+    if _RBD_CORRECTION_RE.search(cleaned):
+        rbd_mode = "section_15_correction"
+    elif _RBD_DELAYED_RE.search(cleaned):
+        rbd_mode = "section_13_delayed_registration"
+    return {
+        "adoption_order": bool(_ADOPTION_RE.search(cleaned)),
+        "senior_citizens_act": bool(_SENIOR_CITIZENS_RE.search(cleaned)),
+        "pre_july_2024_savings": bool(_PRE_JULY_2024_SAVINGS_RE.search(cleaned)),
+        "rbd_subroute": rbd_mode,
+    }
 
 
 class InvalidRequest(ValueError):
@@ -172,11 +253,15 @@ def _post_order_result(response: dict[str, Any], intake: dict[str, Any],
 
 def assess_conversation(payload: Any, *, extractor_mode: str = "auto") -> dict[str, Any]:
     """Replay user turns from the same matter and return the last assessment."""
-    if extractor_mode not in ("auto", "evidence"):
+    if extractor_mode not in ("auto", "classifier", "evidence"):
         raise InvalidRequest("Unsupported server extractor_mode.")
     state = None
     hma_confirmation = None
+    senior_election = None
+    senior_citizens_seen = False
+    pre_2024_seen = False
     declared_acts: set[str] = set()
+    declared_other_laws: set[str] = set()
     order_text = None
     bnss_answer = None
     offered: set[str] = set()
@@ -185,15 +270,22 @@ def assess_conversation(payload: Any, *, extractor_mode: str = "auto") -> dict[s
             raise InvalidRequest("Answers must match question IDs from the preceding assessment.")
         confirmations = dict(answers)
         hma_confirmation = confirmations.pop("hma_applicable", hma_confirmation)
+        senior_election = confirmations.pop("senior_citizens_election", senior_election)
         declared_acts.update(_declared_marriage_acts(text))
+        declared_other_laws.update(_declared_other_personal_laws(text))
+        turn_adv = _statutory_advisories(text)
+        senior_citizens_seen = senior_citizens_seen or turn_adv["senior_citizens_act"]
+        pre_2024_seen = pre_2024_seen or turn_adv["pre_july_2024_savings"]
         act_conflict = (
             len(declared_acts) > 1
+            or (bool(declared_other_laws) and ("hma" in declared_acts or hma_confirmation is True))
             or ("sma" in declared_acts and hma_confirmation is True)
             or ("hma" in declared_acts and hma_confirmation is False)
         )
         sma_declared = "sma" in declared_acts and not act_conflict
+        other_law_declared = bool(declared_other_laws) and not act_conflict
         hma_applicable = hma_confirmation
-        if act_conflict or sma_declared:
+        if act_conflict or sma_declared or other_law_declared:
             hma_applicable = False
         elif "hma" in declared_acts:
             hma_applicable = True
@@ -204,16 +296,21 @@ def assess_conversation(payload: Any, *, extractor_mode: str = "auto") -> dict[s
             strict_pwdva=True,
         )
         response = _chat_result(result, hma_applicable)
-        if response["status"] == "needs_review" and any(
-            sec.startswith("hma-") for sec in result["kept_statutory_ids"]
-        ):
-            if act_conflict:
+        hma_kept = any(sec.startswith("hma-") for sec in result["kept_statutory_ids"])
+        if hma_kept:
+            if response["status"] == "needs_review" and act_conflict:
                 response["review_reason"] = "conflicting_governing_marriage_law"
-            elif sma_declared:
+            elif response["status"] == "needs_review" and sma_declared:
                 response["review_reason"] = "unsupported_sma_relief"
+            elif other_law_declared:
+                response["personal_law_regimes"] = sorted(declared_other_laws)
+                response["statutory_sources"] = [ACT_SOURCES[k] for k in sorted(declared_other_laws) if k in ACT_SOURCES]
+                if response["status"] == "needs_review":
+                    response["review_reason"] = "unsupported_personal_marriage_law"
+
         # The maintenance intake verifies the issuing law from the user's text
         # and separates post-order actions from an initial support application.
-        if response["status"] != "out_of_scope":
+        if response["status"] != "out_of_scope" and not turn_adv["adoption_order"]:
             intake = assess_maintenance(text, lambda _: {})
             facts = intake["facts"]
             if any(facts.get(key, {}).get("value") == "yes" for key in ("recover", "vary")):
@@ -239,6 +336,46 @@ def assess_conversation(payload: Any, *, extractor_mode: str = "auto") -> dict[s
                         for key in ("new_support", "interim", "permanent")
                     )
                     _post_order_result(response, intake, order_text, bnss_answer, mixed)
+
+        if turn_adv["adoption_order"]:
+            response.update(
+                status="needs_review",
+                provisions=[],
+                forums=["District Magistrate"],
+                questions=[],
+                answer=None,
+                review_reason="adoption_district_magistrate_jurisdiction",
+                statutory_note="Under the Juvenile Justice (Care and Protection of Children) Act, 2015 s.61 (as amended 2021), adoption orders lie before the District Magistrate rather than the Family or Civil Court.",
+                statutory_sources=[ACT_SOURCES["jj_act"]],
+            )
+        else:
+            if senior_citizens_seen and any(p["id"] == "bnss-144" for p in response["provisions"]):
+                if senior_election is not True:
+                    questions = list(response["questions"])
+                    if all(q["id"] != SENIOR_CITIZENS_QUESTION["id"] for q in questions):
+                        questions.insert(0, SENIOR_CITIZENS_QUESTION)
+                    response["questions"] = questions[:2]
+                    if response["status"] == "assessment":
+                        response["status"] = "needs_clarification"
+                        response["answer"] = None
+                        response["provisions"] = []
+                        response["forums"] = []
+                    response["review_reason"] = "senior_citizens_election_required"
+                    response["statutory_sources"] = [ACT_SOURCES["senior_citizens"]]
+            if pre_2024_seen:
+                response["pre_july_2024_savings"] = True
+                response["statutory_note"] = (
+                    "Proceedings initiated or offences committed before 1 July 2024 remain saved under CrPC 1973 / IPC 1860 per BNSS s.531 and BNS s.358."
+                )
+            if turn_adv["rbd_subroute"]:
+                for prov in response["provisions"]:
+                    if prov["id"] == "births-deaths-act-1969":
+                        prov["subroute"] = turn_adv["rbd_subroute"]
+                        prov["statutory_note"] = (
+                            "RBD Act 1969 s.15 covers correction/cancellation by Registrar inquiry."
+                            if turn_adv["rbd_subroute"] == "section_15_correction"
+                            else "RBD Act 1969 s.13(3) requires a First-Class Magistrate order for delayed registration after one year."
+                        )
         offered = {q["id"] for q in response["questions"]}
     return response
 

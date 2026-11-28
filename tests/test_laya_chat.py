@@ -313,6 +313,74 @@ class IntegratedAuditTests(unittest.TestCase):
         self.assertEqual(payload["extractor"], "classifier")
         self.assertEqual([p["id"] for p in payload["provisions"]], ["bnss-144"])
 
+    def test_non_hma_personal_marriage_law_avoids_hma_prompt_and_keeps_bnss(self):
+        from src.laya_chat_api import assess_conversation
+
+        res = assess_conversation(
+            {"messages": [{"text": "We married under Muslim personal law by nikah. I want a divorce."}]},
+            extractor_mode="evidence",
+        )
+        self.assertEqual(res["status"], "needs_review")
+        self.assertEqual(res.get("review_reason"), "unsupported_personal_marriage_law")
+        self.assertEqual(res.get("personal_law_regimes"), ["muslim"])
+        self.assertEqual(res["questions"], [])
+
+        maint = assess_conversation(
+            {"messages": [{"text": "We married under Muslim law by nikah. My husband stopped giving monthly maintenance."}]},
+            extractor_mode="evidence",
+        )
+        self.assertIn("bnss-144", [p["id"] for p in maint["provisions"]])
+
+    def test_adoption_order_routes_to_district_magistrate_review(self):
+        from src.laya_chat_api import assess_conversation
+
+        res = assess_conversation(
+            {"messages": [{"text": "How do I apply for an adoption order under CARA in Family Court?"}]},
+            extractor_mode="evidence",
+        )
+        self.assertEqual(res["status"], "needs_review")
+        self.assertEqual(res.get("review_reason"), "adoption_district_magistrate_jurisdiction")
+        self.assertEqual(res["forums"], ["District Magistrate"])
+
+    def test_senior_citizens_act_requires_election_before_bnss144(self):
+        from src.laya_chat_api import assess_conversation
+
+        first = assess_conversation(
+            {"messages": [{"text": "I filed a claim before the Maintenance Tribunal under the Senior Citizens Act and also want monthly maintenance."}]},
+            extractor_mode="evidence",
+        )
+        self.assertEqual(first["status"], "needs_clarification")
+        self.assertEqual(first["questions"][0]["id"], "senior_citizens_election")
+        self.assertEqual(first["provisions"], [])
+
+        second = assess_conversation(
+            {"messages": [
+                {"text": "I filed a claim before the Maintenance Tribunal under the Senior Citizens Act and also want monthly maintenance."},
+                {"text": "I am proceeding only under BNSS 144.", "answers": {"senior_citizens_election": True}},
+            ]},
+            extractor_mode="evidence",
+        )
+        self.assertEqual(second["status"], "assessment")
+        self.assertIn("bnss-144", [p["id"] for p in second["provisions"]])
+
+    def test_pre_july_2024_savings_and_rbd_subroute_metadata(self):
+        from src.laya_chat_api import assess_conversation
+
+        savings = assess_conversation(
+            {"messages": [{"text": "My husband took my gold stridhan in an IPC 406 offence committed before 1 July 2024."}]},
+            extractor_mode="evidence",
+        )
+        self.assertTrue(savings.get("pre_july_2024_savings"))
+        self.assertIn("BNSS s.531", savings.get("statutory_note", ""))
+
+        rbd = assess_conversation(
+            {"messages": [{"text": "We need a delayed registration birth certificate for our baby after one year."}]},
+            extractor_mode="evidence",
+        )
+        b_prov = [p for p in rbd["provisions"] if p["id"] == "births-deaths-act-1969"]
+        self.assertEqual(len(b_prov), 1)
+        self.assertEqual(b_prov[0].get("subroute"), "section_13_delayed_registration")
+
 
 if __name__ == "__main__":
     unittest.main()

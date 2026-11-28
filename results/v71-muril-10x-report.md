@@ -24,17 +24,17 @@
 
 | Suite | `evidence` Mode (`p95 ms`) | `auto` Hybrid Mode (`p95 ms`) | Notes |
 |---|---:|---:|---|
-| `validation-500` exact provisions | `219/500` (`29.60 ms`) | **`369/500` (`65.05 ms`)** | Delivered exact answers jumped **`133/500 -> 283/500`**; stalled `needs_review` dropped **`282 -> 58`** |
-| `brutal-230` exact provisions | `169/230` (`29.47 ms`) | **`181/230` (`51.21 ms`)** | `357 TP / 0 FP`; `needs_review` dropped **`21 -> 6`** |
-| `16-Q` exact provisions | `13/16` (`28.67 ms`) | **`13/16` (`31.05 ms`)** | `40 TP / 0 FP`, `12/16` with delivered answer |
-| `kaanoon-28` exact provisions | `10/28` (`36.45 ms`) | **`10/28` (`46.55 ms`)** | HMA routes intentionally await Turn-2 applicability confirmation (`needs_clarification=6`) |
+| `validation-500` exact provisions | `219/500` (`29.60 ms`) | **`369/500` (`71.28 ms`)** | Delivered exact answers jumped **`133/500 -> 283/500`**; stalled `needs_review` dropped **`282 -> 58`** |
+| `brutal-230` exact provisions | `169/230` (`29.47 ms`) | **`181/230` (`50.03 ms`)** | `357 TP / 0 FP`; `needs_review` dropped **`21 -> 6`** |
+| `16-Q` exact provisions | `13/16` (`28.67 ms`) | **`13/16` (`42.03 ms`)** | `40 TP / 0 FP`, `12/16` with delivered answer |
+| `kaanoon-28` exact provisions | `10/28` (`36.45 ms`) | **`10/28` (`44.58 ms`)** | HMA routes intentionally await Turn-2 applicability confirmation (`needs_clarification=6`) |
 
 ---
 
 ## 3. Verification Gates & What Remains Before Public `10/10`
 
-- **Passing gates (`src/` + `tests/`):** `124` unit tests (`4.17s`), Graph v4 integrity + `7/7` frozen SHAs (`34` sections / `66` nodes / `99` edges), `100%` Graph Contract coverage (`61/61` keys, `0` uncovered), `test_prose_renderer_v2` (`246/246` + `15/15` mutants, `Fp=0`), `check_ngram_leakage.py --strict` (`0` 8-gram overlap), and `license` (`0` CC-BY-NC default dependencies). `latency-determinism` remains blocked until ONNX int8 student export (`models/student_int8.onnx`).
+- **Passing gates (`src/` + `tests/`):** `128` unit tests (`4.37s`, including `laya_chat_api` statutory safety guards for non-HMA personal marriage regimes, `JJ Act §61` District Magistrate adoption jurisdiction, `MWPSC §12` election, `RBD §13(3)` vs `§15`, and `BNSS §531`/`BNS §358` savings), Graph v4 integrity + `7/7` frozen SHAs (`34` sections / `66` nodes / `99` edges), `100%` Graph Contract coverage (`61/61` keys, `0` uncovered), `test_prose_renderer_v2` (`246/246` + `15/15` mutants, `Fp=0`), `check_ngram_leakage.py --strict` (`0` 8-gram overlap), and `license` (`0` CC-BY-NC default dependencies). `latency-determinism` remains blocked until ONNX int8 student export (`models/student_int8.onnx`).
 - **Remaining gaps to `10/10`:**
-  1. Statutory expansion documented in `docs/statutory-gaps-government-sources.md` (Muslim Women Acts 1986/2019, Divorce Act 1869, Parsi/Foreign Marriage Acts, HAMA §§18–22, JJ Act §61 DM adoption forum, Parents & Senior Citizens §12 election bar, RBD §§13 vs 15 split, BNSS §531 / BNS §358 pre-July-2024 savings).
-  2. Primary-authority legal verification (`8/9` cases in `legal/verified_authorities.json` remain unverified) and multi-turn independent lawyer adjudication on real citizen chats.
-  3. Blind confirmation on frozen `test-bank/sealed/` and out-of-distribution English real-question recall (bridging `Kaanoon-28` from `50%` and pure classifier `hn_b`/`neg` generalization toward `>= 90%` without rule fallback).
+  1. Executable Stage-2 graph expansion beyond intake review guards (`docs/statutory-gaps-government-sources.md`: *Muslim Women Acts 1986/2019*, *Divorce Act 1869*, *Parsi/Foreign Marriage Acts*, *HAMA §§18–22*, *PCMA 2006*) and wiring `Graph v4` JSON / `layer_a_filter_options()` dynamically (`V71-P2-2`).
+  2. Primary-authority legal verification (`8/9` cases in `legal/verified_authorities.json` remain unverified, `P2.4`/`P2.5`) plus `G12` blind legal rater and `P2.1` native Kannada prose sign-offs (plus native Kannada deterministic templates `src/laya_prose_kn.py`, `V71-P6-1`).
+  3. Blind confirmation on frozen `test-bank/sealed/` (`Sealed Fresh-20` & `Sealed Kannada-8`), independent lawyer-adjudicated real multi-turn chat evaluation (`Kaanoon-28` `14/28`), ONNX INT8 CPU latency (`models/student_int8.onnx`, `V71-P5-2`), and fixing the sole silent Brutal `B-206` miss + `esc_kinds_strict` (`164/230` vs `>= 200/230`) on `Brutal-230`.
