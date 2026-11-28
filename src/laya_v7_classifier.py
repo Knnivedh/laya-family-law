@@ -547,7 +547,11 @@ def load_corpus_jsonl(
         {id, lang, text, issues: {issue: intent}, facts: {fact: state},
          enums: {claimant_sex, claimant_role, modality_time},
          spans: [{start, end, text, key, kind, clause_idx}],
-         clauses: [{text, start, end}]}
+         clauses: [{text, start, end}],
+         meta: {cluster, blocks, split} as carried in the raw record
+         ({} when absent — preserved, not re-derived, so callers that
+         group by meta.blocks, e.g. scripts/smoke_backbones.py part (b),
+         do not crash with KeyError 'meta')}
 
     Missing issues default to "uncertain", missing facts to "unknown",
     missing enums to the "unknown" member (U / other / present).
@@ -658,6 +662,8 @@ def load_corpus_jsonl(
                 "issues": issues, "facts": facts, "enums": enums,
                 "spans": spans,
                 "clauses": clauses,
+                "meta": raw.get("meta") if isinstance(raw.get("meta"), dict)
+                else {},
             })
             report["n_ok"] += 1
     return records, report
